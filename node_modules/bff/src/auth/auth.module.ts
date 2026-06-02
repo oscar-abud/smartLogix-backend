@@ -9,10 +9,10 @@ import { HttpModule } from '@nestjs/axios';
 @Module({
   imports: [
     PassportModule,
-    HttpModule, // Lo necesitaremos para verificar usuarios con otros microservicios
+    HttpModule,
     JwtModule.register({
-      secret: 'TU_FIRMA_SECRETA_SUPER_SEGURA', // En producción usa process.env.JWT_SECRET
-      signOptions: { expiresIn: '1d' }, // El token expira en 1 día
+      secret: process.env.JWT_SECRET || 'TU_FIRMA_SECRETA_SUPER_SEGURA',
+      signOptions: { expiresIn: '1d' },
     }),
   ],
   controllers: [AuthController],
