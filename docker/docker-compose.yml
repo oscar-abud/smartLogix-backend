@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # Base de datos MS Inventario
+  inventory-db:
+    image: postgres:15-alpine
+    container_name: smartlogix-inventory-db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: inventory_user
+      POSTGRES_PASSWORD: inventory_password
+      POSTGRES_DB: smartlogix_inventory
+    volumes:
+      - inventory_db_data:/var/lib/postgresql/data
+
+  # Base de datos MS Ordenes
+  orders-db:
+    image: postgres:15-alpine
+    container_name: smartlogix-orders-db
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: orders_user
+      POSTGRES_PASSWORD: orders_password
+      POSTGRES_DB: smartlogix_orders
+    volumes:
+      - orders_db_data:/var/lib/postgresql/data
+
+volumes:
+  inventory_db_data:
+  orders_db_data:
