@@ -9,7 +9,7 @@ export class AuthService {
   async login(loginDto: any) {
     const { email, password } = loginDto;
 
-    // 💡 Simulación temporal (Luego harás un fetch al MS correspondiente)
+    // Simulación temporal (Luego harás un fetch al MS correspondiente)
     if (email === 'admin@smartlogix.com' && password === '123456') {
       const payload = { email: email, sub: 'user_id_123', role: 'admin' };
       
