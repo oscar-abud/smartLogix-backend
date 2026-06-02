@@ -9,6 +9,10 @@
   ],
   "main": "index.js",
   "scripts": {
+    "dev:bff": "npm run start:dev --workspace=apps/bff",
+    "dev:inventory": "npm run start:dev --workspace=apps/ms-inventory",
+    "dev:orders": "npm run start:dev --workspace=apps/ms-orders",
+    "dev:shipping": "npm run dev --workspace=apps/ms-shipping",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
