@@ -1,24 +1,40 @@
-// apps/bff/src/auth/auth.service.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { HttpService } from '@nestjs/axios'; // 1. Importamos HttpService
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly jwtService: JwtService) {}
+  private readonly usersServiceUrl = 'http://localhost:3001/api/users';
+
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly httpService: HttpService,
+  ) {}
 
   async login(loginDto: any) {
-    const { email, password } = loginDto;
+    try {
+      const { data: usuarioValido } = await firstValueFrom(
+        this.httpService.post(`${this.usersServiceUrl}/validate`, loginDto)
+      );
 
-    // Simulación temporal (Luego harás un fetch al MS correspondiente)
-    if (email === 'admin@smartlogix.com' && password === '123456') {
-      const payload = { email: email, sub: 'user_id_123', role: 'admin' };
+      // Si el microservicio responde con éxito, estructuramos el Payload del JWT
+      const payload = { 
+        email: usuarioValido.email, 
+        sub: usuarioValido.id, 
+        role: usuarioValido.role 
+      };
       
       return {
         access_token: this.jwtService.sign(payload),
-        user: { email, role: 'admin' }
+        user: { 
+          email: usuarioValido.email, 
+          role: usuarioValido.role 
+        }
       };
-    }
 
-    throw new UnauthorizedException('Credenciales incorrectas');
+    } catch (error) {
+      throw new UnauthorizedException('Credenciales incorrectas o usuario no encontrado');
+    }
   }
 }
