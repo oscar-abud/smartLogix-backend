@@ -29,6 +29,20 @@ services:
     volumes:
       - orders_db_data:/var/lib/postgresql/data
 
+  users-db:
+    image: postgres:15-alpine
+    container_name: smartlogix-users-db
+    restart: always
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: users_user
+      POSTGRES_PASSWORD: users_password
+      POSTGRES_DB: smartlogix_users
+    volumes:
+      - users_db_data:/var/lib/postgresql/data
+
 volumes:
   inventory_db_data:
   orders_db_data:
+  users_db_data:
