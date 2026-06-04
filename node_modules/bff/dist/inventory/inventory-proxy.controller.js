@@ -16,6 +16,7 @@ exports.InventoryProxyController = void 0;
 const common_1 = require("@nestjs/common");
 const axios_1 = require("@nestjs/axios");
 const passport_1 = require("@nestjs/passport");
+const swagger_1 = require("@nestjs/swagger");
 let InventoryProxyController = class InventoryProxyController {
     httpService;
     constructor(httpService) {
@@ -48,6 +49,14 @@ exports.InventoryProxyController = InventoryProxyController;
 __decorate([
     (0, common_1.All)('*'),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Pasamanos automático de Inventario',
+        description: 'Rutas disponibles en ms-inventory:\n\n' +
+            '• **GET /** - Listar todos los productos\n' +
+            '• **GET /:id** - Obtener un producto por ID\n' +
+            '• **POST /** - Crear un producto\n' +
+            '• **DELETE /:id** - Eliminar un producto'
+    }),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),

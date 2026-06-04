@@ -10,7 +10,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
-    .setTitle('SmartLogix - Microservicio de Usuarios')
+    .setTitle('SmartLogix - Microservicio de Inventario')
     .setDescription('API interna para la gestión y validación de usuarios')
     .setVersion('1.0')
     .addTag('Inventory')

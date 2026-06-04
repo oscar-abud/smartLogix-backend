@@ -10,12 +10,19 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const auth_module_1 = require("./auth/auth.module");
 const inventory_module_1 = require("./inventory/inventory.module");
+const axios_1 = require("@nestjs/axios");
+const docs_controller_1 = require("./docs.controller");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [auth_module_1.AuthModule, inventory_module_1.InventoryModule]
+        imports: [
+            axios_1.HttpModule,
+            auth_module_1.AuthModule,
+            inventory_module_1.InventoryModule,
+        ],
+        controllers: [docs_controller_1.DocsController],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

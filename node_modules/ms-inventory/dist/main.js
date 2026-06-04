@@ -9,7 +9,7 @@ async function bootstrap() {
     app.setGlobalPrefix('api');
     app.useGlobalPipes(new common_1.ValidationPipe());
     const config = new swagger_1.DocumentBuilder()
-        .setTitle('SmartLogix - Microservicio de Usuarios')
+        .setTitle('SmartLogix - Microservicio de Inventario')
         .setDescription('API interna para la gestión y validación de usuarios')
         .setVersion('1.0')
         .addTag('Inventory')
@@ -18,8 +18,8 @@ async function bootstrap() {
     swagger_1.SwaggerModule.setup('docs', app, document);
     const puerto = process.env.PORT ?? 3002;
     await app.listen(puerto);
-    console.log(...oo_oo(`1807973232_26_2_26_74_4`, `MS-Inventory corriendo en: http://localhost:${puerto}/api`));
-    console.log(...oo_oo(`1807973232_27_2_27_74_4`, `Documentación Swagger en: http://localhost:${puerto}/docs`));
+    console.log(...oo_oo(`897059469_26_2_26_74_4`, `MS-Inventory corriendo en: http://localhost:${puerto}/api`));
+    console.log(...oo_oo(`897059469_27_2_27_74_4`, `Documentación Swagger en: http://localhost:${puerto}/docs`));
 }
 bootstrap();
 ;

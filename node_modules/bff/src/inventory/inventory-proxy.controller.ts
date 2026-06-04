@@ -3,13 +3,22 @@ import { Controller, All, Req, Res, UseGuards, HttpStatus } from '@nestjs/common
 import type { Request, Response } from 'express';
 import { HttpService } from '@nestjs/axios';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('inventory-proxy') // URL base: http://localhost:3000/api/inventory-proxy
 export class InventoryProxyController {
   constructor(private readonly httpService: HttpService) {}
 
   @All('*')
-  @UseGuards(AuthGuard('jwt')) // Protegemos el inventario para que solo usuarios logueados operen
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ 
+    summary: 'Pasamanos automático de Inventario', 
+    description: 'Rutas disponibles en ms-inventory:\n\n' +
+                 '• **GET /** - Listar todos los productos\n' +
+                 '• **GET /:id** - Obtener un producto por ID\n' +
+                 '• **POST /** - Crear un producto\n' +
+                 '• **DELETE /:id** - Eliminar un producto'
+  }) // Protegemos el inventario para que solo usuarios logueados operen
   async proxyToInventoryModule(@Req() req: Request, @Res() res: Response) {
     const subRoute = req.params[0] && req.params[0] !== '/' ? req.params[0] : '';
     
