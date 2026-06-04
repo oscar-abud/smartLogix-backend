@@ -6,6 +6,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { HttpModule } from '@nestjs/axios';
 import { UsersProxyController } from './users-proxy.controller';
+import { InventoryProxyController } from '../inventory/inventory-proxy.controller';
 
 @Module({
   imports: [

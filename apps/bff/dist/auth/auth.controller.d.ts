@@ -13,4 +13,5 @@ export declare class AuthController {
     register(registerDto: any): Promise<any>;
     getAll(): Promise<any>;
     findUser(id: string): Promise<any>;
+    deleteUser(id: string): Promise<any>;
 }

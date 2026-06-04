@@ -17,4 +17,8 @@ export declare class UsersController {
         role: string;
         createdAt: Date;
     }>;
+    deleteUser(id: string): Promise<{
+        message: string;
+        id: string;
+    }>;
 }

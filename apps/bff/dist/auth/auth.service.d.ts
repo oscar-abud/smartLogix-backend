@@ -15,4 +15,5 @@ export declare class AuthService {
     register(registerDto: any): Promise<any>;
     getAll(): Promise<any>;
     getUser(id: string): Promise<any>;
+    deleteUser(id: string): Promise<any>;
 }

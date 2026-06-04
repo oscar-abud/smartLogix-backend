@@ -87,4 +87,21 @@ export class AuthService {
       );
     }
   }
+
+  async deleteUser(id: string) {
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.delete(`${this.usersServiceUrl}/${id}`,)
+      );
+      
+      // Le devolvemos al frontend el usuario que el microservicio acaba de crear
+      return data;
+      
+    } catch (error: any) {
+      // Si el microservicio falla (ej: correo duplicado), atrapamos el error y lo lanzamos limpio
+      throw new UnauthorizedException(
+        error.response?.data?.message || 'Error al eliminar un usuario'
+      );
+    }
+  }
 }

@@ -18,4 +18,8 @@ export declare class UsersService {
     }>;
     findAll(): Promise<string | User[]>;
     getUser(id: string): Promise<string | User>;
+    deleteUser(id: string): Promise<{
+        message: string;
+        id: string;
+    }>;
 }
