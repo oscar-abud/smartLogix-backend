@@ -51,6 +51,15 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException(error.response?.data?.message || 'Error al registrar el usuario en el sistema');
         }
     }
+    async getAll() {
+        try {
+            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`${this.usersServiceUrl}`));
+            return data;
+        }
+        catch (error) {
+            throw new common_1.UnauthorizedException(error.response?.data?.message || 'Error al registrar el usuario en el sistema');
+        }
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([

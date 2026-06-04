@@ -13,4 +13,5 @@ export declare class AuthService {
         };
     }>;
     register(registerDto: any): Promise<any>;
+    getAll(): Promise<any>;
 }

@@ -16,4 +16,5 @@ export declare class UsersService {
         email: string;
         role: string;
     }>;
+    findAll(): Promise<string | User[]>;
 }

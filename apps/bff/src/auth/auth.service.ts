@@ -54,4 +54,20 @@ export class AuthService {
       );
     }
   }
+
+  async getAll() {
+    try {
+      // Usamos firstValueFrom igual que en el login para pegarle al ms-users
+      const { data } = await firstValueFrom(
+        this.httpService.get(`${this.usersServiceUrl}`)
+      );
+      
+      return data;
+    } catch (error: any) {
+      // Si el microservicio falla (ej: correo duplicado), atrapamos el error y lo lanzamos limpio
+      throw new UnauthorizedException(
+        error.response?.data?.message || 'Error al registrar el usuario en el sistema'
+      );
+    }
+  }
 }

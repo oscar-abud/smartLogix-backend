@@ -28,11 +28,8 @@ let AuthController = class AuthController {
     async register(registerDto) {
         return this.authService.register(registerDto);
     }
-    getProfile(req) {
-        return {
-            message: 'Tienes acceso al BFF',
-            user: req.user,
-        };
+    getUser() {
+        return this.authService.getAll();
     }
 };
 exports.AuthController = AuthController;
@@ -52,12 +49,11 @@ __decorate([
 ], AuthController.prototype, "register", null);
 __decorate([
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
-    (0, common_1.Get)('profile'),
-    __param(0, (0, common_1.Req)()),
+    (0, common_1.Get)('user'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
-], AuthController.prototype, "getProfile", null);
+], AuthController.prototype, "getUser", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

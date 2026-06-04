@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 export declare class UsersController {
     private readonly usersService;
     constructor(usersService: UsersService);
+    findAll(): Promise<string | import("./entities/user.entity").User[]>;
     validateUser(validateUserDto: ValidateUserDto): Promise<{
         id: string;
         email: string;

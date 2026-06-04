@@ -18,11 +18,8 @@ export class AuthController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get('profile')
-  getProfile(@Req() req: any) {
-    return {
-      message: 'Tienes acceso al BFF',
-      user: req.user,
-    };
+  @Get('user')
+  getUser() {
+    return this.authService.getAll();
   }
 }

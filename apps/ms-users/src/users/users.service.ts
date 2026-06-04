@@ -56,4 +56,14 @@ export class UsersService {
       role: user.role,
     };
   }
+
+  async findAll(){
+    try {
+      const users = await this.userRepository.find();
+      console.log(users)
+      return users;
+    } catch (error) {
+      return `Error interno del servidor ${error}`
+    }
+  }
 }

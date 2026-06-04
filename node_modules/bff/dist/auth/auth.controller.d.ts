@@ -11,8 +11,5 @@ export declare class AuthController {
         };
     }>;
     register(registerDto: any): Promise<any>;
-    getProfile(req: any): {
-        message: string;
-        user: any;
-    };
+    getUser(): Promise<any>;
 }
