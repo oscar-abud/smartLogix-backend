@@ -66,4 +66,16 @@ export class UsersService {
       return `Error interno del servidor ${error}`
     }
   }
+
+  async getUser(id: string) {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id }
+      });
+
+      return user;
+    } catch (error) {
+      return `Error interno del servidor ${error}`
+    }
+  }
 }

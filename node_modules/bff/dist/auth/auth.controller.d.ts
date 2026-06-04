@@ -11,5 +11,6 @@ export declare class AuthController {
         };
     }>;
     register(registerDto: any): Promise<any>;
-    getUser(): Promise<any>;
+    getAll(): Promise<any>;
+    findUser(id: string): Promise<any>;
 }

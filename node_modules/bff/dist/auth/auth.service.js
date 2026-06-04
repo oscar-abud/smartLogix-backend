@@ -57,7 +57,16 @@ let AuthService = class AuthService {
             return data;
         }
         catch (error) {
-            throw new common_1.UnauthorizedException(error.response?.data?.message || 'Error al registrar el usuario en el sistema');
+            throw new common_1.UnauthorizedException(error.response?.data?.message || 'Error al buscar usuarios');
+        }
+    }
+    async getUser(id) {
+        try {
+            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`${this.usersServiceUrl}/${id}`));
+            return data;
+        }
+        catch (error) {
+            throw new common_1.UnauthorizedException(error.response?.data?.message || 'Error al buscar un usuario');
         }
     }
 };

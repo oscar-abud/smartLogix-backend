@@ -25,6 +25,9 @@ let UsersController = class UsersController {
     async findAll() {
         return this.usersService.findAll();
     }
+    async findUser(id) {
+        return this.usersService.getUser(id);
+    }
     async validateUser(validateUserDto) {
         return this.usersService.validateUserCredentials(validateUserDto);
     }
@@ -39,6 +42,13 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "findUser", null);
 __decorate([
     (0, common_1.Post)('validate'),
     __param(0, (0, common_1.Body)()),

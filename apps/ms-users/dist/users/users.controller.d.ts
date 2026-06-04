@@ -5,6 +5,7 @@ export declare class UsersController {
     private readonly usersService;
     constructor(usersService: UsersService);
     findAll(): Promise<string | import("./entities/user.entity").User[]>;
+    findUser(id: string): Promise<string | import("./entities/user.entity").User>;
     validateUser(validateUserDto: ValidateUserDto): Promise<{
         id: string;
         email: string;

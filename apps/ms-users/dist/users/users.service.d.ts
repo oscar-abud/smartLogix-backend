@@ -17,4 +17,5 @@ export declare class UsersService {
         role: string;
     }>;
     findAll(): Promise<string | User[]>;
+    getUser(id: string): Promise<string | User>;
 }

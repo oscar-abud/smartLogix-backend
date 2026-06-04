@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Req, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto'; // 1. Importamos el DTO
 import { AuthGuard } from '@nestjs/passport';
@@ -19,7 +19,13 @@ export class AuthController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('user')
-  getUser() {
+  getAll() {
     return this.authService.getAll();
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('user/:id')
+  async findUser(@Param('id') id: string){
+    return this.authService.getUser(id);
   }
 }
