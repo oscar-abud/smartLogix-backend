@@ -1,12 +1,16 @@
 import { JwtService } from '@nestjs/jwt';
+import { HttpService } from '@nestjs/axios';
 export declare class AuthService {
     private readonly jwtService;
-    constructor(jwtService: JwtService);
+    private readonly httpService;
+    private readonly usersServiceUrl;
+    constructor(jwtService: JwtService, httpService: HttpService);
     login(loginDto: any): Promise<{
         access_token: string;
         user: {
             email: any;
-            role: string;
+            role: any;
         };
     }>;
+    register(registerDto: any): Promise<any>;
 }

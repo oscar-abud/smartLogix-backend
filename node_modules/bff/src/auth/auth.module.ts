@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { HttpModule } from '@nestjs/axios';
+import { UsersProxyController } from './users-proxy.controller';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { HttpModule } from '@nestjs/axios';
       signOptions: { expiresIn: '1d' },
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, UsersProxyController],
   providers: [AuthService, JwtStrategy],
   exports: [AuthService],
 })

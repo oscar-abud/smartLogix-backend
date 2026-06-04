@@ -12,6 +12,11 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  @Post('register')
+  async register(@Body() registerDto: any) {
+    return this.authService.register(registerDto);
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @Get('profile')
   getProfile(@Req() req: any) {

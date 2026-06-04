@@ -15,22 +15,17 @@ const axios_1 = require("@nestjs/axios");
 const rxjs_1 = require("rxjs");
 let OrdersService = class OrdersService {
     httpService;
-    inventoryUrl = 'http://localhost:3001/api/inventory';
     ordersUrl = 'http://localhost:3002/api/orders';
     constructor(httpService) {
         this.httpService = httpService;
     }
-    async crearOrdenOrquestada(datosOrden) {
+    async redireccionarAMsOrders(datosOrden) {
         try {
-            const { data: tieneStock } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`${this.inventoryUrl}/check-stock/${datosOrden.productoId}`));
-            if (!tieneStock) {
-                throw new common_1.HttpException('No hay stock disponible para este producto', common_1.HttpStatus.BAD_REQUEST);
-            }
-            const { data: nuevaOrden } = await (0, rxjs_1.firstValueFrom)(this.httpService.post(this.ordersUrl, datosOrden));
-            return nuevaOrden;
+            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.post(this.ordersUrl, datosOrden));
+            return data;
         }
         catch (error) {
-            throw new common_1.HttpException(error.response?.data?.message || 'Error al procesar la orden en el ecosistema', error.status || common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new common_1.HttpException(error.response?.data?.message || 'Error en el servidor de Órdenes', error.status || common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };

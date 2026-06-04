@@ -37,4 +37,21 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales incorrectas o usuario no encontrado');
     }
   }
+
+  async register(registerDto: any) {
+    try {
+      // Usamos firstValueFrom igual que en el login para pegarle al ms-users
+      const { data } = await firstValueFrom(
+        this.httpService.post(`${this.usersServiceUrl}/register`, registerDto)
+      );
+      
+      // Le devolvemos al frontend el usuario que el microservicio acaba de crear
+      return data;
+    } catch (error: any) {
+      // Si el microservicio falla (ej: correo duplicado), atrapamos el error y lo lanzamos limpio
+      throw new UnauthorizedException(
+        error.response?.data?.message || 'Error al registrar el usuario en el sistema'
+      );
+    }
+  }
 }

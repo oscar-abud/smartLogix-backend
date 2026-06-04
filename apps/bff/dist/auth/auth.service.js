@@ -12,26 +12,50 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
+const axios_1 = require("@nestjs/axios");
+const rxjs_1 = require("rxjs");
 let AuthService = class AuthService {
     jwtService;
-    constructor(jwtService) {
+    httpService;
+    usersServiceUrl = 'http://localhost:3001/api/users';
+    constructor(jwtService, httpService) {
         this.jwtService = jwtService;
+        this.httpService = httpService;
     }
     async login(loginDto) {
-        const { email, password } = loginDto;
-        if (email === 'admin@smartlogix.com' && password === '123456') {
-            const payload = { email: email, sub: 'user_id_123', role: 'admin' };
+        try {
+            const { data: usuarioValido } = await (0, rxjs_1.firstValueFrom)(this.httpService.post(`${this.usersServiceUrl}/validate`, loginDto));
+            const payload = {
+                email: usuarioValido.email,
+                sub: usuarioValido.id,
+                role: usuarioValido.role
+            };
             return {
                 access_token: this.jwtService.sign(payload),
-                user: { email, role: 'admin' }
+                user: {
+                    email: usuarioValido.email,
+                    role: usuarioValido.role
+                }
             };
         }
-        throw new common_1.UnauthorizedException('Credenciales incorrectas');
+        catch (error) {
+            throw new common_1.UnauthorizedException('Credenciales incorrectas o usuario no encontrado');
+        }
+    }
+    async register(registerDto) {
+        try {
+            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.post(`${this.usersServiceUrl}/register`, registerDto));
+            return data;
+        }
+        catch (error) {
+            throw new common_1.UnauthorizedException(error.response?.data?.message || 'Error al registrar el usuario en el sistema');
+        }
     }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [jwt_1.JwtService])
+    __metadata("design:paramtypes", [jwt_1.JwtService,
+        axios_1.HttpService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

@@ -15,17 +15,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrdersController = void 0;
 const common_1 = require("@nestjs/common");
 const orders_service_1 = require("./orders.service");
+const passport_1 = require("@nestjs/passport");
 let OrdersController = class OrdersController {
     ordersService;
     constructor(ordersService) {
         this.ordersService = ordersService;
     }
     async crearOrden(datosOrden) {
-        return this.ordersService.crearOrdenOrquestada(datosOrden);
+        return this.ordersService.redireccionarAMsOrders(datosOrden);
     }
 };
 exports.OrdersController = OrdersController;
 __decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
