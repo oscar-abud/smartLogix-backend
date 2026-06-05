@@ -15,7 +15,7 @@ export class AuthService {
   async login(loginDto: any) {
     try {
       const { data: usuarioValido } = await firstValueFrom(
-        this.httpService.post(`${this.usersServiceUrl}/validate`, loginDto)
+        this.httpService.post(`${this.usersServiceUrl}/login`, loginDto)
       );
 
       // Si el microservicio responde con éxito, estructuramos el Payload del JWT

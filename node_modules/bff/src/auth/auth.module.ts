@@ -1,3 +1,4 @@
+// apps/bff/src/auth/auth.module.ts
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
@@ -5,8 +6,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { HttpModule } from '@nestjs/axios';
-import { UsersProxyController } from './users-proxy.controller';
-import { InventoryProxyController } from '../inventory/inventory-proxy.controller';
 
 @Module({
   imports: [
@@ -17,8 +16,8 @@ import { InventoryProxyController } from '../inventory/inventory-proxy.controlle
       signOptions: { expiresIn: '1d' },
     }),
   ],
-  controllers: [AuthController, UsersProxyController],
+  controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
-  exports: [AuthService],
+  exports: [AuthService, JwtModule, PassportModule], // 👈 Exportamos esto para que AppModule los pueda usar
 })
 export class AuthModule {}

@@ -9,14 +9,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.InventoryModule = void 0;
 const common_1 = require("@nestjs/common");
 const axios_1 = require("@nestjs/axios");
-const inventory_proxy_controller_1 = require("./inventory-proxy.controller");
+const inventory_controller_1 = require("./inventory.controller");
 let InventoryModule = class InventoryModule {
 };
 exports.InventoryModule = InventoryModule;
 exports.InventoryModule = InventoryModule = __decorate([
     (0, common_1.Module)({
         imports: [axios_1.HttpModule],
-        controllers: [inventory_proxy_controller_1.InventoryProxyController],
+        controllers: [inventory_controller_1.InventoryController],
     })
 ], InventoryModule);
 //# sourceMappingURL=inventory.module.js.map

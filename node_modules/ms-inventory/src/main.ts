@@ -14,6 +14,7 @@ async function bootstrap() {
     .setDescription('API interna para la gestión y validación de usuarios')
     .setVersion('1.0')
     .addTag('Inventory')
+    .addBearerAuth()
     .build();
     
   const document = SwaggerModule.createDocument(app, config);

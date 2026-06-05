@@ -14,7 +14,6 @@ const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
 const jwt_strategy_1 = require("./strategies/jwt.strategy");
 const axios_1 = require("@nestjs/axios");
-const users_proxy_controller_1 = require("./users-proxy.controller");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -28,9 +27,9 @@ exports.AuthModule = AuthModule = __decorate([
                 signOptions: { expiresIn: '1d' },
             }),
         ],
-        controllers: [auth_controller_1.AuthController, users_proxy_controller_1.UsersProxyController],
+        controllers: [auth_controller_1.AuthController],
         providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],
-        exports: [auth_service_1.AuthService],
+        exports: [auth_service_1.AuthService, jwt_1.JwtModule, passport_1.PassportModule],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

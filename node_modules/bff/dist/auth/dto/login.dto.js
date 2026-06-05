@@ -11,19 +11,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LoginDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class LoginDto {
     email;
     password;
 }
 exports.LoginDto = LoginDto;
 __decorate([
-    (0, class_validator_1.IsEmail)({}, { message: 'El correo electrónico no es válido' }),
-    (0, class_validator_1.IsNotEmpty)({ message: 'El correo electrónico es requerido' }),
+    (0, swagger_1.ApiProperty)({ example: 'oscar@smartlogix.com', description: 'Correo electrónico del usuario' }),
+    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], LoginDto.prototype, "email", void 0);
 __decorate([
-    (0, class_validator_1.IsNotEmpty)({ message: 'La contraseña es requerida' }),
-    (0, class_validator_1.MinLength)(6, { message: 'La contraseña debe tener al menos 6 caracteres' }),
+    (0, swagger_1.ApiProperty)({ example: 'password123', description: 'Contraseña de acceso (mínimo 6 caracteres)' }),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], LoginDto.prototype, "password", void 0);
 //# sourceMappingURL=login.dto.js.map

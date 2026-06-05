@@ -24,7 +24,7 @@ let AuthService = class AuthService {
     }
     async login(loginDto) {
         try {
-            const { data: usuarioValido } = await (0, rxjs_1.firstValueFrom)(this.httpService.post(`${this.usersServiceUrl}/validate`, loginDto));
+            const { data: usuarioValido } = await (0, rxjs_1.firstValueFrom)(this.httpService.post(`${this.usersServiceUrl}/login`, loginDto));
             const payload = {
                 email: usuarioValido.email,
                 sub: usuarioValido.id,

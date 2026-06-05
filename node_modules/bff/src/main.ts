@@ -1,43 +1,24 @@
-// apps/bff/src/main.ts
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { SwaggerModule } from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
 
-  // Configuración limpia usando el explorador nativo de NestJS
-  const swaggerOptions = {
-    explorer: true,
-    swaggerOptions: {
-      urls: [
-        {
-          url: '/api/docs-json/users',
-          name: 'Módulo de Usuarios (ms-users)',
-        },
-        {
-          url: '/api/docs-json/inventory',
-          name: 'Módulo de Inventario (ms-inventory)',
-        },
-      ],
-    },
-  };
+  // Swagger lee de forma nativa tus controladores manuales del BFF
+  const config = new DocumentBuilder()
+    .setTitle('SmartLogix BFF Gateway')
+    .setDescription('Documentación unificada y centralizada del Gateway')
+    .setVersion('1.0.0')
+    .addBearerAuth()
+    .build();
 
-  const baseDocument = {
-    openapi: '3.0.0',
-    info: {
-      title: 'SmartLogix BFF Gateway',
-      version: '1.0.0',
-    },
-    paths: {},
-  };
-
-  // Pasamos las opciones con explorer habilitado
-  SwaggerModule.setup('docs', app, baseDocument as any, swaggerOptions);
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document); // Ya no necesitas pasares 'urls' dinámicas ni explorers rústicos
 
   await app.listen(3000);
-  console.log('BFF unificado corriendo');
-  console.log('Swagger centralizado en http://localhost:3000/docs');
+  console.log('BFF unificado corriendo de forma manual y segura');
+  console.log('Swagger centralizado disponible en http://localhost:3000/docs');
 }
 bootstrap();

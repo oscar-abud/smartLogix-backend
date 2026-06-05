@@ -16,6 +16,7 @@ exports.InventoryController = void 0;
 const common_1 = require("@nestjs/common");
 const inventory_service_1 = require("./inventory.service");
 const create_inventory_dto_1 = require("./dto/create-inventory.dto");
+const swagger_1 = require("@nestjs/swagger");
 let InventoryController = class InventoryController {
     inventoryService;
     constructor(inventoryService) {
@@ -36,12 +37,14 @@ let InventoryController = class InventoryController {
 };
 exports.InventoryController = InventoryController;
 __decorate([
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Get)(''),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "findAll", null);
 __decorate([
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
@@ -49,6 +52,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "findUser", null);
 __decorate([
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Post)(''),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -56,6 +60,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "createProduct", null);
 __decorate([
+    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
