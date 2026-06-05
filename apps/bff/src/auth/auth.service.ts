@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { HttpService } from '@nestjs/axios'; // 1. Importamos HttpService
 import { firstValueFrom } from 'rxjs';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -75,6 +76,23 @@ export class AuthService {
     try {
       const { data } = await firstValueFrom(
         this.httpService.get(`${this.usersServiceUrl}/${id}`,)
+      );
+      
+      // Le devolvemos al frontend el usuario que el microservicio acaba de crear
+      return data;
+      
+    } catch (error: any) {
+      // Si el microservicio falla (ej: correo duplicado), atrapamos el error y lo lanzamos limpio
+      throw new UnauthorizedException(
+        error.response?.data?.message || 'Error al buscar un usuario'
+      );
+    }
+  }
+
+  async updateUser(id: string, updateUserDto: UpdateUserDto) {
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.patch(`${this.usersServiceUrl}/${id}`, updateUserDto)
       );
       
       // Le devolvemos al frontend el usuario que el microservicio acaba de crear

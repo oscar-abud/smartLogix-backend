@@ -69,6 +69,15 @@ let AuthService = class AuthService {
             throw new common_1.UnauthorizedException(error.response?.data?.message || 'Error al buscar un usuario');
         }
     }
+    async updateUser(id, updateUserDto) {
+        try {
+            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.patch(`${this.usersServiceUrl}/${id}`, updateUserDto));
+            return data;
+        }
+        catch (error) {
+            throw new common_1.UnauthorizedException(error.response?.data?.message || 'Error al buscar un usuario');
+        }
+    }
     async deleteUser(id) {
         try {
             const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.delete(`${this.usersServiceUrl}/${id}`));

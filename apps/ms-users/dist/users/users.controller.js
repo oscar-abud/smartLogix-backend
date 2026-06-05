@@ -18,6 +18,7 @@ const users_service_1 = require("./users.service");
 const validate_user_dto_1 = require("./dto/validate-user.dto");
 const create_user_dto_1 = require("./dto/create-user.dto");
 const swagger_1 = require("@nestjs/swagger");
+const update_user_dto_1 = require("./dto/update-user.dto");
 let UsersController = class UsersController {
     usersService;
     constructor(usersService) {
@@ -34,6 +35,9 @@ let UsersController = class UsersController {
     }
     async registerUser(registerUserDto) {
         return this.usersService.registerUser(registerUserDto);
+    }
+    async updateUser(id, updateUserDto) {
+        return this.usersService.updateUser(id, updateUserDto);
     }
     async deleteUser(id) {
         return this.usersService.deleteUser(id);
@@ -69,6 +73,15 @@ __decorate([
     __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "registerUser", null);
+__decorate([
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_user_dto_1.UpdateUserDto]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "updateUser", null);
 __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Delete)(':id'),

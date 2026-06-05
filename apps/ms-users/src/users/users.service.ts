@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { ValidateUserDto } from './dto/validate-user.dto';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -76,6 +77,40 @@ export class UsersService {
       return user;
     } catch (error) {
       return `Error interno del servidor ${error}`
+    }
+  }
+
+  async updateUser(id: string, updateUserDto: UpdateUserDto) {
+    try {
+      const userExists = await this.userRepository.findOne({
+        where: { id }
+      });
+
+      if (!userExists) {
+        throw new NotFoundException(`El usuario con ID ${id} no existe`);
+      }
+
+      if (updateUserDto.email === '') delete updateUserDto.email;
+      if (updateUserDto.password === '') delete updateUserDto.password;
+
+      if (updateUserDto.password) {
+        const salt = await bcrypt.genSalt(10);
+        updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
+      }
+
+      const userUpdated = Object.assign(userExists, updateUserDto);
+
+      await this.userRepository.save(userUpdated);
+
+      delete userUpdated.password;
+
+      return userUpdated;      
+    } catch (error: any) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      // Cualquier otro error de PostgreSQL (como un email duplicado) será 500
+      throw new InternalServerErrorException(`Error interno del servidor: ${error.message || error}`);
     }
   }
 
