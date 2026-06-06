@@ -9,6 +9,7 @@ export declare class AuthController {
         access_token: string;
         user: {
             email: any;
+            id_role: any;
             role: any;
         };
     }>;
