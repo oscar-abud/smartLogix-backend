@@ -1,4 +1,4 @@
-import { IsEmail, IsIn, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength, IsInt, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterDto {
@@ -13,9 +13,8 @@ export class RegisterDto {
   @MinLength(6)
   password!: string;
 
-  @ApiProperty({ example: 'client', description: 'Rol del usuario dentro del sistema', required: false })
+  @ApiProperty({ example: 3, description: 'ID del Rol dentro del sistema (1: ADMIN, 2: OPERATOR, 3: CLIENT)', required: false })
   @IsOptional()
-  @IsString()
-  @IsIn(['client', 'admin'])
-  role?: string;
+  @IsInt({ message: 'El roleId debe ser un número entero' })
+  roleId?: number; // Ahora pasamos el ID numérico
 }
