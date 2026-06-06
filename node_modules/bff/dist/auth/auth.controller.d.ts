@@ -1,6 +1,7 @@
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
@@ -8,11 +9,13 @@ export declare class AuthController {
         access_token: string;
         user: {
             email: any;
+            id_role: any;
             role: any;
         };
     }>;
     register(registerDto: RegisterDto): Promise<any>;
     getAll(): Promise<any>;
     findUser(id: string): Promise<any>;
+    updateUser(id: string, updateUserDto: UpdateUserDto): Promise<any>;
     deleteUser(id: string): Promise<any>;
 }

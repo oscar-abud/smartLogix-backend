@@ -19,6 +19,7 @@ const login_dto_1 = require("./dto/login.dto");
 const passport_1 = require("@nestjs/passport");
 const swagger_1 = require("@nestjs/swagger");
 const register_dto_1 = require("./dto/register.dto");
+const update_user_dto_1 = require("./dto/update-user.dto");
 let AuthController = class AuthController {
     authService;
     constructor(authService) {
@@ -35,6 +36,9 @@ let AuthController = class AuthController {
     }
     async findUser(id) {
         return this.authService.getUser(id);
+    }
+    async updateUser(id, updateUserDto) {
+        return this.authService.updateUser(id, updateUserDto);
     }
     async deleteUser(id) {
         return this.authService.deleteUser(id);
@@ -72,6 +76,16 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "findUser", null);
+__decorate([
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_user_dto_1.UpdateUserDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "updateUser", null);
 __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),

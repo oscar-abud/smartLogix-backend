@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const users_module_1 = require("./users/users.module");
 const user_entity_1 = require("./users/entities/user.entity");
+const role_entity_1 = require("./users/entities/role.entity");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -24,8 +25,8 @@ exports.AppModule = AppModule = __decorate([
                 username: 'users_user',
                 password: 'users_password',
                 database: 'smartlogix_users',
-                entities: [user_entity_1.User],
-                synchronize: true,
+                entities: [user_entity_1.User, role_entity_1.Role],
+                synchronize: false,
             }),
             users_module_1.UsersModule,
         ],

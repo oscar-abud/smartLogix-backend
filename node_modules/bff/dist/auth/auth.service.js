@@ -28,18 +28,22 @@ let AuthService = class AuthService {
             const payload = {
                 email: usuarioValido.email,
                 sub: usuarioValido.id,
-                role: usuarioValido.role
+                id_role: usuarioValido.id_role,
+                role: usuarioValido.rol
             };
             return {
                 access_token: this.jwtService.sign(payload),
                 user: {
                     email: usuarioValido.email,
-                    role: usuarioValido.role
+                    id_role: usuarioValido.id_role,
+                    role: usuarioValido.rol
                 }
             };
         }
         catch (error) {
-            throw new common_1.UnauthorizedException('Credenciales incorrectas o usuario no encontrado');
+            const status = error.response?.status || common_1.HttpStatus.UNAUTHORIZED;
+            const message = error.response?.data?.message || 'Credenciales incorrectas o usuario no encontrado';
+            throw new common_1.HttpException(message, status);
         }
     }
     async register(registerDto) {
@@ -48,7 +52,9 @@ let AuthService = class AuthService {
             return data;
         }
         catch (error) {
-            throw new common_1.UnauthorizedException(error.response?.data?.message || 'Error al registrar el usuario en el sistema');
+            const status = error.response?.status || common_1.HttpStatus.BAD_REQUEST;
+            const message = error.response?.data?.message || 'Error al registrar el usuario en el sistema';
+            throw new common_1.HttpException(message, status);
         }
     }
     async getAll() {
@@ -57,7 +63,9 @@ let AuthService = class AuthService {
             return data;
         }
         catch (error) {
-            throw new common_1.UnauthorizedException(error.response?.data?.message || 'Error al buscar usuarios');
+            const status = error.response?.status || common_1.HttpStatus.INTERNAL_SERVER_ERROR;
+            const message = error.response?.data?.message || 'Error al buscar usuarios';
+            throw new common_1.HttpException(message, status);
         }
     }
     async getUser(id) {
@@ -66,7 +74,20 @@ let AuthService = class AuthService {
             return data;
         }
         catch (error) {
-            throw new common_1.UnauthorizedException(error.response?.data?.message || 'Error al buscar un usuario');
+            const status = error.response?.status || common_1.HttpStatus.NOT_FOUND;
+            const message = error.response?.data?.message || 'Error al buscar un usuario';
+            throw new common_1.HttpException(message, status);
+        }
+    }
+    async updateUser(id, updateUserDto) {
+        try {
+            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.patch(`${this.usersServiceUrl}/${id}`, updateUserDto));
+            return data;
+        }
+        catch (error) {
+            const status = error.response?.status || common_1.HttpStatus.BAD_REQUEST;
+            const message = error.response?.data?.message || 'Error al actualizar el usuario';
+            throw new common_1.HttpException(message, status);
         }
     }
     async deleteUser(id) {
@@ -75,7 +96,9 @@ let AuthService = class AuthService {
             return data;
         }
         catch (error) {
-            throw new common_1.UnauthorizedException(error.response?.data?.message || 'Error al eliminar un usuario');
+            const status = error.response?.status || common_1.HttpStatus.BAD_REQUEST;
+            const message = error.response?.data?.message || 'Error al eliminar un usuario';
+            throw new common_1.HttpException(message, status);
         }
     }
 };

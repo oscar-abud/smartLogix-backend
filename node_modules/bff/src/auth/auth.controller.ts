@@ -1,9 +1,10 @@
-import { Controller, Post, Body, Get, UseGuards, Req, Param, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Req, Param, Delete, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto'; // 1. Importamos el DTO
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { RegisterDto } from './dto/register.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('auth') // http://localhost:3000/api/auth
 export class AuthController {
@@ -31,6 +32,13 @@ export class AuthController {
   @Get('user/:id')
   async findUser(@Param('id') id: string) {
     return this.authService.getUser(id);
+  }
+  
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  @Patch(':id')
+  async updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.authService.updateUser(id, updateUserDto);
   }
 
   @ApiBearerAuth()
