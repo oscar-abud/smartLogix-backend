@@ -13,8 +13,7 @@ async function bootstrap() {
     .setTitle('SmartLogix - Microservicio de Usuarios')
     .setDescription('API interna para la gestión y validación de usuarios')
     .setVersion('1.0')
-    .addTag('Users')
-    .addBearerAuth()
+    .addTag('users')
     .build();
     
   const document = SwaggerModule.createDocument(app, config);

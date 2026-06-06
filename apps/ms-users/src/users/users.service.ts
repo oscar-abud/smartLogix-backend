@@ -1,5 +1,5 @@
 // apps/ms-users/src/users/users.service.ts
-import { Injectable, UnauthorizedException, BadRequestException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -55,55 +55,5 @@ export class UsersService {
       email: user.email,
       role: user.role,
     };
-  }
-
-  async findAll(){
-    try {
-      const users = await this.userRepository.find();
-      console.log(users)
-      return users;
-    } catch (error) {
-      return `Error interno del servidor ${error}`
-    }
-  }
-
-  async getUser(id: string) {
-    try {
-      const user = await this.userRepository.findOne({
-        where: { id }
-      });
-
-      return user;
-    } catch (error) {
-      return `Error interno del servidor ${error}`
-    }
-  }
-
-  async deleteUser(id: string) {
-    try {
-      const userExists = await this.userRepository.findOne({
-        where: { id }
-      })
-
-      if (!userExists) {
-        // Lanza un error 404 estructurado
-        throw new NotFoundException(`El usuario con ID ${id} no existe`);
-      }
-
-      await this.userRepository.delete(id);
-
-      return { 
-        message: 'Usuario eliminado con éxito',
-        id 
-      };
-        
-    } catch (error: any) {
-       if (error instanceof NotFoundException) {
-        throw error;
-      }
-      
-      // Cualquier otro error de PostgreSQL sera 500
-      throw new InternalServerErrorException(`Error interno del servidor: ${error.message || error}`)
-    }
   }
 }

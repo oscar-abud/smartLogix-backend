@@ -16,10 +16,4 @@ export declare class UsersService {
         email: string;
         role: string;
     }>;
-    findAll(): Promise<string | User[]>;
-    getUser(id: string): Promise<string | User>;
-    deleteUser(id: string): Promise<{
-        message: string;
-        id: string;
-    }>;
 }
