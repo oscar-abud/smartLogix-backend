@@ -15,7 +15,7 @@ const swagger_1 = require("@nestjs/swagger");
 class CreateUserDto {
     email;
     password;
-    role;
+    roleId;
 }
 exports.CreateUserDto = CreateUserDto;
 __decorate([
@@ -32,10 +32,9 @@ __decorate([
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "password", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'client', description: 'Rol del usuario dentro del sistema', required: false }),
+    (0, swagger_1.ApiProperty)({ example: 3, description: 'ID del Rol dentro del sistema (1: ADMIN, 2: OPERATOR, 3: CLIENT)', required: false }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsIn)(['client', 'admin']),
-    __metadata("design:type", String)
-], CreateUserDto.prototype, "role", void 0);
+    (0, class_validator_1.IsInt)({ message: 'El roleId debe ser un número entero' }),
+    __metadata("design:type", Number)
+], CreateUserDto.prototype, "roleId", void 0);
 //# sourceMappingURL=create-user.dto.js.map
