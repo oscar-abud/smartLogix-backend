@@ -15,9 +15,8 @@ export class UsersService {
   ) {}
 
   async registerUser(registerDto: CreateUserDto) {
-    const { email, password, role } = registerDto;
+    const { email, password, roleId } = registerDto;
 
-    // Verificar si el correo ya está registrado
     const userExists = await this.userRepository.findOne({ where: { email } });
     if (userExists) {
       throw new BadRequestException('El correo ya está registrado');
@@ -28,13 +27,18 @@ export class UsersService {
     const newUser = this.userRepository.create({
       email,
       password: hashedPassword,
-      role: role || 'client',
+      role: { id: roleId || 3 } // Por defecto rol 3 (CLIENT) si no viene
     });
 
     const userSaved = await this.userRepository.save(newUser);
 
-    const { password: _, ...result } = userSaved;
-    return result;
+    return {
+      id: userSaved.id,
+      email: userSaved.email,
+      id_role: userSaved.role.id,
+      rol: userSaved.role.name,
+      createdAt: userSaved.createdAt
+    };
   }
 
   async validateUserCredentials(validateUserDto: ValidateUserDto) {
@@ -53,7 +57,8 @@ export class UsersService {
     return {
       id: user.id,
       email: user.email,
-      role: user.role,
+      id_role: user.role.id,
+      rol: user.role.name,
     };
   }
 }

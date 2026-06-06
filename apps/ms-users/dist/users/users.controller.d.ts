@@ -7,12 +7,14 @@ export declare class UsersController {
     validateUser(validateUserDto: ValidateUserDto): Promise<{
         id: string;
         email: string;
-        role: string;
+        id_role: number;
+        rol: string;
     }>;
     registerUser(registerUserDto: CreateUserDto): Promise<{
         id: string;
         email: string;
-        role: string;
+        id_role: number;
+        rol: string;
         createdAt: Date;
     }>;
 }

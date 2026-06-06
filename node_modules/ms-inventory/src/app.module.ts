@@ -19,7 +19,7 @@ import { Inventory } from './inventory/entities/inventory.entity';
       password: process.env.DB_PASSWORD || 'inventory_password',
       database: process.env.DB_NAME || 'smartlogix_inventory',
       entities: [Inventory],
-      synchronize: true,
+      synchronize: false,
     }),
     InventoryModule,
   ],

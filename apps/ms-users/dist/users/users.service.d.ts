@@ -8,12 +8,14 @@ export declare class UsersService {
     registerUser(registerDto: CreateUserDto): Promise<{
         id: string;
         email: string;
-        role: string;
+        id_role: number;
+        rol: string;
         createdAt: Date;
     }>;
     validateUserCredentials(validateUserDto: ValidateUserDto): Promise<{
         id: string;
         email: string;
-        role: string;
+        id_role: number;
+        rol: string;
     }>;
 }
