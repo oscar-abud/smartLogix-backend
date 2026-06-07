@@ -29,6 +29,7 @@ services:
       POSTGRES_DB: smartlogix_inventory
     volumes:
       - inventory_db_data:/var/lib/postgresql/data
+      - ./apps/ms-inventory/db/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   # Base de datos MS Ordenes
   orders-db:
