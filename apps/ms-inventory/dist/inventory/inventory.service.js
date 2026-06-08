@@ -58,11 +58,36 @@ let InventoryService = class InventoryService {
     }
     async getAll() {
         try {
-            const inventories = await this.inventoryRepository.find();
-            return inventories;
+            const inventoriesRaw = await this.inventoryRepository.createQueryBuilder('inventory')
+                .addSelect((subQuery) => {
+                return subQuery
+                    .select('COUNT(item.id)', 'totalItems')
+                    .from('inventory_items', 'item')
+                    .where('item.inventory_id = inventory.id');
+            }, 'totalItems')
+                .addSelect((subQuery) => {
+                return subQuery
+                    .select("COALESCE(json_agg(user_inv.user_id) FILTER (WHERE user_inv.user_id IS NOT NULL), '[]')", 'userIds')
+                    .from('user_inventories', 'user_inv')
+                    .where('user_inv.inventory_id = inventory.id');
+            }, 'userIds')
+                .orderBy('inventory.id', 'ASC')
+                .getRawAndEntities();
+            return inventoriesRaw.entities.map((inventory, index) => {
+                const raw = inventoriesRaw.raw[index];
+                const userIdsArray = typeof raw.userIds === 'string'
+                    ? JSON.parse(raw.userIds)
+                    : (raw.userIds || []);
+                return {
+                    ...inventory,
+                    totalItems: raw.totalItems ? parseInt(raw.totalItems, 10) : 0,
+                    totalUsers: userIdsArray.length,
+                    userIds: userIdsArray,
+                };
+            });
         }
         catch (error) {
-            throw new common_1.InternalServerErrorException(`Error al obtener almacenes: ${error.message}`);
+            throw new common_1.InternalServerErrorException(`Error base en ms-inventory: ${error.message}`);
         }
     }
     async getInventory(id) {

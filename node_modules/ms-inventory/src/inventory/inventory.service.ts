@@ -10,7 +10,7 @@ export class InventoryService {
   constructor(
     @InjectRepository(Inventory)
     private readonly inventoryRepository: Repository<Inventory>,
-    private readonly dataSource: DataSource, // 🔥 Inyectamos el DataSource para controlar la transacción
+    private readonly dataSource: DataSource,
   ) {}
 
   async registerInventory(createInventoryDto: CreateInventoryDto, creatorUserId: string) {
@@ -52,10 +52,38 @@ export class InventoryService {
 
   async getAll() {
     try {
-      const inventories = await this.inventoryRepository.find();
-      return inventories;
+      const inventoriesRaw = await this.inventoryRepository.createQueryBuilder('inventory')
+        .addSelect((subQuery) => {
+          return subQuery
+            .select('COUNT(item.id)', 'totalItems')
+            .from('inventory_items', 'item')
+            .where('item.inventory_id = inventory.id');
+        }, 'totalItems')
+        .addSelect((subQuery) => {
+          return subQuery
+            .select("COALESCE(json_agg(user_inv.user_id) FILTER (WHERE user_inv.user_id IS NOT NULL), '[]')", 'userIds')
+            .from('user_inventories', 'user_inv')
+            .where('user_inv.inventory_id = inventory.id');
+        }, 'userIds')
+        .orderBy('inventory.id', 'ASC')
+        .getRawAndEntities();
+
+      // El microservicio solo estructura su data local y la escupe inmediatamente
+      return inventoriesRaw.entities.map((inventory, index) => {
+        const raw = inventoriesRaw.raw[index];
+        const userIdsArray: string[] = typeof raw.userIds === 'string' 
+          ? JSON.parse(raw.userIds) 
+          : (raw.userIds || []);
+
+        return {
+          ...inventory,
+          totalItems: raw.totalItems ? parseInt(raw.totalItems, 10) : 0,
+          totalUsers: userIdsArray.length,
+          userIds: userIdsArray,
+        };
+      });
     } catch (error: any) {
-      throw new InternalServerErrorException(`Error al obtener almacenes: ${error.message}`);
+      throw new InternalServerErrorException(`Error base en ms-inventory: ${error.message}`);
     }
   }
 
