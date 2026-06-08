@@ -8,9 +8,13 @@ export declare class AuthController {
     login(loginDto: LoginDto): Promise<{
         access_token: string;
         user: {
+            id: any;
             email: any;
-            id_role: any;
-            role: any;
+            role: {
+                id: any;
+                name: any;
+            };
+            createdAt: any;
         };
     }>;
     register(registerDto: RegisterDto): Promise<any>;

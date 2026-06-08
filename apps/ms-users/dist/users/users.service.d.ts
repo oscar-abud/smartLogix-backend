@@ -16,8 +16,11 @@ export declare class UsersService {
     validateUserCredentials(validateUserDto: ValidateUserDto): Promise<{
         id: string;
         email: string;
-        id_role: number;
-        rol: string;
+        role: {
+            id: number;
+            name: string;
+        };
+        createdAt: Date;
     }>;
     findAll(): Promise<string | User[]>;
     getUser(id: string): Promise<string | User>;

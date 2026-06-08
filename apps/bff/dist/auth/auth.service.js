@@ -28,15 +28,19 @@ let AuthService = class AuthService {
             const payload = {
                 email: usuarioValido.email,
                 sub: usuarioValido.id,
-                id_role: usuarioValido.id_role,
-                role: usuarioValido.rol
+                id_role: usuarioValido.role.id,
+                role: usuarioValido.role.name
             };
             return {
                 access_token: this.jwtService.sign(payload),
                 user: {
+                    id: usuarioValido.id,
                     email: usuarioValido.email,
-                    id_role: usuarioValido.id_role,
-                    role: usuarioValido.rol
+                    role: {
+                        id: usuarioValido.role.id,
+                        name: usuarioValido.role.name,
+                    },
+                    createdAt: usuarioValido.createdAt,
                 }
             };
         }
