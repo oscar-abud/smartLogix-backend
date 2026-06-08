@@ -2,7 +2,7 @@ import { Controller, Get, Post, Delete, Param, Body, UseGuards, Req, ParseIntPip
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { InventoryService } from './inventory.service';
-import { AuthService } from '../auth/auth.service'; // 🔥 Inyectamos tu AuthService del BFF
+import { AuthService } from '../auth/auth.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 
 @ApiTags('Inventory')

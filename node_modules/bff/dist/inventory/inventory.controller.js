@@ -34,7 +34,7 @@ let InventoryController = class InventoryController {
     }
     async createInventory(createInventoryDto, req) {
         const userId = req.user.userId;
-        console.log(...oo_oo(`347905736_37_4_37_61_4`, 'ID del usuario extraído con éxito:', userId));
+        console.log(...oo_oo(`120332349_37_4_37_61_4`, 'ID del usuario extraído con éxito:', userId));
         return this.inventoryService.createInventory(createInventoryDto, userId);
     }
     async unlinkUserFromInventory(inventoryId, userId) {
