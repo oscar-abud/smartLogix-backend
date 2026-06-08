@@ -109,6 +109,28 @@ let InventoryService = class InventoryService {
             throw new common_1.InternalServerErrorException(`Error al obtener el almacén: ${error.message}`);
         }
     }
+    async assignUser(inventoryId, userId) {
+        await this.inventoryRepository.manager.query(`DELETE FROM user_inventories WHERE user_id = $1 AND inventory_id = $2`, [userId, inventoryId]);
+        await this.inventoryRepository.manager.query(`INSERT INTO user_inventories (inventory_id, user_id) VALUES ($1, $2)`, [inventoryId, userId]);
+        return { success: true, message: 'Usuario asignado exitosamente al almacén' };
+    }
+    async updateUserRelation(inventoryId, userId) {
+        await this.inventoryRepository.manager.query(`DELETE FROM user_inventories WHERE user_id = $1`, [userId]);
+        await this.inventoryRepository.manager.query(`INSERT INTO user_inventories (inventory_id, user_id) VALUES ($1, $2)`, [inventoryId, userId]);
+        return { success: true, message: 'Relación de almacén actualizada con éxito' };
+    }
+    async removeUserRelation(inventoryId, userId) {
+        try {
+            await this.inventoryRepository.manager.query(`DELETE FROM user_inventories WHERE inventory_id = $1 AND user_id = $2`, [inventoryId, userId]);
+            return {
+                success: true,
+                message: `Usuario ${userId} desvinculado con éxito del almacén ${inventoryId}`
+            };
+        }
+        catch (error) {
+            throw new common_1.InternalServerErrorException(`Error al eliminar la relación en ms-inventory: ${error.message}`);
+        }
+    }
     async deleteInventory(id) {
         try {
             const inventoryExists = await this.inventoryRepository.findOne({

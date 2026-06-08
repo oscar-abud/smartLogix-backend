@@ -19,6 +19,18 @@ export declare class InventoryService {
         userAssignments: UserInventory[];
     }[]>;
     getInventory(id: number): Promise<Inventory>;
+    assignUser(inventoryId: number, userId: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
+    updateUserRelation(inventoryId: number, userId: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
+    removeUserRelation(inventoryId: number, userId: string): Promise<{
+        success: boolean;
+        message: string;
+    }>;
     deleteInventory(id: number): Promise<{
         message: string;
         id: number;

@@ -107,6 +107,58 @@ export class InventoryService {
     }
   }
 
+  async assignUser(inventoryId: number, userId: string) {
+    // Ejemplo usando QueryBuilder o repositorio de tu entidad intermedia (user_inventories)
+    // Evitamos duplicados limpiando cualquier rastro previo del usuario en este almacén antes de insertar
+    await this.inventoryRepository.manager.query(
+      `DELETE FROM user_inventories WHERE user_id = $1 AND inventory_id = $2`,
+      [userId, inventoryId]
+    );
+
+    await this.inventoryRepository.manager.query(
+      `INSERT INTO user_inventories (inventory_id, user_id) VALUES ($1, $2)`,
+      [inventoryId, userId]
+    );
+
+    return { success: true, message: 'Usuario asignado exitosamente al almacén' };
+  }
+
+  async updateUserRelation(inventoryId: number, userId: string) {
+    // Al actualizar, limpiamos todas las asignaciones antiguas que tenía este usuario
+    // para que quede exclusivamente asignado a la nueva bodega seleccionada
+    await this.inventoryRepository.manager.query(
+      `DELETE FROM user_inventories WHERE user_id = $1`,
+      [userId]
+    );
+
+    // Insertamos la nueva relación
+    await this.inventoryRepository.manager.query(
+      `INSERT INTO user_inventories (inventory_id, user_id) VALUES ($1, $2)`,
+      [inventoryId, userId]
+    );
+
+    return { success: true, message: 'Relación de almacén actualizada con éxito' };
+  }
+
+  async removeUserRelation(inventoryId: number, userId: string) {
+    try {
+      // Eliminamos únicamente el registro relacional que une a este usuario con este almacén
+      await this.inventoryRepository.manager.query(
+        `DELETE FROM user_inventories WHERE inventory_id = $1 AND user_id = $2`,
+        [inventoryId, userId]
+      );
+
+      return { 
+        success: true, 
+        message: `Usuario ${userId} desvinculado con éxito del almacén ${inventoryId}` 
+      };
+    } catch (error: any) {
+      throw new InternalServerErrorException(
+        `Error al eliminar la relación en ms-inventory: ${error.message}`
+      );
+    }
+  }
+
   async deleteInventory(id: number) {
     try {
       const inventoryExists = await this.inventoryRepository.findOne({

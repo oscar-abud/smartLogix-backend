@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Delete, Param, Body, UseGuards, Req, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, UseGuards, Req, ParseIntPipe, Headers } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { InventoryService } from './inventory.service';
+import { AuthService } from '../auth/auth.service'; // 🔥 Inyectamos tu AuthService del BFF
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 
 @ApiTags('Inventory')
@@ -9,7 +10,10 @@ import { CreateInventoryDto } from './dto/create-inventory.dto';
 @UseGuards(AuthGuard('jwt'))
 @Controller('inventory') // URL Base en el BFF: http://localhost:3000/api/inventory
 export class InventoryController {
-  constructor(private readonly inventoryService: InventoryService) {}
+  constructor(
+    private readonly inventoryService: InventoryService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Get('')
   @ApiOperation({ summary: 'Listar todos los almacenes de inventario' })
@@ -33,6 +37,15 @@ export class InventoryController {
     console.log('ID del usuario extraído con éxito:', userId);
     
     return this.inventoryService.createInventory(createInventoryDto, userId);
+  }
+
+  @Delete(':inventoryId/users/:userId')
+  @ApiOperation({ summary: 'Desvincular a un usuario de un almacén' })
+  async unlinkUserFromInventory(
+    @Param('inventoryId', ParseIntPipe) inventoryId: number,
+    @Param('userId') userId: string,
+  ) {
+    return this.authService.unlinkUserFromInventory(inventoryId, userId);
   }
 
   @Delete(':id')

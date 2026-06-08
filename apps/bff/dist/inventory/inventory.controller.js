@@ -17,11 +17,14 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const passport_1 = require("@nestjs/passport");
 const inventory_service_1 = require("./inventory.service");
+const auth_service_1 = require("../auth/auth.service");
 const create_inventory_dto_1 = require("./dto/create-inventory.dto");
 let InventoryController = class InventoryController {
     inventoryService;
-    constructor(inventoryService) {
+    authService;
+    constructor(inventoryService, authService) {
         this.inventoryService = inventoryService;
+        this.authService = authService;
     }
     async findAll() {
         return this.inventoryService.getAll();
@@ -31,8 +34,11 @@ let InventoryController = class InventoryController {
     }
     async createInventory(createInventoryDto, req) {
         const userId = req.user.userId;
-        console.log(...oo_oo(`3756227535_33_4_33_61_4`, 'ID del usuario extraído con éxito:', userId));
+        console.log(...oo_oo(`347905736_37_4_37_61_4`, 'ID del usuario extraído con éxito:', userId));
         return this.inventoryService.createInventory(createInventoryDto, userId);
+    }
+    async unlinkUserFromInventory(inventoryId, userId) {
+        return this.authService.unlinkUserFromInventory(inventoryId, userId);
     }
     async deleteInventory(id) {
         return this.inventoryService.deleteInventory(id);
@@ -64,6 +70,15 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "createInventory", null);
 __decorate([
+    (0, common_1.Delete)(':inventoryId/users/:userId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Desvincular a un usuario de un almacén' }),
+    __param(0, (0, common_1.Param)('inventoryId', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Param)('userId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, String]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "unlinkUserFromInventory", null);
+__decorate([
     (0, common_1.Delete)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Eliminar un almacén del inventario' }),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
@@ -76,7 +91,8 @@ exports.InventoryController = InventoryController = __decorate([
     (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, common_1.Controller)('inventory'),
-    __metadata("design:paramtypes", [inventory_service_1.InventoryService])
+    __metadata("design:paramtypes", [inventory_service_1.InventoryService,
+        auth_service_1.AuthService])
 ], InventoryController);
 ;
 function oo_cm() { try {

@@ -64,7 +64,7 @@ let AuthService = class AuthService {
                     }));
                 }
                 catch (invError) {
-                    console.error(...oo_tx(`2476744572_74_10_74_154_11`, `[BFF Orquestador] Usuario creado (${createdUser.id}) pero falló vinculación física en almacén ${inventoryId}:`, invError.message));
+                    console.error(...oo_tx(`3105853580_74_10_74_154_11`, `[BFF Orquestador] Usuario creado (${createdUser.id}) pero falló vinculación física en almacén ${inventoryId}:`, invError.message));
                 }
             }
             return {
@@ -113,7 +113,7 @@ let AuthService = class AuthService {
                     }));
                 }
                 catch (invError) {
-                    console.error(...oo_tx(`2476744572_136_10_136_119_11`, `[BFF Orquestador] Error editando asignación de almacén para usuario ${id}:`, invError.message));
+                    console.error(...oo_tx(`3105853580_136_10_136_119_11`, `[BFF Orquestador] Error editando asignación de almacén para usuario ${id}:`, invError.message));
                 }
             }
             return {
@@ -135,6 +135,17 @@ let AuthService = class AuthService {
         catch (error) {
             const status = error.response?.status || common_1.HttpStatus.BAD_REQUEST;
             const message = error.response?.data?.message || 'Error al eliminar un usuario';
+            throw new common_1.HttpException(message, status);
+        }
+    }
+    async unlinkUserFromInventory(inventoryId, userId) {
+        try {
+            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.delete(`${this.inventoryServiceUrl}/${inventoryId}/users/${userId}`));
+            return data;
+        }
+        catch (error) {
+            const status = error.response?.status || common_1.HttpStatus.BAD_REQUEST;
+            const message = error.response?.data?.message || 'Error al desvincular al usuario del almacén';
             throw new common_1.HttpException(message, status);
         }
     }

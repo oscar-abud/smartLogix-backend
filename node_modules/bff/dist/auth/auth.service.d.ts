@@ -26,4 +26,5 @@ export declare class AuthService {
     getUser(id: string): Promise<any>;
     updateUser(id: string, updateUserDto: UpdateUserDto): Promise<any>;
     deleteUser(id: string): Promise<any>;
+    unlinkUserFromInventory(inventoryId: number, userId: string): Promise<any>;
 }

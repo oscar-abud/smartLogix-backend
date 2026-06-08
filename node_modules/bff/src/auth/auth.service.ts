@@ -161,4 +161,19 @@ export class AuthService {
       throw new HttpException(message, status);
     }
   }
+
+  async unlinkUserFromInventory(inventoryId: number, userId: string) {
+    try {
+      // Le pegamos al microservicio metiendo el userId en la URL
+      const { data } = await firstValueFrom(
+        this.httpService.delete(`${this.inventoryServiceUrl}/${inventoryId}/users/${userId}`)
+      );
+      return data;
+    } catch (error: any) {
+      const status = error.response?.status || HttpStatus.BAD_REQUEST;
+      const message = error.response?.data?.message || 'Error al desvincular al usuario del almacén';
+      throw new HttpException(message, status);
+    }
+  }
+
 }

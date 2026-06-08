@@ -10,12 +10,13 @@ exports.InventoryModule = void 0;
 const common_1 = require("@nestjs/common");
 const axios_1 = require("@nestjs/axios");
 const inventory_controller_1 = require("./inventory.controller");
+const auth_module_1 = require("../auth/auth.module");
 let InventoryModule = class InventoryModule {
 };
 exports.InventoryModule = InventoryModule;
 exports.InventoryModule = InventoryModule = __decorate([
     (0, common_1.Module)({
-        imports: [axios_1.HttpModule],
+        imports: [axios_1.HttpModule, auth_module_1.AuthModule],
         controllers: [inventory_controller_1.InventoryController],
     })
 ], InventoryModule);
