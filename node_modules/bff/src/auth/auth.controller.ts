@@ -25,6 +25,8 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
