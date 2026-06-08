@@ -1,5 +1,8 @@
 export declare class RegisterDto {
     email: string;
     password: string;
-    roleId?: number;
+    role: {
+        id: number;
+    };
+    inventoryId?: number;
 }

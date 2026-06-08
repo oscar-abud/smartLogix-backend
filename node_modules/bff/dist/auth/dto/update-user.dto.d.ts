@@ -3,5 +3,6 @@ declare const UpdateUserDto_base: import("@nestjs/common").Type<Partial<Register
 export declare class UpdateUserDto extends UpdateUserDto_base {
     password?: string;
     email?: string;
+    inventoryId?: number;
 }
 export {};

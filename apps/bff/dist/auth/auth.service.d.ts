@@ -7,6 +7,7 @@ export declare class AuthService {
     private readonly jwtService;
     private readonly httpService;
     private readonly usersServiceUrl;
+    private readonly inventoryServiceUrl;
     constructor(jwtService: JwtService, httpService: HttpService);
     login(loginDto: LoginDto): Promise<{
         access_token: string;

@@ -1,3 +1,4 @@
+// bff/src/auth/auth.service.ts
 import { Injectable, UnauthorizedException, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { HttpService } from '@nestjs/axios'; 
@@ -9,6 +10,7 @@ import { LoginDto } from './dto/login.dto';
 @Injectable()
 export class AuthService {
   private readonly usersServiceUrl = 'http://localhost:3001/api/users';
+  private readonly inventoryServiceUrl = 'http://localhost:3002/api/inventory';
 
   constructor(
     private readonly jwtService: JwtService,
@@ -49,12 +51,35 @@ export class AuthService {
   }
 
   async register(registerDto: RegisterDto) {
+    const { inventoryId, ...userData } = registerDto;
+
     try {
-      const { data } = await firstValueFrom(
-        this.httpService.post(`${this.usersServiceUrl}/register`, registerDto)
+      // 1. Registramos el usuario de manera normal en ms-users
+      const { data: createdUser } = await firstValueFrom(
+        this.httpService.post(`${this.usersServiceUrl}/register`, userData)
       );
       
-      return data;
+      // 2. Si hay un almacén seleccionado, intentamos vincularlo
+      if (inventoryId && createdUser?.id) {
+        try {
+          await firstValueFrom(
+            this.httpService.post(`${this.inventoryServiceUrl}/${inventoryId}/users`, {}, {
+              headers: {
+                'x-user-id': createdUser.id,
+              },
+            })
+          );
+        } catch (invError: any) {
+          // Si falla ms-inventory, lo reportamos en consola pero NO tumbamos la respuesta al cliente
+          console.error(`[BFF Orquestador] Usuario creado (${createdUser.id}) pero falló vinculación física en almacén ${inventoryId}:`, invError.message);
+        }
+      }
+
+      return {
+        ...createdUser,
+        inventoryId: inventoryId ? Number(inventoryId) : null
+      };
+
     } catch (error: any) {
       const status = error.response?.status || HttpStatus.BAD_REQUEST;
       const message = error.response?.data?.message || 'Error al registrar el usuario en el sistema';
@@ -89,11 +114,34 @@ export class AuthService {
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
+    const { inventoryId, ...userData } = updateUserDto;
+
     try {
-      const { data } = await firstValueFrom(
-        this.httpService.patch(`${this.usersServiceUrl}/${id}`, updateUserDto)
+      // 1. Actualizamos el perfil en ms-users
+      const { data: updatedUser } = await firstValueFrom(
+        this.httpService.patch(`${this.usersServiceUrl}/${id}`, userData)
       );
-      return data;
+
+      // 2. Si se editó agregando o cambiando un almacén, enviamos la relación
+      if (inventoryId) {
+        try {
+          await firstValueFrom(
+            this.httpService.post(`${this.inventoryServiceUrl}/${inventoryId}/users`, {}, {
+              headers: {
+                'x-user-id': id,
+              },
+            })
+          );
+        } catch (invError: any) {
+          console.error(`[BFF Orquestador] Error editando asignación de almacén para usuario ${id}:`, invError.message);
+        }
+      }
+
+      return {
+        ...updatedUser,
+        inventoryId: inventoryId ? Number(inventoryId) : null
+      };
+
     } catch (error: any) {
       const status = error.response?.status || HttpStatus.BAD_REQUEST;
       const message = error.response?.data?.message || 'Error al actualizar el usuario';

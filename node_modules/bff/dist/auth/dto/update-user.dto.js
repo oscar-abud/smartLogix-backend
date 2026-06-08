@@ -16,16 +16,25 @@ const register_dto_1 = require("./register.dto");
 class UpdateUserDto extends (0, swagger_1.PartialType)(register_dto_1.RegisterDto) {
     password;
     email;
+    inventoryId;
 }
 exports.UpdateUserDto = UpdateUserDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'nueva_password123', required: false }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "password", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: 'cambio@smartlogix.com', required: false }),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "email", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ example: 3, required: false, description: 'ID del nuevo almacén a vincular' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNumber)({}, { message: 'El ID del almacén debe ser un número válido' }),
+    __metadata("design:type", Number)
+], UpdateUserDto.prototype, "inventoryId", void 0);
 //# sourceMappingURL=update-user.dto.js.map
