@@ -28,31 +28,35 @@ let InventoryService = class InventoryService {
             throw new common_1.InternalServerErrorException(error.response?.data?.message || 'Error al conectar con el microservicio de inventario');
         }
     }
-    async getProduct(id) {
+    async getInventory(id) {
         try {
             const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`${this.inventoryMicroserviceUrl}/${id}`));
             return data;
         }
         catch (error) {
-            throw new common_1.InternalServerErrorException(error.response?.data?.message || 'Error al buscar el producto por ID');
+            throw new common_1.InternalServerErrorException(error.response?.data?.message || 'Error al buscar el almacén por ID');
         }
     }
-    async createProduct(createInventoryDto) {
+    async createInventory(createInventoryDto, userId) {
         try {
-            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.post(this.inventoryMicroserviceUrl, createInventoryDto));
+            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.post(this.inventoryMicroserviceUrl, createInventoryDto, {
+                headers: {
+                    'x-user-id': userId,
+                },
+            }));
             return data;
         }
         catch (error) {
-            throw new common_1.InternalServerErrorException(error.response?.data?.message || 'Error al crear el producto');
+            throw new common_1.InternalServerErrorException(error.response?.data?.message || 'Error al crear el almacén de inventario');
         }
     }
-    async deleteProduct(id) {
+    async deleteInventory(id) {
         try {
             const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.delete(`${this.inventoryMicroserviceUrl}/${id}`));
             return data;
         }
         catch (error) {
-            throw new common_1.InternalServerErrorException(error.response?.data?.message || 'Error al eliminar el producto');
+            throw new common_1.InternalServerErrorException(error.response?.data?.message || 'Error al eliminar el almacén');
         }
     }
 };

@@ -1,84 +1,104 @@
-// apps/ms-inventory/src/inventory/inventory.service.ts
 import { Injectable, BadRequestException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { Inventory } from './entities/inventory.entity';
+import { UserInventory } from './entities/user-inventory.entity';
 
 @Injectable()
 export class InventoryService {
   constructor(
     @InjectRepository(Inventory)
     private readonly inventoryRepository: Repository<Inventory>,
+    private readonly dataSource: DataSource, // 🔥 Inyectamos el DataSource para controlar la transacción
   ) {}
 
-  async registerInventory(createInventoryDto: CreateInventoryDto) {
-    const { name, description, price, quantity } = createInventoryDto;
+  async registerInventory(createInventoryDto: CreateInventoryDto, creatorUserId: string) {
+    const { name, description } = createInventoryDto;
 
-    // Verificar si el producto ya está registrado
-    const productExists = await this.inventoryRepository.findOne({ where: { name } });
-    if (productExists) {
-      throw new BadRequestException('El producto ya está registrado');
+    const inventoryExists = await this.inventoryRepository.findOne({ where: { name } });
+    if (inventoryExists) {
+      throw new BadRequestException('Ya existe un almacén registrado con este nombre');
     }
 
-    const newProduct = this.inventoryRepository.create({
-      name,
-      price,
-      description,
-      quantity: quantity || 0,
-    });
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    const productSaved = await this.inventoryRepository.save(newProduct);
+    try {
+      const newInventory = queryRunner.manager.create(Inventory, {
+        name,
+        description,
+      });
+      const inventorySaved = await queryRunner.manager.save(Inventory, newInventory);
 
-    return productSaved;
+      const userAssignment = queryRunner.manager.create(UserInventory, {
+        userId: creatorUserId,            // UUID que vendrá desde el BFF
+        inventoryId: inventorySaved.id,   // ID numérico autoincremental recién generado
+      });
+      await queryRunner.manager.save(UserInventory, userAssignment);
+
+      await queryRunner.commitTransaction();
+
+      return inventorySaved;
+
+    } catch (error: any) {
+      await queryRunner.rollbackTransaction();
+      throw new InternalServerErrorException(`Error al registrar el almacén y asignar usuario: ${error.message}`);
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async getAll() {
     try {
-      const products = await this.inventoryRepository.find();
-      return products;
+      const inventories = await this.inventoryRepository.find();
+      return inventories;
     } catch (error: any) {
-      throw new InternalServerErrorException(`Error al obtener productos: ${error.message}`);
+      throw new InternalServerErrorException(`Error al obtener almacenes: ${error.message}`);
     }
   }
 
-  async getProduct(id: string) {
+  async getInventory(id: number) {
     try {
-      const product = await this.inventoryRepository.findOne({
+      const inventory = await this.inventoryRepository.findOne({
+        where: { id },
+        relations: {
+          items: true,
+        },
+      });
+
+      if (!inventory) {
+        throw new NotFoundException(`El almacén con ID ${id} no existe`);
+      }
+
+      return inventory;
+    } catch (error: any) {
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException(`Error al obtener el almacén: ${error.message}`);
+    }
+  }
+
+  async deleteInventory(id: number) {
+    try {
+      const inventoryExists = await this.inventoryRepository.findOne({
         where: { id }
       });
 
-      return product;
-    } catch (error: any) {
-      throw new InternalServerErrorException(`Error al obtener productos: ${error.message}`);
-    }
-  }
-
-  async deleteProduct(id: string) {
-    try {
-      const productExists = await this.inventoryRepository.findOne({
-        where: { id }
-      })
-
-      if (!productExists) {
-        // Lanza un error 404 estructurado
-        throw new NotFoundException(`El producto con ID ${id} no existe`);
+      if (!inventoryExists) {
+        throw new NotFoundException(`El almacén con ID ${id} no existe`);
       }
 
       await this.inventoryRepository.delete(id);
 
       return { 
-        message: 'Producto eliminado con éxito',
+        message: 'Almacén y sus dependencias eliminados con éxito',
         id 
       };
         
     } catch (error: any) {
-       if (error instanceof NotFoundException) {
-        throw error;
-      }
-      
-      // Cualquier otro error de PostgreSQL sera 500
-      throw new InternalServerErrorException(`Error interno del servidor: ${error.message || error}`)
+       if (error instanceof NotFoundException) throw error;
+       throw new InternalServerErrorException(`Error interno del servidor al eliminar: ${error.message}`)
     }
   }
 }

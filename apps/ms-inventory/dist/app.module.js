@@ -11,7 +11,6 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
 const inventory_module_1 = require("./inventory/inventory.module");
-const inventory_entity_1 = require("./inventory/entities/inventory.entity");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -28,8 +27,8 @@ exports.AppModule = AppModule = __decorate([
                 username: process.env.DB_USER || 'inventory_user',
                 password: process.env.DB_PASSWORD || 'inventory_password',
                 database: process.env.DB_NAME || 'smartlogix_inventory',
-                entities: [inventory_entity_1.Inventory],
-                synchronize: true,
+                autoLoadEntities: true,
+                synchronize: false,
             }),
             inventory_module_1.InventoryModule,
         ],

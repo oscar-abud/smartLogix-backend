@@ -16,7 +16,6 @@ exports.InventoryController = void 0;
 const common_1 = require("@nestjs/common");
 const inventory_service_1 = require("./inventory.service");
 const create_inventory_dto_1 = require("./dto/create-inventory.dto");
-const swagger_1 = require("@nestjs/swagger");
 let InventoryController = class InventoryController {
     inventoryService;
     constructor(inventoryService) {
@@ -25,48 +24,45 @@ let InventoryController = class InventoryController {
     async findAll() {
         return this.inventoryService.getAll();
     }
-    async findUser(id) {
-        return this.inventoryService.getProduct(id);
+    async findOne(id) {
+        return this.inventoryService.getInventory(id);
     }
-    async createProduct(createInventoryDto) {
-        return this.inventoryService.registerInventory(createInventoryDto);
+    async create(createInventoryDto, userId) {
+        return this.inventoryService.registerInventory(createInventoryDto, userId);
     }
-    async deleteProduct(id) {
-        return this.inventoryService.deleteProduct(id);
+    async delete(id) {
+        return this.inventoryService.deleteInventory(id);
     }
 };
 exports.InventoryController = InventoryController;
 __decorate([
-    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Get)(''),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "findAll", null);
 __decorate([
-    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
-], InventoryController.prototype, "findUser", null);
+], InventoryController.prototype, "findOne", null);
 __decorate([
-    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Post)(''),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Headers)('x-user-id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_inventory_dto_1.CreateInventoryDto]),
+    __metadata("design:paramtypes", [create_inventory_dto_1.CreateInventoryDto, String]),
     __metadata("design:returntype", Promise)
-], InventoryController.prototype, "createProduct", null);
+], InventoryController.prototype, "create", null);
 __decorate([
-    (0, swagger_1.ApiBearerAuth)(),
     (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
-], InventoryController.prototype, "deleteProduct", null);
+], InventoryController.prototype, "delete", null);
 exports.InventoryController = InventoryController = __decorate([
     (0, common_1.Controller)('inventory'),
     __metadata("design:paramtypes", [inventory_service_1.InventoryService])

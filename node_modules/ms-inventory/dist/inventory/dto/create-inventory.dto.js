@@ -15,32 +15,26 @@ const swagger_1 = require("@nestjs/swagger");
 class CreateInventoryDto {
     name;
     description;
-    price;
-    quantity;
 }
 exports.CreateInventoryDto = CreateInventoryDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Notebook Acer aspire', description: 'Ingresar nombre de un producto para inventario' }),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, swagger_1.ApiProperty)({
+        example: 'Almacén Central Norte',
+        description: 'Nombre descriptivo del nuevo almacén o bodega'
+    }),
+    (0, class_validator_1.IsString)({ message: 'El nombre del inventario debe ser una cadena de texto.' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'El nombre del inventario es obligatorio.' }),
+    (0, class_validator_1.Length)(3, 100, { message: 'El nombre debe tener entre 3 y 100 caracteres.' }),
     __metadata("design:type", String)
 ], CreateInventoryDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'Notebook ultima generación de gama media', description: 'Ingresar nombre descripción de un producto para inventario' }),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, swagger_1.ApiProperty)({
+        example: 'Bodega principal destinada a productos de alta tecnología y servidores.',
+        description: 'Detalles adicionales sobre el uso o ubicación del almacén',
+        required: false
+    }),
+    (0, class_validator_1.IsString)({ message: 'La descripción debe ser una cadena de texto.' }),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateInventoryDto.prototype, "description", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: '545990', description: 'Ingresar precio del producto' }),
-    (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", Number)
-], CreateInventoryDto.prototype, "price", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ example: '100', description: 'Ingresar cantidad del producto' }),
-    (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Number)
-], CreateInventoryDto.prototype, "quantity", void 0);
 //# sourceMappingURL=create-inventory.dto.js.map

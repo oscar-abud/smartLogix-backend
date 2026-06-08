@@ -4,10 +4,10 @@ export declare class InventoryController {
     private readonly inventoryService;
     constructor(inventoryService: InventoryService);
     findAll(): Promise<import("./entities/inventory.entity").Inventory[]>;
-    findUser(id: string): Promise<import("./entities/inventory.entity").Inventory | null>;
-    createProduct(createInventoryDto: CreateInventoryDto): Promise<import("./entities/inventory.entity").Inventory>;
-    deleteProduct(id: string): Promise<{
+    findOne(id: number): Promise<import("./entities/inventory.entity").Inventory>;
+    create(createInventoryDto: CreateInventoryDto, userId: string): Promise<import("./entities/inventory.entity").Inventory>;
+    delete(id: number): Promise<{
         message: string;
-        id: string;
+        id: number;
     }>;
 }

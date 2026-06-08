@@ -1,33 +1,31 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, Headers, ParseIntPipe } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('inventory') // Ruta interna: http://localhost:3002/api/inventory
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
-  @ApiBearerAuth()
   @Get('')
-  async findAll(){
+  async findAll() {
     return this.inventoryService.getAll();
   }
 
-  @ApiBearerAuth()
   @Get(':id')
-  async findUser(@Param('id') id: string){
-    return this.inventoryService.getProduct(id);
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.inventoryService.getInventory(id);
   }
 
-  @ApiBearerAuth()
   @Post('')
-  async createProduct(@Body() createInventoryDto: CreateInventoryDto) {
-    return this.inventoryService.registerInventory(createInventoryDto);
+  async create(
+    @Body() createInventoryDto: CreateInventoryDto,
+    @Headers('x-user-id') userId: string,
+  ) {
+    return this.inventoryService.registerInventory(createInventoryDto, userId);
   }
 
-  @ApiBearerAuth()
   @Delete(':id')
-  async deleteProduct(@Param('id') id: string) {
-    return this.inventoryService.deleteProduct(id);
+  async delete(@Param('id', ParseIntPipe) id: number) {
+    return this.inventoryService.deleteInventory(id);
   }
-} 
+}

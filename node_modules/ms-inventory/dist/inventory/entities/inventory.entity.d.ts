@@ -1,8 +1,10 @@
+import { InventoryItem } from './inventory-item.entity';
+import { UserInventory } from './user-inventory.entity';
 export declare class Inventory {
-    id: string;
+    id: number;
     name: string;
     description: string;
-    price: number;
-    quantity: number;
     createdAt: Date;
+    items: InventoryItem[];
+    userAssignments: UserInventory[];
 }

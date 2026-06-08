@@ -17,65 +17,91 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const inventory_entity_1 = require("./entities/inventory.entity");
+const user_inventory_entity_1 = require("./entities/user-inventory.entity");
 let InventoryService = class InventoryService {
     inventoryRepository;
-    constructor(inventoryRepository) {
+    dataSource;
+    constructor(inventoryRepository, dataSource) {
         this.inventoryRepository = inventoryRepository;
+        this.dataSource = dataSource;
     }
-    async registerInventory(createInventoryDto) {
-        const { name, description, price, quantity } = createInventoryDto;
-        const productExists = await this.inventoryRepository.findOne({ where: { name } });
-        if (productExists) {
-            throw new common_1.BadRequestException('El producto ya está registrado');
+    async registerInventory(createInventoryDto, creatorUserId) {
+        const { name, description } = createInventoryDto;
+        const inventoryExists = await this.inventoryRepository.findOne({ where: { name } });
+        if (inventoryExists) {
+            throw new common_1.BadRequestException('Ya existe un almacén registrado con este nombre');
         }
-        const newProduct = this.inventoryRepository.create({
-            name,
-            price,
-            description,
-            quantity: quantity || 0,
-        });
-        const productSaved = await this.inventoryRepository.save(newProduct);
-        return productSaved;
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        try {
+            const newInventory = queryRunner.manager.create(inventory_entity_1.Inventory, {
+                name,
+                description,
+            });
+            const inventorySaved = await queryRunner.manager.save(inventory_entity_1.Inventory, newInventory);
+            const userAssignment = queryRunner.manager.create(user_inventory_entity_1.UserInventory, {
+                userId: creatorUserId,
+                inventoryId: inventorySaved.id,
+            });
+            await queryRunner.manager.save(user_inventory_entity_1.UserInventory, userAssignment);
+            await queryRunner.commitTransaction();
+            return inventorySaved;
+        }
+        catch (error) {
+            await queryRunner.rollbackTransaction();
+            throw new common_1.InternalServerErrorException(`Error al registrar el almacén y asignar usuario: ${error.message}`);
+        }
+        finally {
+            await queryRunner.release();
+        }
     }
     async getAll() {
         try {
-            const products = await this.inventoryRepository.find();
-            return products;
+            const inventories = await this.inventoryRepository.find();
+            return inventories;
         }
         catch (error) {
-            throw new common_1.InternalServerErrorException(`Error al obtener productos: ${error.message}`);
+            throw new common_1.InternalServerErrorException(`Error al obtener almacenes: ${error.message}`);
         }
     }
-    async getProduct(id) {
+    async getInventory(id) {
         try {
-            const product = await this.inventoryRepository.findOne({
-                where: { id }
+            const inventory = await this.inventoryRepository.findOne({
+                where: { id },
+                relations: {
+                    items: true,
+                },
             });
-            return product;
+            if (!inventory) {
+                throw new common_1.NotFoundException(`El almacén con ID ${id} no existe`);
+            }
+            return inventory;
         }
         catch (error) {
-            throw new common_1.InternalServerErrorException(`Error al obtener productos: ${error.message}`);
+            if (error instanceof common_1.NotFoundException)
+                throw error;
+            throw new common_1.InternalServerErrorException(`Error al obtener el almacén: ${error.message}`);
         }
     }
-    async deleteProduct(id) {
+    async deleteInventory(id) {
         try {
-            const productExists = await this.inventoryRepository.findOne({
+            const inventoryExists = await this.inventoryRepository.findOne({
                 where: { id }
             });
-            if (!productExists) {
-                throw new common_1.NotFoundException(`El producto con ID ${id} no existe`);
+            if (!inventoryExists) {
+                throw new common_1.NotFoundException(`El almacén con ID ${id} no existe`);
             }
             await this.inventoryRepository.delete(id);
             return {
-                message: 'Producto eliminado con éxito',
+                message: 'Almacén y sus dependencias eliminados con éxito',
                 id
             };
         }
         catch (error) {
-            if (error instanceof common_1.NotFoundException) {
+            if (error instanceof common_1.NotFoundException)
                 throw error;
-            }
-            throw new common_1.InternalServerErrorException(`Error interno del servidor: ${error.message || error}`);
+            throw new common_1.InternalServerErrorException(`Error interno del servidor al eliminar: ${error.message}`);
         }
     }
 };
@@ -83,6 +109,7 @@ exports.InventoryService = InventoryService;
 exports.InventoryService = InventoryService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(inventory_entity_1.Inventory)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.DataSource])
 ], InventoryService);
 //# sourceMappingURL=inventory.service.js.map

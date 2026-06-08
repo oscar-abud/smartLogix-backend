@@ -1,10 +1,11 @@
 import { HttpService } from '@nestjs/axios';
+import { CreateInventoryDto } from './dto/create-inventory.dto';
 export declare class InventoryService {
     private readonly httpService;
     private readonly inventoryMicroserviceUrl;
     constructor(httpService: HttpService);
     getAll(): Promise<any>;
-    getProduct(id: string): Promise<any>;
-    createProduct(createInventoryDto: any): Promise<any>;
-    deleteProduct(id: string): Promise<any>;
+    getInventory(id: number): Promise<any>;
+    createInventory(createInventoryDto: CreateInventoryDto, userId: string): Promise<any>;
+    deleteInventory(id: number): Promise<any>;
 }
