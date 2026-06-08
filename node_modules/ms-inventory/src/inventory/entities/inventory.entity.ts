@@ -1,25 +1,26 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import { InventoryItem } from './inventory-item.entity';
+import { UserInventory } from './user-inventory.entity';
 
-@Entity('inventory')
+@Entity('inventories')
 export class Inventory {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-  
-  // @Column()
-  // id_category!: string
+  @PrimaryGeneratedColumn('increment')
+  id!: number;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', length: 100 })
   name!: string;
 
-  @Column()
+  @Column({ type: 'text', nullable: true })
   description!: string;
 
-  @Column()
-  price!: number;
-
-  @Column({ default: 0 })
-  quantity!: number;
-
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
+
+  // Relación local: Un almacén tiene muchos items
+  @OneToMany(() => InventoryItem, (item) => item.inventory)
+  items!: InventoryItem[];
+
+  // Relación local: Un almacén tiene muchas asignaciones de usuarios
+  @OneToMany(() => UserInventory, (userInv) => userInv.inventory)
+  userAssignments!: UserInventory[];
 }
