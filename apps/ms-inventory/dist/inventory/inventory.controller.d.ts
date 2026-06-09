@@ -4,6 +4,7 @@ export declare class InventoryController {
     private readonly inventoryService;
     constructor(inventoryService: InventoryService);
     findAll(): Promise<{
+        items: import("./entities/inventory-item.entity").InventoryItem[];
         totalItems: number;
         totalUsers: number;
         userIds: string[];
@@ -11,10 +12,18 @@ export declare class InventoryController {
         name: string;
         description: string;
         createdAt: Date;
-        items: import("./entities/inventory-item.entity").InventoryItem[];
         userAssignments: import("./entities/user-inventory.entity").UserInventory[];
     }[]>;
-    findOne(id: number): Promise<import("./entities/inventory.entity").Inventory>;
+    findOne(id: number): Promise<{
+        id: number;
+        name: string;
+        description: string;
+        createdAt: Date;
+        items: import("./entities/inventory-item.entity").InventoryItem[];
+        totalItems: number;
+        totalUsers: number;
+        userIds: string[];
+    }>;
     create(createInventoryDto: CreateInventoryDto, userId: string): Promise<import("./entities/inventory.entity").Inventory>;
     assignUserToInventory(inventoryId: number, userId: string): Promise<{
         success: boolean;

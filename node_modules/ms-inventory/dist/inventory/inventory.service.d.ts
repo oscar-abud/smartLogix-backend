@@ -8,6 +8,7 @@ export declare class InventoryService {
     constructor(inventoryRepository: Repository<Inventory>, dataSource: DataSource);
     registerInventory(createInventoryDto: CreateInventoryDto, creatorUserId: string): Promise<Inventory>;
     getAll(): Promise<{
+        items: import("./entities/inventory-item.entity").InventoryItem[];
         totalItems: number;
         totalUsers: number;
         userIds: string[];
@@ -15,10 +16,18 @@ export declare class InventoryService {
         name: string;
         description: string;
         createdAt: Date;
-        items: import("./entities/inventory-item.entity").InventoryItem[];
         userAssignments: UserInventory[];
     }[]>;
-    getInventory(id: number): Promise<Inventory>;
+    getInventory(id: number): Promise<{
+        id: number;
+        name: string;
+        description: string;
+        createdAt: Date;
+        items: import("./entities/inventory-item.entity").InventoryItem[];
+        totalItems: number;
+        totalUsers: number;
+        userIds: string[];
+    }>;
     assignUser(inventoryId: number, userId: string): Promise<{
         success: boolean;
         message: string;

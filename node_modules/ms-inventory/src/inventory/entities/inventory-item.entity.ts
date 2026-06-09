@@ -28,8 +28,8 @@ export class InventoryItem {
   @Column({ name: 'inventory_id', type: 'int' })
   inventoryId!: number;
 
-  @CreateDateColumn({ name: 'createdat' })
-  createdAt!: Date;
+  @CreateDateColumn({ name: 'createdAt' })
+createdAt!: Date;
 
   // ==========================================
   // RELACIONES FÍSICAS LOCALES (Muchos a Uno)

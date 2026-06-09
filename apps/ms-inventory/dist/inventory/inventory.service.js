@@ -59,11 +59,12 @@ let InventoryService = class InventoryService {
     async getAll() {
         try {
             const inventoriesRaw = await this.inventoryRepository.createQueryBuilder('inventory')
+                .leftJoinAndSelect('inventory.items', 'item')
                 .addSelect((subQuery) => {
                 return subQuery
-                    .select('COUNT(item.id)', 'totalItems')
-                    .from('inventory_items', 'item')
-                    .where('item.inventory_id = inventory.id');
+                    .select('COUNT(subItem.id)', 'totalItems')
+                    .from('inventory_items', 'subItem')
+                    .where('subItem.inventory_id = inventory.id');
             }, 'totalItems')
                 .addSelect((subQuery) => {
                 return subQuery
@@ -73,13 +74,14 @@ let InventoryService = class InventoryService {
             }, 'userIds')
                 .orderBy('inventory.id', 'ASC')
                 .getRawAndEntities();
-            return inventoriesRaw.entities.map((inventory, index) => {
-                const raw = inventoriesRaw.raw[index];
+            return inventoriesRaw.entities.map((inventory) => {
+                const raw = inventoriesRaw.raw.find(r => r.inventory_id === inventory.id) || {};
                 const userIdsArray = typeof raw.userIds === 'string'
                     ? JSON.parse(raw.userIds)
                     : (raw.userIds || []);
                 return {
                     ...inventory,
+                    items: inventory.items || [],
                     totalItems: raw.totalItems ? parseInt(raw.totalItems, 10) : 0,
                     totalUsers: userIdsArray.length,
                     userIds: userIdsArray,
@@ -92,21 +94,45 @@ let InventoryService = class InventoryService {
     }
     async getInventory(id) {
         try {
-            const inventory = await this.inventoryRepository.findOne({
-                where: { id },
-                relations: {
-                    items: true,
-                },
-            });
-            if (!inventory) {
+            const inventoryRaw = await this.inventoryRepository.createQueryBuilder('inventory')
+                .leftJoinAndSelect('inventory.items', 'item')
+                .where('inventory.id = :id', { id })
+                .addSelect((subQuery) => {
+                return subQuery
+                    .select('COUNT(subItem.id)', 'totalItems')
+                    .from('inventory_items', 'subItem')
+                    .where('subItem.inventory_id = inventory.id');
+            }, 'totalItems')
+                .addSelect((subQuery) => {
+                return subQuery
+                    .select("COALESCE(json_agg(user_inv.user_id) FILTER (WHERE user_inv.user_id IS NOT NULL), '[]')", 'userIds')
+                    .from('user_inventories', 'user_inv')
+                    .where('user_inv.inventory_id = inventory.id');
+            }, 'userIds')
+                .getRawAndEntities();
+            if (!inventoryRaw.entities || inventoryRaw.entities.length === 0) {
                 throw new common_1.NotFoundException(`El almacén con ID ${id} no existe`);
             }
-            return inventory;
+            const inventory = inventoryRaw.entities[0];
+            const raw = inventoryRaw.raw[0] || {};
+            const userIdsArray = typeof raw.userIds === 'string'
+                ? JSON.parse(raw.userIds)
+                : (raw.userIds || []);
+            return {
+                id: inventory.id,
+                name: inventory.name,
+                description: inventory.description,
+                createdAt: inventory.createdAt,
+                items: inventory.items || [],
+                totalItems: raw.totalItems ? parseInt(raw.totalItems, 10) : 0,
+                totalUsers: userIdsArray.length,
+                userIds: userIdsArray,
+            };
         }
         catch (error) {
             if (error instanceof common_1.NotFoundException)
                 throw error;
-            throw new common_1.InternalServerErrorException(`Error al obtener el almacén: ${error.message}`);
+            throw new common_1.InternalServerErrorException(`Error al obtener el almacén en ms-inventory: ${error.message}`);
         }
     }
     async assignUser(inventoryId, userId) {

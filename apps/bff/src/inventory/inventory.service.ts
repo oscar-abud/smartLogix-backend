@@ -66,13 +66,46 @@ export class InventoryService {
 
   async getInventory(id: number) {
     try {
-      const { data } = await firstValueFrom(
+      const { data: inventory } = await firstValueFrom(
         this.httpService.get(`${this.inventoryMicroserviceUrl}/${id}`)
       );
-      return data;
+
+      if (!inventory || !inventory.userIds || inventory.userIds.length === 0) {
+        return {
+          ...inventory,
+          users: []
+        };
+      }
+
+      const userPromises = inventory.userIds.map(async (userId: string) => {
+        try {
+          const { data: userData } = await firstValueFrom(
+            this.httpService.get(`${this.usersMicroserviceUrl}/${userId}`)
+          );
+
+          if (userData) {
+            const { password, createdAt, ...cleanUser } = userData;
+            return cleanUser;
+          }
+          return null;
+        } catch (err: any) {
+          console.error(`[BFF - Detail] No se pudo obtener el usuario con ID ${userId}:`, err.message);
+          return null;
+        }
+      });
+
+      const resolvedUsers = await Promise.all(userPromises);
+      
+      const externalUsers = resolvedUsers.filter((user) => user !== null);
+
+      return {
+        ...inventory,
+        users: externalUsers,
+      };
+
     } catch (error: any) {
       throw new InternalServerErrorException(
-        error.response?.data?.message || 'Error al buscar el almacén por ID'
+        error.response?.data?.message || `Error en el orquestador BFF al consolidar el detalle del almacén #${id}`
       );
     }
   }

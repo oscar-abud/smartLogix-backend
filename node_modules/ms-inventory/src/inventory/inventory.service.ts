@@ -53,11 +53,15 @@ export class InventoryService {
   async getAll() {
     try {
       const inventoriesRaw = await this.inventoryRepository.createQueryBuilder('inventory')
+        // 1. Traemos la relación de los productos mapeada como objeto de forma nativa
+        .leftJoinAndSelect('inventory.items', 'item')
+        
+        // 2. Subconsultas rápidas para los contadores y usuarios asignados
         .addSelect((subQuery) => {
           return subQuery
-            .select('COUNT(item.id)', 'totalItems')
-            .from('inventory_items', 'item')
-            .where('item.inventory_id = inventory.id');
+            .select('COUNT(subItem.id)', 'totalItems')
+            .from('inventory_items', 'subItem')
+            .where('subItem.inventory_id = inventory.id');
         }, 'totalItems')
         .addSelect((subQuery) => {
           return subQuery
@@ -68,15 +72,18 @@ export class InventoryService {
         .orderBy('inventory.id', 'ASC')
         .getRawAndEntities();
 
-      // El microservicio solo estructura su data local y la escupe inmediatamente
-      return inventoriesRaw.entities.map((inventory, index) => {
-        const raw = inventoriesRaw.raw[index];
+      // 3. Mapeamos los resultados emparejando la entidad con su data cruda correspondiente
+      return inventoriesRaw.entities.map((inventory) => {
+        // Buscamos en el arreglo raw el registro que pertenezca a este inventario específico
+        const raw = inventoriesRaw.raw.find(r => r.inventory_id === inventory.id) || {};
+        
         const userIdsArray: string[] = typeof raw.userIds === 'string' 
           ? JSON.parse(raw.userIds) 
           : (raw.userIds || []);
 
         return {
           ...inventory,
+          items: inventory.items || [], // Si no tiene ítems, se asegura de mandar un array vacío
           totalItems: raw.totalItems ? parseInt(raw.totalItems, 10) : 0,
           totalUsers: userIdsArray.length,
           userIds: userIdsArray,
@@ -89,21 +96,57 @@ export class InventoryService {
 
   async getInventory(id: number) {
     try {
-      const inventory = await this.inventoryRepository.findOne({
-        where: { id },
-        relations: {
-          items: true,
-        },
-      });
+      const inventoryRaw = await this.inventoryRepository.createQueryBuilder('inventory')
+        // 1. Traemos la relación de los productos mapeada como objeto de forma nativa
+        .leftJoinAndSelect('inventory.items', 'item')
+        
+        // 2. Filtramos estrictamente por el ID que viene por parámetro
+        .where('inventory.id = :id', { id })
+        
+        // 3. Subconsultas idénticas a las de getAll para totalizadores y userIds
+        .addSelect((subQuery) => {
+          return subQuery
+            .select('COUNT(subItem.id)', 'totalItems')
+            .from('inventory_items', 'subItem')
+            .where('subItem.inventory_id = inventory.id');
+        }, 'totalItems')
+        .addSelect((subQuery) => {
+          return subQuery
+            .select("COALESCE(json_agg(user_inv.user_id) FILTER (WHERE user_inv.user_id IS NOT NULL), '[]')", 'userIds')
+            .from('user_inventories', 'user_inv')
+            .where('user_inv.inventory_id = inventory.id');
+        }, 'userIds')
+        .getRawAndEntities();
 
-      if (!inventory) {
+      // 4. Validamos si el registro existe en la base de datos
+      if (!inventoryRaw.entities || inventoryRaw.entities.length === 0) {
         throw new NotFoundException(`El almacén con ID ${id} no existe`);
       }
 
-      return inventory;
+      // Extraemos la entidad única y su primer registro crudo correspondiente
+      const inventory = inventoryRaw.entities[0];
+      const raw = inventoryRaw.raw[0] || {};
+      
+      // Parseamos el arreglo de UUIDs de usuarios asignados
+      const userIdsArray: string[] = typeof raw.userIds === 'string' 
+        ? JSON.parse(raw.userIds) 
+        : (raw.userIds || []);
+
+      // 5. Retornamos la estructura exacta reflejando el formato empresarial
+      return {
+        id: inventory.id,
+        name: inventory.name,
+        description: inventory.description,
+        createdAt: inventory.createdAt,
+        items: inventory.items || [],
+        totalItems: raw.totalItems ? parseInt(raw.totalItems, 10) : 0,
+        totalUsers: userIdsArray.length,
+        userIds: userIdsArray,
+      };
+
     } catch (error: any) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(`Error al obtener el almacén: ${error.message}`);
+      throw new InternalServerErrorException(`Error al obtener el almacén en ms-inventory: ${error.message}`);
     }
   }
 
