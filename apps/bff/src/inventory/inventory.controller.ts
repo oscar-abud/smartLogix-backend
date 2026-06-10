@@ -5,6 +5,7 @@ import { InventoryService } from './inventory.service';
 import { AuthService } from '../auth/auth.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { CreateItemDto } from './dto/create-item.dto';
+import { CreateInventoryTypeDto } from './dto/create-inventory-type.dto';
 
 @ApiTags('Inventory')
 @ApiBearerAuth()
@@ -20,6 +21,12 @@ export class InventoryController {
   @ApiOperation({ summary: 'Listar todos los almacenes de inventario' })
   async findAll() {
     return this.inventoryService.getAll();
+  }
+
+  @Get('types')
+  @ApiOperation({ summary: 'Obtener el catálogo completo de tipos de inventario para desplegar en Selects' })
+  async findAllTypes() {
+    return this.inventoryService.getAllTypes();
   }
 
   @Get(':id')
@@ -38,6 +45,12 @@ export class InventoryController {
     console.log('ID del usuario extraído con éxito:', userId);
     
     return this.inventoryService.createInventory(createInventoryDto, userId);
+  }
+
+  @Post('types')
+  @ApiOperation({ summary: 'Registrar una nueva categoría o tipo de inventario global' })
+  async createType(@Body() createInventoryTypeDto: CreateInventoryTypeDto) {
+    return this.inventoryService.createType(createInventoryTypeDto);
   }
 
   @Post(':id/items')

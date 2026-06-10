@@ -20,6 +20,7 @@ const inventory_service_1 = require("./inventory.service");
 const auth_service_1 = require("../auth/auth.service");
 const create_inventory_dto_1 = require("./dto/create-inventory.dto");
 const create_item_dto_1 = require("./dto/create-item.dto");
+const create_inventory_type_dto_1 = require("./dto/create-inventory-type.dto");
 let InventoryController = class InventoryController {
     inventoryService;
     authService;
@@ -30,13 +31,19 @@ let InventoryController = class InventoryController {
     async findAll() {
         return this.inventoryService.getAll();
     }
+    async findAllTypes() {
+        return this.inventoryService.getAllTypes();
+    }
     async findOne(id) {
         return this.inventoryService.getInventory(id);
     }
     async createInventory(createInventoryDto, req) {
         const userId = req.user.userId;
-        console.log(...oo_oo(`3504186771_38_4_38_61_4`, 'ID del usuario extraído con éxito:', userId));
+        console.log(...oo_oo(`1081953621_45_4_45_61_4`, 'ID del usuario extraído con éxito:', userId));
         return this.inventoryService.createInventory(createInventoryDto, userId);
+    }
+    async createType(createInventoryTypeDto) {
+        return this.inventoryService.createType(createInventoryTypeDto);
     }
     async addItem(id, createItemDto) {
         return this.inventoryService.addItemToInventory(id, createItemDto);
@@ -57,6 +64,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "findAll", null);
 __decorate([
+    (0, common_1.Get)('types'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener el catálogo completo de tipos de inventario para desplegar en Selects' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "findAllTypes", null);
+__decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Obtener un almacén por su ID' }),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
@@ -73,6 +87,14 @@ __decorate([
     __metadata("design:paramtypes", [create_inventory_dto_1.CreateInventoryDto, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "createInventory", null);
+__decorate([
+    (0, common_1.Post)('types'),
+    (0, swagger_1.ApiOperation)({ summary: 'Registrar una nueva categoría o tipo de inventario global' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_inventory_type_dto_1.CreateInventoryTypeDto]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "createType", null);
 __decorate([
     (0, common_1.Post)(':id/items'),
     (0, swagger_1.ApiOperation)({ summary: 'Registrar y asociar un nuevo producto/ítem a un almacén específico' }),
