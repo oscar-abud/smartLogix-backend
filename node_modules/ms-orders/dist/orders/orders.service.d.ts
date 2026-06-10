@@ -7,6 +7,7 @@ export declare class OrdersService {
     private readonly dataSource;
     private readonly httpService;
     constructor(orderRepository: Repository<Order>, dataSource: DataSource, httpService: HttpService);
+    findAll(): Promise<Order[]>;
     create(createOrderDto: CreateOrderDto): Promise<{
         message: string;
         orderId: number;
@@ -15,5 +16,4 @@ export declare class OrdersService {
         quantity: number;
         createdAt: Date;
     }>;
-    findAll(): Promise<Order[]>;
 }

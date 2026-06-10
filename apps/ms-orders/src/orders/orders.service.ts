@@ -16,6 +16,17 @@ export class OrdersService {
     private readonly httpService: HttpService,
   ) {}
 
+  async findAll() {
+    return await this.orderRepository.find({
+      relations: {
+      items: true,
+      },
+      order: { 
+      createdAt: 'DESC' 
+      },
+    });
+  }
+
   async create(createOrderDto: CreateOrderDto) {
     const { productId, quantity } = createOrderDto;
 
@@ -92,16 +103,5 @@ export class OrdersService {
       // Liberar el query runner
       await queryRunner.release();
     }
-  }
-
-  async findAll() {
-    return await this.orderRepository.find({
-      relations: {
-      items: true,
-      },
-      order: { 
-      createdAt: 'DESC' 
-      },
-    });
   }
 }

@@ -29,6 +29,16 @@ let OrdersService = class OrdersService {
         this.dataSource = dataSource;
         this.httpService = httpService;
     }
+    async findAll() {
+        return await this.orderRepository.find({
+            relations: {
+                items: true,
+            },
+            order: {
+                createdAt: 'DESC'
+            },
+        });
+    }
     async create(createOrderDto) {
         const { productId, quantity } = createOrderDto;
         const inventoryUrl = 'http://localhost:3002/api/inventory';
@@ -74,22 +84,12 @@ let OrdersService = class OrdersService {
         }
         catch (transactionError) {
             await queryRunner.rollbackTransaction();
-            console.error(...oo_tx(`2821076991_89_6_89_78_11`, 'Error transaccional en OrdersService:', transactionError));
+            console.error(...oo_tx(`498312056_100_6_100_78_11`, 'Error transaccional en OrdersService:', transactionError));
             throw new common_1.InternalServerErrorException('No se pudo procesar la orden debido a un problema interno.');
         }
         finally {
             await queryRunner.release();
         }
-    }
-    async findAll() {
-        return await this.orderRepository.find({
-            relations: {
-                items: true,
-            },
-            order: {
-                createdAt: 'DESC'
-            },
-        });
     }
 };
 exports.OrdersService = OrdersService;
