@@ -6,12 +6,14 @@ import { AuthModule } from './auth/auth.module';
 import { InventoryController } from './inventory/inventory.controller';
 import { InventoryService } from './inventory/inventory.service';
 import { CommonModule } from './common/common.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
     HttpModule,
     AuthModule,
-    CommonModule
+    CommonModule,
+    OrdersModule
   ],
   controllers: [
     InventoryController

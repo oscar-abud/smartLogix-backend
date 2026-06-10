@@ -14,27 +14,42 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrdersController = void 0;
 const common_1 = require("@nestjs/common");
-const orders_service_1 = require("./orders.service");
+const swagger_1 = require("@nestjs/swagger");
 const passport_1 = require("@nestjs/passport");
+const orders_service_1 = require("./orders.service");
+const create_order_dto_1 = require("./dto/create-order.dto");
 let OrdersController = class OrdersController {
     ordersService;
     constructor(ordersService) {
         this.ordersService = ordersService;
     }
-    async crearOrden(datosOrden) {
-        return this.ordersService.redireccionarAMsOrders(datosOrden);
+    async createOrder(createOrderDto) {
+        return this.ordersService.createOrder(createOrderDto);
+    }
+    async findAll() {
+        return this.ordersService.getOrdersHistory();
     }
 };
 exports.OrdersController = OrdersController;
 __decorate([
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
-    (0, common_1.Post)(),
+    (0, common_1.Post)(''),
+    (0, swagger_1.ApiOperation)({ summary: 'Generar una nueva orden de compra y rebajar stock de inventario' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [create_order_dto_1.CreateOrderDto]),
     __metadata("design:returntype", Promise)
-], OrdersController.prototype, "crearOrden", null);
+], OrdersController.prototype, "createOrder", null);
+__decorate([
+    (0, common_1.Get)(''),
+    (0, swagger_1.ApiOperation)({ summary: 'Listar el historial completo de órdenes generadas' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], OrdersController.prototype, "findAll", null);
 exports.OrdersController = OrdersController = __decorate([
+    (0, swagger_1.ApiTags)('Orders'),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
     (0, common_1.Controller)('orders'),
     __metadata("design:paramtypes", [orders_service_1.OrdersService])
 ], OrdersController);

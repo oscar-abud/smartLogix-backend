@@ -1,24 +1,63 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, ServiceUnavailableException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { CircuitBreakerService } from '../common/circuit-breaker.service';
 
 @Injectable()
 export class OrdersService {
-  private readonly ordersUrl = 'http://localhost:3002/api/orders';
+  // URL apuntando a tu ms-orders (NestJS en puerto 3003 con prefijo api)
+  private readonly ordersMicroserviceUrl = 'http://localhost:3003/api/orders';
 
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly breakerService: CircuitBreakerService
+  ) {}
 
-  async redireccionarAMsOrders(datosOrden: any) {
+  async getOrdersHistory() {
     try {
-      // Pasamanos directo: Envía todo el body tal cual llegó a ms-orders
-      const { data } = await firstValueFrom(
-        this.httpService.post(this.ordersUrl, datosOrden)
+      return await this.breakerService.runWithCircuitBreaker(
+        'MS-ORDERS-GET-ALL',
+        async () => {
+          const { data } = await firstValueFrom(
+            this.httpService.get(this.ordersMicroserviceUrl)
+          );
+          return data;
+        },
+        // Fallback: Si se cae ms-orders, retornamos un arreglo vacío para no congelar la pantalla del Front
+        async () => {
+          console.error('[BFF Fallback] ms-orders inaccesible. Retornando historial vacío.');
+          return [];
+        }
       );
-      return data;
-    } catch (error) {
-      throw new HttpException(
-        error.response?.data?.message || 'Error en el servidor de Órdenes',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+    } catch (error: any) {
+      throw new InternalServerErrorException(
+        error.response?.data?.message || 'Error al recuperar el historial de órdenes desde el BFF'
+      );
+    }
+  }
+
+  async createOrder(createOrderDto: CreateOrderDto) {
+    try {
+      // Usamos el Circuit Breaker para proteger las transacciones de escritura
+      return await this.breakerService.runWithCircuitBreaker(
+        'MS-ORDERS-CREATE',
+        async () => {
+          const { data } = await firstValueFrom(
+            this.httpService.post(this.ordersMicroserviceUrl, createOrderDto)
+          );
+          return data;
+        },
+        async () => {
+          throw new ServiceUnavailableException(
+            'El sistema de procesamiento de órdenes no está disponible temporalmente. La compra no pudo ser completada.'
+          );
+        }
+      );
+    } catch (error: any) {
+      if (error instanceof ServiceUnavailableException) throw error;
+      throw new InternalServerErrorException(
+        error.response?.data?.message || 'Error al procesar la creación de la orden en el BFF'
       );
     }
   }

@@ -13,6 +13,7 @@ const auth_module_1 = require("./auth/auth.module");
 const inventory_controller_1 = require("./inventory/inventory.controller");
 const inventory_service_1 = require("./inventory/inventory.service");
 const common_module_1 = require("./common/common.module");
+const orders_module_1 = require("./orders/orders.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -21,7 +22,8 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             axios_1.HttpModule,
             auth_module_1.AuthModule,
-            common_module_1.CommonModule
+            common_module_1.CommonModule,
+            orders_module_1.OrdersModule
         ],
         controllers: [
             inventory_controller_1.InventoryController
