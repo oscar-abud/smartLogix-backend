@@ -2,6 +2,7 @@ import { Repository, DataSource } from 'typeorm';
 import { HttpService } from '@nestjs/axios';
 import { Order, OrderStatus } from './entities/order.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 export declare class OrdersService {
     private readonly orderRepository;
     private readonly dataSource;
@@ -16,5 +17,9 @@ export declare class OrdersService {
         status: OrderStatus;
         quantity: number;
         createdAt: Date;
+    }>;
+    updateStatus(orderId: number, updateOrderStatusDto: UpdateOrderStatusDto): Promise<Order>;
+    remove(orderId: number): Promise<{
+        message: string;
     }>;
 }

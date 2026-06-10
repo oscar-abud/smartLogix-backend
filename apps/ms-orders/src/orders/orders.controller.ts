@@ -1,7 +1,8 @@
-import { Controller, Post, Get, Body, HttpCode, HttpStatus, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Get, Body, HttpCode, HttpStatus, Param, ParseIntPipe, Delete, Patch } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -54,5 +55,20 @@ export class OrdersController {
   })
   create(@Body() createOrderDto: CreateOrderDto) {
     return this.ordersService.create(createOrderDto);
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Actualizar el estado de una orden (PENDING, PROCESSED, CANCELLED)' })
+  updateStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateOrderStatusDto: UpdateOrderStatusDto
+  ) {
+    return this.ordersService.updateStatus(id, updateOrderStatusDto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Eliminar una orden del sistema por su ID' })
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.ordersService.remove(id);
   }
 }

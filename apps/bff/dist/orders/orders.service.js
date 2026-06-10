@@ -28,7 +28,7 @@ let OrdersService = class OrdersService {
                 const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(this.ordersMicroserviceUrl));
                 return data;
             }, async () => {
-                console.error(...oo_tx(`2218385248_29_10_29_92_11`, '[BFF Fallback] ms-orders inaccesible. Retornando historial vacío.'));
+                console.error(...oo_tx(`528789458_29_10_29_92_11`, '[BFF Fallback] ms-orders inaccesible. Retornando historial vacío.'));
                 return [];
             });
         }
@@ -64,6 +64,36 @@ let OrdersService = class OrdersService {
             if (error instanceof common_1.ServiceUnavailableException)
                 throw error;
             throw new common_1.InternalServerErrorException(error.response?.data?.message || 'Error al procesar la creación de la orden en el BFF');
+        }
+    }
+    async updateOrderStatus(orderId, status) {
+        try {
+            return await this.breakerService.runWithCircuitBreaker('MS-ORDERS-UPDATE-STATUS', async () => {
+                const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.patch(`${this.ordersMicroserviceUrl}/${orderId}/status`, { status }));
+                return data;
+            }, async () => {
+                throw new common_1.ServiceUnavailableException('El servicio de actualización de órdenes está caído. Intente más tarde.');
+            });
+        }
+        catch (error) {
+            if (error instanceof common_1.ServiceUnavailableException)
+                throw error;
+            throw new common_1.InternalServerErrorException(error.response?.data?.message || 'Error al actualizar la orden en el BFF');
+        }
+    }
+    async deleteOrder(orderId) {
+        try {
+            return await this.breakerService.runWithCircuitBreaker('MS-ORDERS-DELETE', async () => {
+                const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.delete(`${this.ordersMicroserviceUrl}/${orderId}`));
+                return data;
+            }, async () => {
+                throw new common_1.ServiceUnavailableException('El servicio de eliminación de órdenes no está disponible.');
+            });
+        }
+        catch (error) {
+            if (error instanceof common_1.ServiceUnavailableException)
+                throw error;
+            throw new common_1.InternalServerErrorException(error.response?.data?.message || 'Error al eliminar la orden desde el BFF');
         }
     }
 };

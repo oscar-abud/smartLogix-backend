@@ -85,4 +85,44 @@ export class OrdersService {
       );
     }
   }
+
+  async updateOrderStatus(orderId: number, status: string) {
+    try {
+      return await this.breakerService.runWithCircuitBreaker(
+        'MS-ORDERS-UPDATE-STATUS',
+        async () => {
+          const { data } = await firstValueFrom(
+            this.httpService.patch(`${this.ordersMicroserviceUrl}/${orderId}/status`, { status })
+          );
+          return data;
+        },
+        async () => {
+          throw new ServiceUnavailableException('El servicio de actualización de órdenes está caído. Intente más tarde.');
+        }
+      );
+    } catch (error: any) {
+      if (error instanceof ServiceUnavailableException) throw error;
+      throw new InternalServerErrorException(error.response?.data?.message || 'Error al actualizar la orden en el BFF');
+    }
+  }
+
+  async deleteOrder(orderId: number) {
+    try {
+      return await this.breakerService.runWithCircuitBreaker(
+        'MS-ORDERS-DELETE',
+        async () => {
+          const { data } = await firstValueFrom(
+            this.httpService.delete(`${this.ordersMicroserviceUrl}/${orderId}`)
+          );
+          return data;
+        },
+        async () => {
+          throw new ServiceUnavailableException('El servicio de eliminación de órdenes no está disponible.');
+        }
+      );
+    } catch (error: any) {
+      if (error instanceof ServiceUnavailableException) throw error;
+      throw new InternalServerErrorException(error.response?.data?.message || 'Error al eliminar la orden desde el BFF');
+    }
+  }
 }

@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import { Order, OrderStatus } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 @Injectable()
 export class OrdersService {
@@ -119,6 +120,38 @@ export class OrdersService {
     } finally {
       // Liberar el query runner
       await queryRunner.release();
+    }
+  }
+
+  async updateStatus(orderId: number, updateOrderStatusDto: UpdateOrderStatusDto) {
+    try {
+      const order = await this.orderRepository.findOne({ where: { id: orderId } });
+        
+      if (!order) {
+        throw new NotFoundException(`La orden con ID ${orderId} no existe.`);
+      }
+
+      order.status = updateOrderStatusDto.status;
+      return await this.orderRepository.save(order);
+    } catch (error: any) {
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException('Error interno al actualizar el estado de la orden.');
+    }
+  }
+
+  async remove(orderId: number) {
+    try {
+      const order = await this.orderRepository.findOne({ where: { id: orderId } });
+        
+      if (!order) {
+      throw new NotFoundException(`La orden con ID ${orderId} no existe.`);
+      }
+
+      await this.orderRepository.remove(order);
+      return { message: `Orden #${orderId} eliminada correctamente de forma lógica/física.` };
+    } catch (error: any) {
+      if (error instanceof NotFoundException) throw error;
+      throw new InternalServerErrorException('Error interno al intentar eliminar la orden.');
     }
   }
 }

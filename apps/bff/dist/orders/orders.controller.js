@@ -18,6 +18,7 @@ const swagger_1 = require("@nestjs/swagger");
 const passport_1 = require("@nestjs/passport");
 const orders_service_1 = require("./orders.service");
 const create_order_dto_1 = require("./dto/create-order.dto");
+const update_order_status_dto_1 = require("./dto/update-order-status.dto");
 let OrdersController = class OrdersController {
     ordersService;
     constructor(ordersService) {
@@ -31,6 +32,12 @@ let OrdersController = class OrdersController {
     }
     async createOrder(createOrderDto) {
         return this.ordersService.createOrder(createOrderDto);
+    }
+    async updateStatus(id, updateOrderStatusDto) {
+        return this.ordersService.updateOrderStatus(id, updateOrderStatusDto.status);
+    }
+    async remove(id) {
+        return this.ordersService.deleteOrder(id);
     }
 };
 exports.OrdersController = OrdersController;
@@ -57,6 +64,23 @@ __decorate([
     __metadata("design:paramtypes", [create_order_dto_1.CreateOrderDto]),
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "createOrder", null);
+__decorate([
+    (0, common_1.Patch)(':id/status'),
+    (0, swagger_1.ApiOperation)({ summary: 'Modificar el estado actual de una orden' }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, update_order_status_dto_1.UpdateOrderStatusDto]),
+    __metadata("design:returntype", Promise)
+], OrdersController.prototype, "updateStatus", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Eliminar una orden de compra por su ID' }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], OrdersController.prototype, "remove", null);
 exports.OrdersController = OrdersController = __decorate([
     (0, swagger_1.ApiTags)('Orders'),
     (0, swagger_1.ApiBearerAuth)(),

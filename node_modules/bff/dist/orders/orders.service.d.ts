@@ -9,4 +9,6 @@ export declare class OrdersService {
     getOrdersHistory(): Promise<any>;
     getOrderById(orderId: number): Promise<any>;
     createOrder(createOrderDto: CreateOrderDto): Promise<any>;
+    updateOrderStatus(orderId: number, status: string): Promise<any>;
+    deleteOrder(orderId: number): Promise<any>;
 }

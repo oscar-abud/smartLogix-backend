@@ -1,5 +1,6 @@
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 export declare class OrdersController {
     private readonly ordersService;
     constructor(ordersService: OrdersService);
@@ -12,5 +13,9 @@ export declare class OrdersController {
         status: import("./entities/order.entity").OrderStatus;
         quantity: number;
         createdAt: Date;
+    }>;
+    updateStatus(id: number, updateOrderStatusDto: UpdateOrderStatusDto): Promise<import("./entities/order.entity").Order>;
+    remove(id: number): Promise<{
+        message: string;
     }>;
 }

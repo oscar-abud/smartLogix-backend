@@ -50,7 +50,7 @@ let OrdersService = class OrdersService {
             return orden;
         }
         catch (error) {
-            console.error(...oo_tx(`1369915455_42_6_42_72_11`, 'Error en buscar el orden en OrdersService:', error));
+            console.error(...oo_tx(`2429976761_43_6_43_72_11`, 'Error en buscar el orden en OrdersService:', error));
             throw new common_1.InternalServerErrorException('No se pudo buscar la orden debido a un problema interno.');
         }
     }
@@ -99,11 +99,41 @@ let OrdersService = class OrdersService {
         }
         catch (transactionError) {
             await queryRunner.rollbackTransaction();
-            console.error(...oo_tx(`1369915455_117_6_117_78_11`, 'Error transaccional en OrdersService:', transactionError));
+            console.error(...oo_tx(`2429976761_118_6_118_78_11`, 'Error transaccional en OrdersService:', transactionError));
             throw new common_1.InternalServerErrorException('No se pudo procesar la orden debido a un problema interno.');
         }
         finally {
             await queryRunner.release();
+        }
+    }
+    async updateStatus(orderId, updateOrderStatusDto) {
+        try {
+            const order = await this.orderRepository.findOne({ where: { id: orderId } });
+            if (!order) {
+                throw new common_1.NotFoundException(`La orden con ID ${orderId} no existe.`);
+            }
+            order.status = updateOrderStatusDto.status;
+            return await this.orderRepository.save(order);
+        }
+        catch (error) {
+            if (error instanceof common_1.NotFoundException)
+                throw error;
+            throw new common_1.InternalServerErrorException('Error interno al actualizar el estado de la orden.');
+        }
+    }
+    async remove(orderId) {
+        try {
+            const order = await this.orderRepository.findOne({ where: { id: orderId } });
+            if (!order) {
+                throw new common_1.NotFoundException(`La orden con ID ${orderId} no existe.`);
+            }
+            await this.orderRepository.remove(order);
+            return { message: `Orden #${orderId} eliminada correctamente de forma lógica/física.` };
+        }
+        catch (error) {
+            if (error instanceof common_1.NotFoundException)
+                throw error;
+            throw new common_1.InternalServerErrorException('Error interno al intentar eliminar la orden.');
         }
     }
 };

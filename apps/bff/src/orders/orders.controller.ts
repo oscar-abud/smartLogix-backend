@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, UseGuards, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Param, ParseIntPipe, Patch, Delete } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 
 @ApiTags('Orders')
 @ApiBearerAuth()
@@ -27,5 +28,20 @@ export class OrdersController {
   @ApiOperation({ summary: 'Generar una nueva orden de compra y rebajar stock de inventario' })
   async createOrder(@Body() createOrderDto: CreateOrderDto) {
     return this.ordersService.createOrder(createOrderDto);
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Modificar el estado actual de una orden' })
+  async updateStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateOrderStatusDto: UpdateOrderStatusDto // Puedes replicar aquí el DTO si deseas validaciones estrictas en el BFF
+  ) {
+    return this.ordersService.updateOrderStatus(id, updateOrderStatusDto.status);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Eliminar una orden de compra por su ID' })
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return this.ordersService.deleteOrder(id);
   }
 }
