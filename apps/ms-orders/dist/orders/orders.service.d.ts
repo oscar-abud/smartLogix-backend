@@ -12,6 +12,7 @@ export declare class OrdersService {
         orderId: number;
         totalAmount: number;
         status: OrderStatus;
+        quantity: number;
         createdAt: Date;
     }>;
     findAll(): Promise<Order[]>;

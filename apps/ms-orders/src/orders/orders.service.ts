@@ -79,6 +79,7 @@ export class OrdersService {
         orderId: savedOrder.id,
         totalAmount: savedOrder.totalAmount,
         status: savedOrder.status,
+        quantity: quantity,
         createdAt: savedOrder.createdAt,
       };
 

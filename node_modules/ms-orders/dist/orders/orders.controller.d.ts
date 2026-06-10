@@ -9,6 +9,7 @@ export declare class OrdersController {
         orderId: number;
         totalAmount: number;
         status: import("./entities/order.entity").OrderStatus;
+        quantity: number;
         createdAt: Date;
     }>;
 }
