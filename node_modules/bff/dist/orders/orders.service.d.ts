@@ -5,6 +5,7 @@ export declare class OrdersService {
     private readonly httpService;
     private readonly breakerService;
     private readonly ordersMicroserviceUrl;
+    private readonly inventoryMicroserviceUrl;
     constructor(httpService: HttpService, breakerService: CircuitBreakerService);
     getOrdersHistory(): Promise<any>;
     getOrderById(orderId: number): Promise<any>;

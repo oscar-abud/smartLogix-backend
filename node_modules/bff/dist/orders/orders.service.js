@@ -18,37 +18,88 @@ let OrdersService = class OrdersService {
     httpService;
     breakerService;
     ordersMicroserviceUrl = 'http://localhost:3003/api/orders';
+    inventoryMicroserviceUrl = 'http://localhost:3002/api/inventory';
     constructor(httpService, breakerService) {
         this.httpService = httpService;
         this.breakerService = breakerService;
     }
     async getOrdersHistory() {
         try {
-            return await this.breakerService.runWithCircuitBreaker('MS-ORDERS-GET-ALL', async () => {
+            const orders = await this.breakerService.runWithCircuitBreaker('MS-ORDERS-GET-ALL', async () => {
                 const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(this.ordersMicroserviceUrl));
                 return data;
-            }, async () => {
-                console.error(...oo_tx(`528789458_29_10_29_92_11`, '[BFF Fallback] ms-orders inaccesible. Retornando historial vacío.'));
+            }, async () => []);
+            if (!orders || orders.length === 0)
                 return [];
+            const allProductIds = Array.from(new Set(orders.flatMap((order) => (order.items || []).map((item) => item.productId))));
+            const productsMap = await this.breakerService.runWithCircuitBreaker('MS-INVENTORY-BULK-GET', async () => {
+                const productPromises = allProductIds.map(async (id) => {
+                    try {
+                        const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`${this.inventoryMicroserviceUrl}/items/${id}`));
+                        return { id: data.id, name: data.name, sku: data.sku };
+                    }
+                    catch (err) {
+                        return { id, name: 'Producto no disponible', sku: 'N/A' };
+                    }
+                });
+                const resolvedProducts = await Promise.all(productPromises);
+                return new Map(resolvedProducts.map(p => [p.id, p]));
+            }, async () => {
+                console.error(...oo_tx(`4257725895_61_10_61_85_11`, '[BFF Fallback] ms-inventory inaccesible al listar órdenes.'));
+                return new Map();
             });
+            return orders.map((order) => ({
+                ...order,
+                items: (order.items || []).map((item) => ({
+                    ...item,
+                    product: productsMap.get(item.productId) || { id: item.productId, name: 'Desconocido', sku: 'N/A' }
+                }))
+            }));
         }
         catch (error) {
-            throw new common_1.InternalServerErrorException(error.response?.data?.message || 'Error al recuperar el historial de órdenes desde el BFF');
+            throw new common_1.InternalServerErrorException(error.response?.data?.message || 'Error al consolidar el historial de órdenes con productos en el BFF');
         }
     }
     async getOrderById(orderId) {
         try {
-            return await this.breakerService.runWithCircuitBreaker('MS-ORDERS-GET-BY-ID', async () => {
+            const order = await this.breakerService.runWithCircuitBreaker('MS-ORDERS-GET-BY-ID', async () => {
                 const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`${this.ordersMicroserviceUrl}/${orderId}`));
                 return data;
             }, async () => {
-                throw new common_1.ServiceUnavailableException(`El servicio de órdenes no está disponible. No se pudo recuperar la orden #${orderId}.`);
+                throw new common_1.ServiceUnavailableException('Servicio de órdenes no disponible.');
             });
+            if (!order || !order.items || order.items.length === 0) {
+                return { ...order, items: [] };
+            }
+            const itemPromises = order.items.map(async (item) => {
+                try {
+                    const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`${this.inventoryMicroserviceUrl}/items/${item.productId}`));
+                    return {
+                        ...item,
+                        product: {
+                            id: data.id,
+                            sku: data.sku,
+                            name: data.name
+                        }
+                    };
+                }
+                catch (error) {
+                    return {
+                        ...item,
+                        product: { id: item.productId, name: 'Producto no disponible', sku: 'N/A' }
+                    };
+                }
+            });
+            const hydratedItems = await Promise.all(itemPromises);
+            return {
+                ...order,
+                items: hydratedItems
+            };
         }
         catch (error) {
             if (error instanceof common_1.ServiceUnavailableException)
                 throw error;
-            throw new common_1.InternalServerErrorException(error.response?.data?.message || `Error al recuperar la orden #${orderId} desde el BFF`);
+            throw new common_1.InternalServerErrorException(error.response?.data?.message || `Error al consolidar la orden #${orderId} con sus productos`);
         }
     }
     async createOrder(createOrderDto) {
