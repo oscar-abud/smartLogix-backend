@@ -18,11 +18,14 @@ const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const inventory_entity_1 = require("./entities/inventory.entity");
 const user_inventory_entity_1 = require("./entities/user-inventory.entity");
+const inventory_item_entity_1 = require("./entities/inventory-item.entity");
 let InventoryService = class InventoryService {
     inventoryRepository;
+    itemRepository;
     dataSource;
-    constructor(inventoryRepository, dataSource) {
+    constructor(inventoryRepository, itemRepository, dataSource) {
         this.inventoryRepository = inventoryRepository;
+        this.itemRepository = itemRepository;
         this.dataSource = dataSource;
     }
     async registerInventory(createInventoryDto, creatorUserId) {
@@ -54,6 +57,30 @@ let InventoryService = class InventoryService {
         }
         finally {
             await queryRunner.release();
+        }
+    }
+    async addItemToInventory(inventoryId, createItemDto) {
+        try {
+            const inventory = await this.inventoryRepository.findOne({ where: { id: inventoryId } });
+            if (!inventory) {
+                throw new common_1.NotFoundException(`El almacén con ID ${inventoryId} no existe`);
+            }
+            const skuExists = await this.itemRepository.findOne({ where: { sku: createItemDto.sku } });
+            if (skuExists) {
+                throw new common_1.BadRequestException(`El producto con SKU '${createItemDto.sku}' ya está registrado`);
+            }
+            const newItem = this.itemRepository.create({
+                ...createItemDto,
+                inventoryId: inventoryId,
+                stockReserved: createItemDto.stockReserved || 0,
+            });
+            return await this.itemRepository.save(newItem);
+        }
+        catch (error) {
+            if (error instanceof common_1.NotFoundException || error instanceof common_1.BadRequestException) {
+                throw error;
+            }
+            throw new common_1.InternalServerErrorException(`Error al registrar el producto en el almacén: ${error.message}`);
         }
     }
     async getAll() {
@@ -182,7 +209,9 @@ exports.InventoryService = InventoryService;
 exports.InventoryService = InventoryService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(inventory_entity_1.Inventory)),
+    __param(1, (0, typeorm_1.InjectRepository)(inventory_item_entity_1.InventoryItem)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.DataSource])
 ], InventoryService);
 //# sourceMappingURL=inventory.service.js.map

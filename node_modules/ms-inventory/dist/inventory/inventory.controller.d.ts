@@ -1,5 +1,6 @@
 import { InventoryService } from './inventory.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
+import { CreateItemDto } from './dto/create-item.dto';
 export declare class InventoryController {
     private readonly inventoryService;
     constructor(inventoryService: InventoryService);
@@ -29,6 +30,7 @@ export declare class InventoryController {
         success: boolean;
         message: string;
     }>;
+    addItem(id: number, createItemDto: CreateItemDto): Promise<import("./entities/inventory-item.entity").InventoryItem>;
     updateUserInventoryRelation(inventoryId: number, userId: string): Promise<{
         success: boolean;
         message: string;

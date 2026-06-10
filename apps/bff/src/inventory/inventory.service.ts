@@ -1,19 +1,23 @@
-// bff/src/inventory/inventory.service.ts
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, ServiceUnavailableException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
+import { CircuitBreakerService } from '../common/circuit-breaker.service';
+import { CreateItemDto } from './dto/create-item.dto';
 
 @Injectable()
 export class InventoryService {
   private readonly inventoryMicroserviceUrl = 'http://localhost:3002/api/inventory';
   private readonly usersMicroserviceUrl = 'http://localhost:3001/api/users'; 
 
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService, 
+    private readonly breakerService: CircuitBreakerService
+  ) {}
 
   async getAll() {
     try {
-      // 1. Obtener la lista base de almacenes desde el ms-inventory
+      // Obtener la lista base de almacenes desde el ms-inventory
       const { data: localInventories } = await firstValueFrom(
         this.httpService.get(this.inventoryMicroserviceUrl)
       );
@@ -30,25 +34,29 @@ export class InventoryService {
         return localInventories.map((inv: any) => ({ ...inv, users: [] }));
       }
 
-      const userPromises = allUserIds.map(async (id) => {
-        try {
-          const { data: userData } = await firstValueFrom(
-            this.httpService.get(`${this.usersMicroserviceUrl}/${id}`)
-          );
-
-          if (userData) {
-            const { password, createdAt, ...cleanUser } = userData;
-            return cleanUser;
-          }
-          return null;
-        } catch (err: any) {
-          console.error(`[BFF] No se pudo obtener el usuario con ID ${id}:`, err.message);
-          return null;
+      // Protegemos la hidratación masiva de usuarios con el Circuit Breaker
+      const externalUsers = await this.breakerService.runWithCircuitBreaker(
+        'MS-USERS-GET-ALL',
+        async () => {
+          const userPromises = allUserIds.map(async (id) => {
+            const { data: userData } = await firstValueFrom(
+              this.httpService.get(`${this.usersMicroserviceUrl}/${id}`)
+            );
+            if (userData) {
+              const { password, createdAt, ...cleanUser } = userData;
+              return cleanUser;
+            }
+            return null;
+          });
+          const resolved = await Promise.all(userPromises);
+          return resolved.filter((user) => user !== null);
+        },
+        // Fallback: Si ms-users se cae, el listado general sigue cargando sin colapsar el BFF
+        async () => {
+          console.error('[BFF Fallback - getAll] ms-users inaccesible. Retornando lista sin nombres de operador.');
+          return []; 
         }
-      });
-
-      const resolvedUsers = await Promise.all(userPromises);
-      const externalUsers = resolvedUsers.filter((user) => user !== null);
+      );
 
       return localInventories.map((inventory: any) => {
         return {
@@ -71,33 +79,32 @@ export class InventoryService {
       );
 
       if (!inventory || !inventory.userIds || inventory.userIds.length === 0) {
-        return {
-          ...inventory,
-          users: []
-        };
+        return { ...inventory, users: [] };
       }
 
-      const userPromises = inventory.userIds.map(async (userId: string) => {
-        try {
-          const { data: userData } = await firstValueFrom(
-            this.httpService.get(`${this.usersMicroserviceUrl}/${userId}`)
-          );
-
-          if (userData) {
+      const externalUsers = await this.breakerService.runWithCircuitBreaker(
+        'MS-USERS',
+        async () => {
+          const userPromises = inventory.userIds.map(async (userId: string) => {
+            const { data: userData } = await firstValueFrom(
+              this.httpService.get(`${this.usersMicroserviceUrl}/${userId}`)
+            );
             const { password, createdAt, ...cleanUser } = userData;
             return cleanUser;
-          }
-          return null;
-        } catch (err: any) {
-          console.error(`[BFF - Detail] No se pudo obtener el usuario con ID ${userId}:`, err.message);
-          return null;
+          });
+          const resolved = await Promise.all(userPromises);
+          return resolved.filter(u => u !== null);
+        },
+        async () => {
+          console.error(`[BFF Fallback] Retornando usuarios fantasma temporales debido a caída de ms-users`);
+          return inventory.userIds.map((userId: string) => ({
+            id: userId,
+            email: 'usuario.no.disponible@smartlogix.com',
+            role: { id: 0, name: 'OFFLINE_MODE' }
+          }));
         }
-      });
-
-      const resolvedUsers = await Promise.all(userPromises);
+      );
       
-      const externalUsers = resolvedUsers.filter((user) => user !== null);
-
       return {
         ...inventory,
         users: externalUsers,
@@ -112,28 +119,71 @@ export class InventoryService {
 
   async createInventory(createInventoryDto: CreateInventoryDto, userId: string) {
     try {
-      const { data } = await firstValueFrom(
-        this.httpService.post(this.inventoryMicroserviceUrl, createInventoryDto, {
-          headers: {
-            'x-user-id': userId,
-          },
-        })
+      // En operaciones de escritura, el fallback NO inventa datos; arroja una excepción limpia de disponibilidad
+      return await this.breakerService.runWithCircuitBreaker(
+        'MS-INVENTORY-CREATE',
+        async () => {
+          const { data } = await firstValueFrom(
+            this.httpService.post(this.inventoryMicroserviceUrl, createInventoryDto, {
+              headers: { 'x-user-id': userId },
+            })
+          );
+          return data;
+        },
+        async () => {
+          throw new ServiceUnavailableException('El sistema de creación de almacenes no está disponible temporalmente. Intente más tarde.');
+        }
       );
-      return data;
     } catch (error: any) {
+      if (error instanceof ServiceUnavailableException) throw error;
       throw new InternalServerErrorException(
         error.response?.data?.message || 'Error al crear el almacén de inventario'
       );
     }
   }
 
+  async addItemToInventory(inventoryId: number, createItemDto: CreateItemDto) {
+    try {
+      return await this.breakerService.runWithCircuitBreaker(
+        'MS-INVENTORY-ADD-ITEM',
+        async () => {
+          // Enrutamos la petición de forma dinámica inyectando el ID del almacén en la URL objetivo del MS
+          const { data } = await firstValueFrom(
+            this.httpService.post(`${this.inventoryMicroserviceUrl}/${inventoryId}/items`, createItemDto)
+          );
+          return data;
+        },
+        async () => {
+          throw new ServiceUnavailableException(
+            'El servicio encargado de añadir productos al inventario no se encuentra disponible.'
+          );
+        }
+      );
+    } catch (error: any) {
+      if (error instanceof ServiceUnavailableException) throw error;
+      throw new InternalServerErrorException(
+        error.response?.data?.message || 'Error al procesar el alta del producto desde el orquestador BFF'
+      );
+    }
+  }
+
   async deleteInventory(id: number) {
     try {
-      const { data } = await firstValueFrom(
-        this.httpService.delete(`${this.inventoryMicroserviceUrl}/${id}`)
+      // Aplicamos la misma lógica de protección de infraestructura para escrituras
+      return await this.breakerService.runWithCircuitBreaker(
+        'MS-INVENTORY-DELETE',
+        async () => {
+          const { data } = await firstValueFrom(
+            this.httpService.delete(`${this.inventoryMicroserviceUrl}/${id}`)
+          );
+          return data;
+        },
+        async () => {
+          throw new ServiceUnavailableException('El sistema de eliminación de almacenes no está respondiendo. Intente más tarde.');
+        }
       );
-      return data;
     } catch (error: any) {
+      if (error instanceof ServiceUnavailableException) throw error;
       throw new InternalServerErrorException(
         error.response?.data?.message || 'Error al eliminar el almacén'
       );

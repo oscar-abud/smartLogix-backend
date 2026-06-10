@@ -14,18 +14,26 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const axios_1 = require("@nestjs/axios");
 const rxjs_1 = require("rxjs");
+const circuit_breaker_service_1 = require("../common/circuit-breaker.service");
 let AuthService = class AuthService {
     jwtService;
     httpService;
+    breakerService;
     usersServiceUrl = 'http://localhost:3001/api/users';
     inventoryServiceUrl = 'http://localhost:3002/api/inventory';
-    constructor(jwtService, httpService) {
+    constructor(jwtService, httpService, breakerService) {
         this.jwtService = jwtService;
         this.httpService = httpService;
+        this.breakerService = breakerService;
     }
     async login(loginDto) {
         try {
-            const { data: usuarioValido } = await (0, rxjs_1.firstValueFrom)(this.httpService.post(`${this.usersServiceUrl}/login`, loginDto));
+            const usuarioValido = await this.breakerService.runWithCircuitBreaker('MS-USERS-LOGIN', async () => {
+                const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.post(`${this.usersServiceUrl}/login`, loginDto));
+                return data;
+            }, async () => {
+                throw new common_1.ServiceUnavailableException('El servicio de autenticación no se encuentra disponible temporalmente.');
+            });
             const payload = {
                 email: usuarioValido.email,
                 sub: usuarioValido.id,
@@ -46,6 +54,8 @@ let AuthService = class AuthService {
             };
         }
         catch (error) {
+            if (error instanceof common_1.ServiceUnavailableException)
+                throw error;
             const status = error.response?.status || common_1.HttpStatus.UNAUTHORIZED;
             const message = error.response?.data?.message || 'Credenciales incorrectas o usuario no encontrado';
             throw new common_1.HttpException(message, status);
@@ -54,13 +64,16 @@ let AuthService = class AuthService {
     async register(registerDto) {
         const { inventoryId, ...userData } = registerDto;
         try {
-            const { data: createdUser } = await (0, rxjs_1.firstValueFrom)(this.httpService.post(`${this.usersServiceUrl}/register`, userData));
+            const createdUser = await this.breakerService.runWithCircuitBreaker('MS-USERS-REGISTER', async () => {
+                const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.post(`${this.usersServiceUrl}/register`, userData));
+                return data;
+            }, async () => {
+                throw new common_1.ServiceUnavailableException('El sistema de registro no está disponible temporalmente.');
+            });
             if (inventoryId && createdUser?.id) {
                 try {
                     await (0, rxjs_1.firstValueFrom)(this.httpService.post(`${this.inventoryServiceUrl}/${inventoryId}/users`, {}, {
-                        headers: {
-                            'x-user-id': createdUser.id,
-                        },
+                        headers: { 'x-user-id': createdUser.id },
                     }));
                 }
                 catch (invError) {
@@ -73,6 +86,8 @@ let AuthService = class AuthService {
             };
         }
         catch (error) {
+            if (error instanceof common_1.ServiceUnavailableException)
+                throw error;
             const status = error.response?.status || common_1.HttpStatus.BAD_REQUEST;
             const message = error.response?.data?.message || 'Error al registrar el usuario en el sistema';
             throw new common_1.HttpException(message, status);
@@ -80,8 +95,13 @@ let AuthService = class AuthService {
     }
     async getAll() {
         try {
-            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`${this.usersServiceUrl}`));
-            return data;
+            return await this.breakerService.runWithCircuitBreaker('MS-USERS-GET-ALL', async () => {
+                const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`${this.usersServiceUrl}`));
+                return data;
+            }, async () => {
+                console.error('[BFF Fallback] ms-users inaccesible al listar todos. Enviando array vacío.');
+                return [];
+            });
         }
         catch (error) {
             const status = error.response?.status || common_1.HttpStatus.INTERNAL_SERVER_ERROR;
@@ -91,10 +111,16 @@ let AuthService = class AuthService {
     }
     async getUser(id) {
         try {
-            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`${this.usersServiceUrl}/${id}`));
-            return data;
+            return await this.breakerService.runWithCircuitBreaker('MS-USERS-GET-ONE', async () => {
+                const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`${this.usersServiceUrl}/${id}`));
+                return data;
+            }, async () => {
+                throw new common_1.ServiceUnavailableException('No se puede recuperar la información del perfil en este momento.');
+            });
         }
         catch (error) {
+            if (error instanceof common_1.ServiceUnavailableException)
+                throw error;
             const status = error.response?.status || common_1.HttpStatus.NOT_FOUND;
             const message = error.response?.data?.message || 'Error al buscar un usuario';
             throw new common_1.HttpException(message, status);
@@ -103,13 +129,16 @@ let AuthService = class AuthService {
     async updateUser(id, updateUserDto) {
         const { inventoryId, ...userData } = updateUserDto;
         try {
-            const { data: updatedUser } = await (0, rxjs_1.firstValueFrom)(this.httpService.patch(`${this.usersServiceUrl}/${id}`, userData));
+            const updatedUser = await this.breakerService.runWithCircuitBreaker('MS-USERS-UPDATE', async () => {
+                const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.patch(`${this.usersServiceUrl}/${id}`, userData));
+                return data;
+            }, async () => {
+                throw new common_1.ServiceUnavailableException('El sistema de actualización de perfiles está fuera de línea.');
+            });
             if (inventoryId) {
                 try {
                     await (0, rxjs_1.firstValueFrom)(this.httpService.post(`${this.inventoryServiceUrl}/${inventoryId}/users`, {}, {
-                        headers: {
-                            'x-user-id': id,
-                        },
+                        headers: { 'x-user-id': id },
                     }));
                 }
                 catch (invError) {
@@ -122,6 +151,8 @@ let AuthService = class AuthService {
             };
         }
         catch (error) {
+            if (error instanceof common_1.ServiceUnavailableException)
+                throw error;
             const status = error.response?.status || common_1.HttpStatus.BAD_REQUEST;
             const message = error.response?.data?.message || 'Error al actualizar el usuario';
             throw new common_1.HttpException(message, status);
@@ -129,10 +160,16 @@ let AuthService = class AuthService {
     }
     async deleteUser(id) {
         try {
-            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.delete(`${this.usersServiceUrl}/${id}`));
-            return data;
+            return await this.breakerService.runWithCircuitBreaker('MS-USERS-DELETE', async () => {
+                const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.delete(`${this.usersServiceUrl}/${id}`));
+                return data;
+            }, async () => {
+                throw new common_1.ServiceUnavailableException('No se pudo procesar la eliminación del usuario debido a una falla del servidor.');
+            });
         }
         catch (error) {
+            if (error instanceof common_1.ServiceUnavailableException)
+                throw error;
             const status = error.response?.status || common_1.HttpStatus.BAD_REQUEST;
             const message = error.response?.data?.message || 'Error al eliminar un usuario';
             throw new common_1.HttpException(message, status);
@@ -140,10 +177,16 @@ let AuthService = class AuthService {
     }
     async unlinkUserFromInventory(inventoryId, userId) {
         try {
-            const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.delete(`${this.inventoryServiceUrl}/${inventoryId}/users/${userId}`));
-            return data;
+            return await this.breakerService.runWithCircuitBreaker('MS-INVENTORY-UNLINK', async () => {
+                const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.delete(`${this.inventoryServiceUrl}/${inventoryId}/users/${userId}`));
+                return data;
+            }, async () => {
+                throw new common_1.ServiceUnavailableException('El sistema de inventarios no responde. No se pudo desvincular al operador.');
+            });
         }
         catch (error) {
+            if (error instanceof common_1.ServiceUnavailableException)
+                throw error;
             const status = error.response?.status || common_1.HttpStatus.BAD_REQUEST;
             const message = error.response?.data?.message || 'Error al desvincular al usuario del almacén';
             throw new common_1.HttpException(message, status);
@@ -154,6 +197,7 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [jwt_1.JwtService,
-        axios_1.HttpService])
+        axios_1.HttpService,
+        circuit_breaker_service_1.CircuitBreakerService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

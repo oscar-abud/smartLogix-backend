@@ -2,13 +2,17 @@ import { Repository, DataSource } from 'typeorm';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { Inventory } from './entities/inventory.entity';
 import { UserInventory } from './entities/user-inventory.entity';
+import { InventoryItem } from './entities/inventory-item.entity';
+import { CreateItemDto } from './dto/create-item.dto';
 export declare class InventoryService {
     private readonly inventoryRepository;
+    private readonly itemRepository;
     private readonly dataSource;
-    constructor(inventoryRepository: Repository<Inventory>, dataSource: DataSource);
+    constructor(inventoryRepository: Repository<Inventory>, itemRepository: Repository<InventoryItem>, dataSource: DataSource);
     registerInventory(createInventoryDto: CreateInventoryDto, creatorUserId: string): Promise<Inventory>;
+    addItemToInventory(inventoryId: number, createItemDto: CreateItemDto): Promise<InventoryItem>;
     getAll(): Promise<{
-        items: import("./entities/inventory-item.entity").InventoryItem[];
+        items: InventoryItem[];
         totalItems: number;
         totalUsers: number;
         userIds: string[];
@@ -23,7 +27,7 @@ export declare class InventoryService {
         name: string;
         description: string;
         createdAt: Date;
-        items: import("./entities/inventory-item.entity").InventoryItem[];
+        items: InventoryItem[];
         totalItems: number;
         totalUsers: number;
         userIds: string[];

@@ -3,12 +3,14 @@ import { HttpService } from '@nestjs/axios';
 import { RegisterDto } from './dto/register.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginDto } from './dto/login.dto';
+import { CircuitBreakerService } from '../common/circuit-breaker.service';
 export declare class AuthService {
     private readonly jwtService;
     private readonly httpService;
+    private readonly breakerService;
     private readonly usersServiceUrl;
     private readonly inventoryServiceUrl;
-    constructor(jwtService: JwtService, httpService: HttpService);
+    constructor(jwtService: JwtService, httpService: HttpService, breakerService: CircuitBreakerService);
     login(loginDto: LoginDto): Promise<{
         access_token: string;
         user: {

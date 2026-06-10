@@ -4,6 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { InventoryService } from './inventory.service';
 import { AuthService } from '../auth/auth.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
+import { CreateItemDto } from './dto/create-item.dto';
 
 @ApiTags('Inventory')
 @ApiBearerAuth()
@@ -37,6 +38,15 @@ export class InventoryController {
     console.log('ID del usuario extraído con éxito:', userId);
     
     return this.inventoryService.createInventory(createInventoryDto, userId);
+  }
+
+  @Post(':id/items')
+  @ApiOperation({ summary: 'Registrar y asociar un nuevo producto/ítem a un almacén específico' })
+  async addItem(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() createItemDto: CreateItemDto
+  ) {
+    return this.inventoryService.addItemToInventory(id, createItemDto);
   }
 
   @Delete(':inventoryId/users/:userId')

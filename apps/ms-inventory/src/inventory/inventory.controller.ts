@@ -2,6 +2,7 @@ import { Controller, Get, Post, Delete, Param, Body, Headers, ParseIntPipe, Patc
 import { InventoryService } from './inventory.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { ApiOperation } from '@nestjs/swagger';
+import { CreateItemDto } from './dto/create-item.dto';
 
 @Controller('inventory') // Ruta interna: http://localhost:3002/api/inventory
 export class InventoryController {
@@ -32,6 +33,14 @@ export class InventoryController {
   ) {
     // Registra la relación física en la tabla intermedia (Cuando creas un usuario)
     return this.inventoryService.assignUser(inventoryId, userId);
+  }
+
+  @Post(':id/items')
+  async addItem(
+    @Param('id', ParseIntPipe) id: number, // Captura e intercepta el /:id de la URL de forma numérica
+    @Body() createItemDto: CreateItemDto
+  ) {
+    return this.inventoryService.addItemToInventory(id, createItemDto);
   }
 
   @Patch(':inventoryId/users') // Escucha: PATCH http://localhost:3002/api/inventory/:inventoryId/users

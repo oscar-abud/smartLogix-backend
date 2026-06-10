@@ -4,12 +4,18 @@ import { Repository, DataSource } from 'typeorm';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { Inventory } from './entities/inventory.entity';
 import { UserInventory } from './entities/user-inventory.entity';
+import { InventoryItem } from './entities/inventory-item.entity';
+import { CreateItemDto } from './dto/create-item.dto';
 
 @Injectable()
 export class InventoryService {
   constructor(
     @InjectRepository(Inventory)
     private readonly inventoryRepository: Repository<Inventory>,
+    
+    @InjectRepository(InventoryItem)
+    private readonly itemRepository: Repository<InventoryItem>,
+    
     private readonly dataSource: DataSource,
   ) {}
 
@@ -47,6 +53,38 @@ export class InventoryService {
       throw new InternalServerErrorException(`Error al registrar el almacén y asignar usuario: ${error.message}`);
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  async addItemToInventory(inventoryId: number, createItemDto: CreateItemDto) {
+    try {
+      // 1. Validar la existencia del almacén
+      const inventory = await this.inventoryRepository.findOne({ where: { id: inventoryId } });
+      if (!inventory) {
+        throw new NotFoundException(`El almacén con ID ${inventoryId} no existe`);
+      }
+
+      // 2. Validar que el SKU no esté duplicado en el sistema
+      const skuExists = await this.itemRepository.findOne({ where: { sku: createItemDto.sku } });
+      if (skuExists) {
+        throw new BadRequestException(`El producto con SKU '${createItemDto.sku}' ya está registrado`);
+      }
+
+      // 3. Crear e instanciar el nuevo producto vinculándolo al inventario
+      const newItem = this.itemRepository.create({
+        ...createItemDto,
+        inventoryId: inventoryId, // Clave foránea manual o asignación de objeto
+        stockReserved: createItemDto.stockReserved || 0,
+      });
+
+      // 4. Guardar en la base de datos
+      return await this.itemRepository.save(newItem);
+
+    } catch (error: any) {
+      if (error instanceof NotFoundException || error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Error al registrar el producto en el almacén: ${error.message}`);
     }
   }
 
