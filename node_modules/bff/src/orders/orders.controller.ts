@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Param, ParseIntPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { OrdersService } from './orders.service';
@@ -11,15 +11,21 @@ import { CreateOrderDto } from './dto/create-order.dto';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @Post('')
-  @ApiOperation({ summary: 'Generar una nueva orden de compra y rebajar stock de inventario' })
-  async createOrder(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.createOrder(createOrderDto);
-  }
-
   @Get('')
   @ApiOperation({ summary: 'Listar el historial completo de órdenes generadas' })
   async findAll() {
     return this.ordersService.getOrdersHistory();
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Obtener el detalle de una orden específica por su ID' })
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.ordersService.getOrderById(id);
+  }
+
+  @Post('')
+  @ApiOperation({ summary: 'Generar una nueva orden de compra y rebajar stock de inventario' })
+  async createOrder(@Body() createOrderDto: CreateOrderDto) {
+    return this.ordersService.createOrder(createOrderDto);
   }
 }

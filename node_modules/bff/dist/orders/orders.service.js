@@ -28,12 +28,27 @@ let OrdersService = class OrdersService {
                 const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(this.ordersMicroserviceUrl));
                 return data;
             }, async () => {
-                console.error(...oo_tx(`2405659345_29_10_29_92_11`, '[BFF Fallback] ms-orders inaccesible. Retornando historial vacío.'));
+                console.error(...oo_tx(`2218385248_29_10_29_92_11`, '[BFF Fallback] ms-orders inaccesible. Retornando historial vacío.'));
                 return [];
             });
         }
         catch (error) {
             throw new common_1.InternalServerErrorException(error.response?.data?.message || 'Error al recuperar el historial de órdenes desde el BFF');
+        }
+    }
+    async getOrderById(orderId) {
+        try {
+            return await this.breakerService.runWithCircuitBreaker('MS-ORDERS-GET-BY-ID', async () => {
+                const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`${this.ordersMicroserviceUrl}/${orderId}`));
+                return data;
+            }, async () => {
+                throw new common_1.ServiceUnavailableException(`El servicio de órdenes no está disponible. No se pudo recuperar la orden #${orderId}.`);
+            });
+        }
+        catch (error) {
+            if (error instanceof common_1.ServiceUnavailableException)
+                throw error;
+            throw new common_1.InternalServerErrorException(error.response?.data?.message || `Error al recuperar la orden #${orderId} desde el BFF`);
         }
     }
     async createOrder(createOrderDto) {

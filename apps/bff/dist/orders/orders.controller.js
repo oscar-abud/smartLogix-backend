@@ -23,14 +23,32 @@ let OrdersController = class OrdersController {
     constructor(ordersService) {
         this.ordersService = ordersService;
     }
-    async createOrder(createOrderDto) {
-        return this.ordersService.createOrder(createOrderDto);
-    }
     async findAll() {
         return this.ordersService.getOrdersHistory();
     }
+    async findOne(id) {
+        return this.ordersService.getOrderById(id);
+    }
+    async createOrder(createOrderDto) {
+        return this.ordersService.createOrder(createOrderDto);
+    }
 };
 exports.OrdersController = OrdersController;
+__decorate([
+    (0, common_1.Get)(''),
+    (0, swagger_1.ApiOperation)({ summary: 'Listar el historial completo de órdenes generadas' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], OrdersController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener el detalle de una orden específica por su ID' }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], OrdersController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Post)(''),
     (0, swagger_1.ApiOperation)({ summary: 'Generar una nueva orden de compra y rebajar stock de inventario' }),
@@ -39,13 +57,6 @@ __decorate([
     __metadata("design:paramtypes", [create_order_dto_1.CreateOrderDto]),
     __metadata("design:returntype", Promise)
 ], OrdersController.prototype, "createOrder", null);
-__decorate([
-    (0, common_1.Get)(''),
-    (0, swagger_1.ApiOperation)({ summary: 'Listar el historial completo de órdenes generadas' }),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], OrdersController.prototype, "findAll", null);
 exports.OrdersController = OrdersController = __decorate([
     (0, swagger_1.ApiTags)('Orders'),
     (0, swagger_1.ApiBearerAuth)(),

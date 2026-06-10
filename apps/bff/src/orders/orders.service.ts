@@ -37,6 +37,30 @@ export class OrdersService {
     }
   }
 
+  async getOrderById(orderId: number) {
+    try {
+      return await this.breakerService.runWithCircuitBreaker(
+        'MS-ORDERS-GET-BY-ID',
+        async () => {
+          const { data } = await firstValueFrom(
+            this.httpService.get(`${this.ordersMicroserviceUrl}/${orderId}`)
+          );
+          return data;
+        },
+        async () => {
+          throw new ServiceUnavailableException(
+            `El servicio de órdenes no está disponible. No se pudo recuperar la orden #${orderId}.`
+          );
+        }
+      );
+    } catch (error: any) {
+      if (error instanceof ServiceUnavailableException) throw error;
+      throw new InternalServerErrorException(
+        error.response?.data?.message || `Error al recuperar la orden #${orderId} desde el BFF`
+      );
+    }
+  }
+
   async createOrder(createOrderDto: CreateOrderDto) {
     try {
       // Usamos el Circuit Breaker para proteger las transacciones de escritura

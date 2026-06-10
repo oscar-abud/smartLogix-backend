@@ -7,5 +7,6 @@ export declare class OrdersService {
     private readonly ordersMicroserviceUrl;
     constructor(httpService: HttpService, breakerService: CircuitBreakerService);
     getOrdersHistory(): Promise<any>;
+    getOrderById(orderId: number): Promise<any>;
     createOrder(createOrderDto: CreateOrderDto): Promise<any>;
 }
