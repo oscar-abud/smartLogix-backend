@@ -30,6 +30,12 @@ export class InventoryController {
     return this.inventoryService.getAllTypes();
   }
 
+  @Get('items/:itemId')
+  @ApiOperation({ summary: 'Obtener el detalle de un producto individual por su ID para validaciones internas' })
+  async findItemById(@Param('itemId', ParseIntPipe) itemId: number) {
+    return this.inventoryService.getItemById(itemId);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Obtener un almacén por su ID' })
   async findOne(@Param('id', ParseIntPipe) id: number) {

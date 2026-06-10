@@ -221,6 +221,18 @@ export class InventoryService {
     }
   }
 
+  async getItemById(itemId: number) {
+    const item = await this.itemRepository.findOne({
+      where: { id: itemId }
+    });
+
+    if (!item) {
+      throw new NotFoundException(`El ítem con ID ${itemId} no existe en el inventario.`);
+    }
+
+    return item;
+  }
+
   async assignUser(inventoryId: number, userId: string) {
     // Ejemplo usando QueryBuilder o repositorio de tu entidad intermedia (user_inventories)
     // Evitamos duplicados limpiando cualquier rastro previo del usuario en este almacén antes de insertar

@@ -45,7 +45,7 @@ let InventoryService = class InventoryService {
                 const resolved = await Promise.all(userPromises);
                 return resolved.filter((user) => user !== null);
             }, async () => {
-                console.error(...oo_tx(`2089558028_58_10_58_114_11`, '[BFF Fallback - getAll] ms-users inaccesible. Retornando lista sin nombres de operador.'));
+                console.error(...oo_tx(`293381908_58_10_58_114_11`, '[BFF Fallback - getAll] ms-users inaccesible. Retornando lista sin nombres de operador.'));
                 return [];
             });
             return localInventories.map((inventory) => {
@@ -74,7 +74,7 @@ let InventoryService = class InventoryService {
                 const resolved = await Promise.all(userPromises);
                 return resolved.filter(u => u !== null);
             }, async () => {
-                console.error(...oo_tx(`2089558028_101_10_101_108_11`, `[BFF Fallback] Retornando usuarios fantasma temporales debido a caída de ms-users`));
+                console.error(...oo_tx(`293381908_101_10_101_108_11`, `[BFF Fallback] Retornando usuarios fantasma temporales debido a caída de ms-users`));
                 return inventory.userIds.map((userId) => ({
                     id: userId,
                     email: 'usuario.no.disponible@smartlogix.com',
@@ -96,7 +96,7 @@ let InventoryService = class InventoryService {
                 const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`${this.inventoryMicroserviceUrl}/types`));
                 return data;
             }, async () => {
-                console.error(...oo_tx(`2089558028_134_10_134_114_11`, '[BFF Fallback - getTypes] ms-inventory inaccesible. Devolviendo catálogo de emergencia.'));
+                console.error(...oo_tx(`293381908_134_10_134_114_11`, '[BFF Fallback - getTypes] ms-inventory inaccesible. Devolviendo catálogo de emergencia.'));
                 return [
                     { id: 1, name: 'Inventario A (Supermercado) [MODO OFFLINE]', description: 'Catálogo de contingencia' },
                     { id: 2, name: 'Inventario B (Médico) [MODO OFFLINE]', description: 'Catálogo de contingencia' }
@@ -105,6 +105,21 @@ let InventoryService = class InventoryService {
         }
         catch (error) {
             throw new common_1.InternalServerErrorException(error.response?.data?.message || 'Error al recuperar el catálogo de tipos de inventario');
+        }
+    }
+    async getItemById(itemId) {
+        try {
+            return await this.breakerService.runWithCircuitBreaker('MS-INVENTORY-GET-ITEM', async () => {
+                const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`${this.inventoryMicroserviceUrl}/items/${itemId}`));
+                return data;
+            }, async () => {
+                throw new common_1.ServiceUnavailableException(`El catálogo de inventarios no se encuentra disponible. No se pudo verificar el producto #${itemId}.`);
+            });
+        }
+        catch (error) {
+            if (error instanceof common_1.ServiceUnavailableException)
+                throw error;
+            throw new common_1.InternalServerErrorException(error.response?.data?.message || `Error al recuperar el detalle del ítem #${itemId} desde el BFF`);
         }
     }
     async createInventory(createInventoryDto, userId) {

@@ -35,12 +35,15 @@ let InventoryController = class InventoryController {
     async findAllTypes() {
         return this.inventoryService.getAllTypes();
     }
+    async findItemById(itemId) {
+        return this.inventoryService.getItemById(itemId);
+    }
     async findOne(id) {
         return this.inventoryService.getInventory(id);
     }
     async createInventory(createInventoryDto, req) {
         const userId = req.user.userId;
-        console.log(...oo_oo(`2916263086_46_4_46_61_4`, 'ID del usuario extraído con éxito:', userId));
+        console.log(...oo_oo(`2296378932_52_4_52_61_4`, 'ID del usuario extraído con éxito:', userId));
         return this.inventoryService.createInventory(createInventoryDto, userId);
     }
     async createType(createInventoryTypeDto) {
@@ -74,6 +77,14 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "findAllTypes", null);
+__decorate([
+    (0, common_1.Get)('items/:itemId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener el detalle de un producto individual por su ID para validaciones internas' }),
+    __param(0, (0, common_1.Param)('itemId', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "findItemById", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Obtener un almacén por su ID' }),

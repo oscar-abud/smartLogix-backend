@@ -191,6 +191,15 @@ let InventoryService = class InventoryService {
             throw new common_1.InternalServerErrorException(`Error al obtener los tipos de inventario: ${error.message}`);
         }
     }
+    async getItemById(itemId) {
+        const item = await this.itemRepository.findOne({
+            where: { id: itemId }
+        });
+        if (!item) {
+            throw new common_1.NotFoundException(`El ítem con ID ${itemId} no existe en el inventario.`);
+        }
+        return item;
+    }
     async assignUser(inventoryId, userId) {
         await this.inventoryRepository.manager.query(`DELETE FROM user_inventories WHERE user_id = $1 AND inventory_id = $2`, [userId, inventoryId]);
         await this.inventoryRepository.manager.query(`INSERT INTO user_inventories (inventory_id, user_id) VALUES ($1, $2)`, [inventoryId, userId]);

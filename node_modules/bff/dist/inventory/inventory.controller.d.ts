@@ -10,6 +10,7 @@ export declare class InventoryController {
     constructor(inventoryService: InventoryService, authService: AuthService);
     findAll(): Promise<any[]>;
     findAllTypes(): Promise<any>;
+    findItemById(itemId: number): Promise<any>;
     findOne(id: number): Promise<any>;
     createInventory(createInventoryDto: CreateInventoryDto, req: any): Promise<any>;
     createType(createInventoryTypeDto: CreateInventoryTypeDto): Promise<any>;

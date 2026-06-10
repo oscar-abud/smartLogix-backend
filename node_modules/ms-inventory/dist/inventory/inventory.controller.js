@@ -30,6 +30,9 @@ let InventoryController = class InventoryController {
     async getTypes() {
         return this.inventoryService.getAllInventoryTypes();
     }
+    async findItemById(itemId) {
+        return this.inventoryService.getItemById(itemId);
+    }
     async findOne(id) {
         return this.inventoryService.getInventory(id);
     }
@@ -52,7 +55,7 @@ let InventoryController = class InventoryController {
         return this.inventoryService.updateItemStock(itemId, updateStockDto);
     }
     async removeUserFromInventory(inventoryId, userId) {
-        console.log(...oo_oo(`821804209_80_4_80_83_4`, '[Microservicio] ID de usuario recibido para desvincular:', userId));
+        console.log(...oo_oo(`189671310_85_4_85_83_4`, '[Microservicio] ID de usuario recibido para desvincular:', userId));
         return this.inventoryService.removeUserRelation(inventoryId, userId);
     }
     async delete(id) {
@@ -72,6 +75,13 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "getTypes", null);
+__decorate([
+    (0, common_1.Get)('items/:itemId'),
+    __param(0, (0, common_1.Param)('itemId', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "findItemById", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
