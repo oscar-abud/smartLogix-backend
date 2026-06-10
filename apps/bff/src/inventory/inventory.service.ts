@@ -5,6 +5,7 @@ import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { CircuitBreakerService } from '../common/circuit-breaker.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { CreateInventoryTypeDto } from './dto/create-inventory-type.dto';
+import { UpdateStockDto } from './dto/update-stock.dto';
 
 @Injectable()
 export class InventoryService {
@@ -212,6 +213,30 @@ export class InventoryService {
       if (error instanceof ServiceUnavailableException) throw error;
       throw new InternalServerErrorException(
         error.response?.data?.message || 'Error al procesar el alta de la categoría desde el BFF'
+      );
+    }
+  }
+
+  async updateItemStock(itemId: number, updateStockDto: UpdateStockDto) {
+    try {
+      return await this.breakerService.runWithCircuitBreaker(
+        'MS-INVENTORY-UPDATE-STOCK',
+        async () => {
+          const { data } = await firstValueFrom(
+            this.httpService.patch(`${this.inventoryMicroserviceUrl}/items/${itemId}/stock`, updateStockDto)
+          );
+          return data;
+        },
+        async () => {
+          throw new ServiceUnavailableException(
+            'El servicio de actualización de inventarios no está disponible en este momento. La orden no pudo alterar el stock.'
+          );
+        }
+      );
+    } catch (error: any) {
+      if (error instanceof ServiceUnavailableException) throw error;
+      throw new InternalServerErrorException(
+        error.response?.data?.message || 'Error al procesar la actualización de stock en el BFF'
       );
     }
   }

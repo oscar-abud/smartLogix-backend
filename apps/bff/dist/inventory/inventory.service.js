@@ -45,7 +45,7 @@ let InventoryService = class InventoryService {
                 const resolved = await Promise.all(userPromises);
                 return resolved.filter((user) => user !== null);
             }, async () => {
-                console.error(...oo_tx(`2176416365_57_10_57_114_11`, '[BFF Fallback - getAll] ms-users inaccesible. Retornando lista sin nombres de operador.'));
+                console.error(...oo_tx(`2089558028_58_10_58_114_11`, '[BFF Fallback - getAll] ms-users inaccesible. Retornando lista sin nombres de operador.'));
                 return [];
             });
             return localInventories.map((inventory) => {
@@ -74,7 +74,7 @@ let InventoryService = class InventoryService {
                 const resolved = await Promise.all(userPromises);
                 return resolved.filter(u => u !== null);
             }, async () => {
-                console.error(...oo_tx(`2176416365_100_10_100_108_11`, `[BFF Fallback] Retornando usuarios fantasma temporales debido a caída de ms-users`));
+                console.error(...oo_tx(`2089558028_101_10_101_108_11`, `[BFF Fallback] Retornando usuarios fantasma temporales debido a caída de ms-users`));
                 return inventory.userIds.map((userId) => ({
                     id: userId,
                     email: 'usuario.no.disponible@smartlogix.com',
@@ -96,7 +96,7 @@ let InventoryService = class InventoryService {
                 const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.get(`${this.inventoryMicroserviceUrl}/types`));
                 return data;
             }, async () => {
-                console.error(...oo_tx(`2176416365_133_10_133_114_11`, '[BFF Fallback - getTypes] ms-inventory inaccesible. Devolviendo catálogo de emergencia.'));
+                console.error(...oo_tx(`2089558028_134_10_134_114_11`, '[BFF Fallback - getTypes] ms-inventory inaccesible. Devolviendo catálogo de emergencia.'));
                 return [
                     { id: 1, name: 'Inventario A (Supermercado) [MODO OFFLINE]', description: 'Catálogo de contingencia' },
                     { id: 2, name: 'Inventario B (Médico) [MODO OFFLINE]', description: 'Catálogo de contingencia' }
@@ -152,6 +152,21 @@ let InventoryService = class InventoryService {
             if (error instanceof common_1.ServiceUnavailableException)
                 throw error;
             throw new common_1.InternalServerErrorException(error.response?.data?.message || 'Error al procesar el alta de la categoría desde el BFF');
+        }
+    }
+    async updateItemStock(itemId, updateStockDto) {
+        try {
+            return await this.breakerService.runWithCircuitBreaker('MS-INVENTORY-UPDATE-STOCK', async () => {
+                const { data } = await (0, rxjs_1.firstValueFrom)(this.httpService.patch(`${this.inventoryMicroserviceUrl}/items/${itemId}/stock`, updateStockDto));
+                return data;
+            }, async () => {
+                throw new common_1.ServiceUnavailableException('El servicio de actualización de inventarios no está disponible en este momento. La orden no pudo alterar el stock.');
+            });
+        }
+        catch (error) {
+            if (error instanceof common_1.ServiceUnavailableException)
+                throw error;
+            throw new common_1.InternalServerErrorException(error.response?.data?.message || 'Error al procesar la actualización de stock en el BFF');
         }
     }
     async deleteInventory(id) {

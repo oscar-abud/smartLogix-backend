@@ -201,6 +201,25 @@ let InventoryService = class InventoryService {
         await this.inventoryRepository.manager.query(`INSERT INTO user_inventories (inventory_id, user_id) VALUES ($1, $2)`, [inventoryId, userId]);
         return { success: true, message: 'Relación de almacén actualizada con éxito' };
     }
+    async updateItemStock(itemId, updateStockDto) {
+        const { quantity } = updateStockDto;
+        const item = await this.itemRepository.findOne({ where: { id: itemId } });
+        if (!item) {
+            throw new common_1.NotFoundException(`El producto con ID ${itemId} no existe en el catálogo.`);
+        }
+        if (quantity < 0 && (item.stockAvailable + quantity) < 0) {
+            throw new common_1.BadRequestException(`Stock insuficiente para realizar la operación. Stock actual: ${item.stockAvailable}, solicitado: ${Math.abs(quantity)}`);
+        }
+        item.stockAvailable += quantity;
+        const updatedItem = await this.itemRepository.save(item);
+        return {
+            message: quantity < 0 ? 'Stock descontado con éxito' : 'Stock incrementado con éxito',
+            itemId: updatedItem.id,
+            sku: updatedItem.sku,
+            previousStock: item.stockAvailable - quantity,
+            newStock: updatedItem.stockAvailable
+        };
+    }
     async removeUserRelation(inventoryId, userId) {
         try {
             await this.inventoryRepository.manager.query(`DELETE FROM user_inventories WHERE inventory_id = $1 AND user_id = $2`, [inventoryId, userId]);

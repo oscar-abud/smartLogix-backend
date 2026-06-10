@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Param, Body, UseGuards, Req, ParseIntPipe, Headers } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, UseGuards, Req, ParseIntPipe, Headers, Patch } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { InventoryService } from './inventory.service';
@@ -6,6 +6,7 @@ import { AuthService } from '../auth/auth.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { CreateItemDto } from './dto/create-item.dto';
 import { CreateInventoryTypeDto } from './dto/create-inventory-type.dto';
+import { UpdateStockDto } from './dto/update-stock.dto';
 
 @ApiTags('Inventory')
 @ApiBearerAuth()
@@ -60,6 +61,16 @@ export class InventoryController {
     @Body() createItemDto: CreateItemDto
   ) {
     return this.inventoryService.addItemToInventory(id, createItemDto);
+  }
+
+  @Patch('items/:itemId/stock')
+  @ApiOperation({ summary: 'Modificar de forma atómica el stock disponible de un producto (Suma o Resta)' })
+  @ApiBearerAuth()
+  async updateStock(
+    @Param('itemId', ParseIntPipe) itemId: number,
+    @Body() updateStockDto: UpdateStockDto
+  ) {
+    return this.inventoryService.updateItemStock(itemId, updateStockDto);
   }
 
   @Delete(':inventoryId/users/:userId')

@@ -2,6 +2,7 @@ import { InventoryService } from './inventory.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { CreateItemDto } from './dto/create-item.dto';
 import { CreateInventoryTypeDto } from './dto/create-inventory-type.dto';
+import { UpdateStockDto } from './dto/update-stock.dto';
 export declare class InventoryController {
     private readonly inventoryService;
     constructor(inventoryService: InventoryService);
@@ -37,6 +38,13 @@ export declare class InventoryController {
     updateUserInventoryRelation(inventoryId: number, userId: string): Promise<{
         success: boolean;
         message: string;
+    }>;
+    updateStock(itemId: number, updateStockDto: UpdateStockDto): Promise<{
+        message: string;
+        itemId: number;
+        sku: string;
+        previousStock: number;
+        newStock: number;
     }>;
     removeUserFromInventory(inventoryId: number, userId: string): Promise<{
         success: boolean;

@@ -18,6 +18,7 @@ const inventory_service_1 = require("./inventory.service");
 const create_inventory_dto_1 = require("./dto/create-inventory.dto");
 const create_item_dto_1 = require("./dto/create-item.dto");
 const create_inventory_type_dto_1 = require("./dto/create-inventory-type.dto");
+const update_stock_dto_1 = require("./dto/update-stock.dto");
 let InventoryController = class InventoryController {
     inventoryService;
     constructor(inventoryService) {
@@ -47,8 +48,11 @@ let InventoryController = class InventoryController {
     async updateUserInventoryRelation(inventoryId, userId) {
         return this.inventoryService.updateUserRelation(inventoryId, userId);
     }
+    async updateStock(itemId, updateStockDto) {
+        return this.inventoryService.updateItemStock(itemId, updateStockDto);
+    }
     async removeUserFromInventory(inventoryId, userId) {
-        console.log(...oo_oo(`2843848326_71_4_71_83_4`, '[Microservicio] ID de usuario recibido para desvincular:', userId));
+        console.log(...oo_oo(`821804209_80_4_80_83_4`, '[Microservicio] ID de usuario recibido para desvincular:', userId));
         return this.inventoryService.removeUserRelation(inventoryId, userId);
     }
     async delete(id) {
@@ -114,6 +118,14 @@ __decorate([
     __metadata("design:paramtypes", [Number, String]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "updateUserInventoryRelation", null);
+__decorate([
+    (0, common_1.Patch)('items/:itemId/stock'),
+    __param(0, (0, common_1.Param)('itemId', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, update_stock_dto_1.UpdateStockDto]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "updateStock", null);
 __decorate([
     (0, common_1.Delete)(':inventoryId/users/:userId'),
     __param(0, (0, common_1.Param)('inventoryId', common_1.ParseIntPipe)),

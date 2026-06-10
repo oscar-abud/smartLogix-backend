@@ -21,6 +21,7 @@ const auth_service_1 = require("../auth/auth.service");
 const create_inventory_dto_1 = require("./dto/create-inventory.dto");
 const create_item_dto_1 = require("./dto/create-item.dto");
 const create_inventory_type_dto_1 = require("./dto/create-inventory-type.dto");
+const update_stock_dto_1 = require("./dto/update-stock.dto");
 let InventoryController = class InventoryController {
     inventoryService;
     authService;
@@ -39,7 +40,7 @@ let InventoryController = class InventoryController {
     }
     async createInventory(createInventoryDto, req) {
         const userId = req.user.userId;
-        console.log(...oo_oo(`1081953621_45_4_45_61_4`, 'ID del usuario extraído con éxito:', userId));
+        console.log(...oo_oo(`2916263086_46_4_46_61_4`, 'ID del usuario extraído con éxito:', userId));
         return this.inventoryService.createInventory(createInventoryDto, userId);
     }
     async createType(createInventoryTypeDto) {
@@ -47,6 +48,9 @@ let InventoryController = class InventoryController {
     }
     async addItem(id, createItemDto) {
         return this.inventoryService.addItemToInventory(id, createItemDto);
+    }
+    async updateStock(itemId, updateStockDto) {
+        return this.inventoryService.updateItemStock(itemId, updateStockDto);
     }
     async unlinkUserFromInventory(inventoryId, userId) {
         return this.authService.unlinkUserFromInventory(inventoryId, userId);
@@ -104,6 +108,16 @@ __decorate([
     __metadata("design:paramtypes", [Number, create_item_dto_1.CreateItemDto]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "addItem", null);
+__decorate([
+    (0, common_1.Patch)('items/:itemId/stock'),
+    (0, swagger_1.ApiOperation)({ summary: 'Modificar de forma atómica el stock disponible de un producto (Suma o Resta)' }),
+    (0, swagger_1.ApiBearerAuth)(),
+    __param(0, (0, common_1.Param)('itemId', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, update_stock_dto_1.UpdateStockDto]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "updateStock", null);
 __decorate([
     (0, common_1.Delete)(':inventoryId/users/:userId'),
     (0, swagger_1.ApiOperation)({ summary: 'Desvincular a un usuario de un almacén' }),

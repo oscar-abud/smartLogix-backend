@@ -4,6 +4,7 @@ import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { ApiOperation } from '@nestjs/swagger';
 import { CreateItemDto } from './dto/create-item.dto';
 import { CreateInventoryTypeDto } from './dto/create-inventory-type.dto';
+import { UpdateStockDto } from './dto/update-stock.dto';
 
 @Controller('inventory') // Ruta interna: http://localhost:3002/api/inventory
 export class InventoryController {
@@ -61,6 +62,14 @@ export class InventoryController {
   ) {
     // Actualiza o reemplaza la relación (Cuando editas un usuario y lo cambias de almacén)
     return this.inventoryService.updateUserRelation(inventoryId, userId);
+  }
+
+  @Patch('items/:itemId/stock')
+  async updateStock(
+    @Param('itemId', ParseIntPipe) itemId: number,
+    @Body() updateStockDto: UpdateStockDto
+  ) {
+    return this.inventoryService.updateItemStock(itemId, updateStockDto);
   }
 
   @Delete(':inventoryId/users/:userId')

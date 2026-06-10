@@ -6,6 +6,7 @@ import { InventoryItem } from './entities/inventory-item.entity';
 import { CreateItemDto } from './dto/create-item.dto';
 import { CreateInventoryTypeDto } from './dto/create-inventory-type.dto';
 import { InventoryType } from './entities/inventory-type.entity';
+import { UpdateStockDto } from './dto/update-stock.dto';
 export declare class InventoryService {
     private readonly inventoryRepository;
     private readonly itemRepository;
@@ -44,6 +45,13 @@ export declare class InventoryService {
     updateUserRelation(inventoryId: number, userId: string): Promise<{
         success: boolean;
         message: string;
+    }>;
+    updateItemStock(itemId: number, updateStockDto: UpdateStockDto): Promise<{
+        message: string;
+        itemId: number;
+        sku: string;
+        previousStock: number;
+        newStock: number;
     }>;
     removeUserRelation(inventoryId: number, userId: string): Promise<{
         success: boolean;

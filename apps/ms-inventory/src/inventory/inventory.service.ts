@@ -8,6 +8,7 @@ import { InventoryItem } from './entities/inventory-item.entity';
 import { CreateItemDto } from './dto/create-item.dto';
 import { CreateInventoryTypeDto } from './dto/create-inventory-type.dto';
 import { InventoryType } from './entities/inventory-type.entity';
+import { UpdateStockDto } from './dto/update-stock.dto';
 
 @Injectable()
 export class InventoryService {
@@ -251,6 +252,32 @@ export class InventoryService {
     );
 
     return { success: true, message: 'Relación de almacén actualizada con éxito' };
+  }
+
+  async updateItemStock(itemId: number, updateStockDto: UpdateStockDto) {
+    const { quantity } = updateStockDto;
+
+    const item = await this.itemRepository.findOne({ where: { id: itemId } });
+    if (!item) {
+      throw new NotFoundException(`El producto con ID ${itemId} no existe en el catálogo.`);
+    }
+
+    if (quantity < 0 && (item.stockAvailable + quantity) < 0) {
+      throw new BadRequestException(
+        `Stock insuficiente para realizar la operación. Stock actual: ${item.stockAvailable}, solicitado: ${Math.abs(quantity)}`
+      );
+    }
+
+    item.stockAvailable += quantity;
+    const updatedItem = await this.itemRepository.save(item);
+
+    return {
+      message: quantity < 0 ? 'Stock descontado con éxito' : 'Stock incrementado con éxito',
+      itemId: updatedItem.id,
+      sku: updatedItem.sku,
+      previousStock: item.stockAvailable - quantity,
+      newStock: updatedItem.stockAvailable
+    };
   }
 
   async removeUserRelation(inventoryId: number, userId: string) {
