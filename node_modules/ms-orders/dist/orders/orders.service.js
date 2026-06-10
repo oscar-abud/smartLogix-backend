@@ -39,6 +39,21 @@ let OrdersService = class OrdersService {
             },
         });
     }
+    async findOrderById(orderId) {
+        try {
+            const orden = await this.orderRepository.findOne({
+                where: { id: orderId }
+            });
+            if (!orden) {
+                throw new common_1.NotFoundException(`El orden con ID ${orderId} no existe en el inventario.`);
+            }
+            return orden;
+        }
+        catch (error) {
+            console.error(...oo_tx(`1369915455_42_6_42_72_11`, 'Error en buscar el orden en OrdersService:', error));
+            throw new common_1.InternalServerErrorException('No se pudo buscar la orden debido a un problema interno.');
+        }
+    }
     async create(createOrderDto) {
         const { productId, quantity } = createOrderDto;
         const inventoryUrl = 'http://localhost:3002/api/inventory';
@@ -84,7 +99,7 @@ let OrdersService = class OrdersService {
         }
         catch (transactionError) {
             await queryRunner.rollbackTransaction();
-            console.error(...oo_tx(`498312056_100_6_100_78_11`, 'Error transaccional en OrdersService:', transactionError));
+            console.error(...oo_tx(`1369915455_117_6_117_78_11`, 'Error transaccional en OrdersService:', transactionError));
             throw new common_1.InternalServerErrorException('No se pudo procesar la orden debido a un problema interno.');
         }
         finally {

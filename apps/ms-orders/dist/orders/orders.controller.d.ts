@@ -4,6 +4,7 @@ export declare class OrdersController {
     private readonly ordersService;
     constructor(ordersService: OrdersService);
     findAll(): Promise<import("./entities/order.entity").Order[]>;
+    findOrderById(id: number): Promise<import("./entities/order.entity").Order>;
     create(createOrderDto: CreateOrderDto): Promise<{
         message: string;
         orderId: number;

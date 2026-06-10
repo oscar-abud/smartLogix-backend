@@ -27,6 +27,23 @@ export class OrdersService {
     });
   }
 
+  async findOrderById(orderId: number) {
+    try {
+      const orden = await this.orderRepository.findOne({
+        where: { id: orderId }
+      })
+
+      if (!orden) {
+        throw new NotFoundException(`El orden con ID ${orderId} no existe en el inventario.`);
+      }
+
+      return orden;
+    } catch (error) {
+      console.error('Error en buscar el orden en OrdersService:', error);
+      throw new InternalServerErrorException('No se pudo buscar la orden debido a un problema interno.');
+    }
+  }
+
   async create(createOrderDto: CreateOrderDto) {
     const { productId, quantity } = createOrderDto;
 

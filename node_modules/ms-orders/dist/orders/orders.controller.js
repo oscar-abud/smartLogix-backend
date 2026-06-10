@@ -25,6 +25,9 @@ let OrdersController = class OrdersController {
     findAll() {
         return this.ordersService.findAll();
     }
+    findOrderById(id) {
+        return this.ordersService.findOrderById(id);
+    }
     create(createOrderDto) {
         return this.ordersService.create(createOrderDto);
     }
@@ -44,6 +47,21 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], OrdersController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Obtener la órden por ID',
+        description: 'Retorna el órden buscado por ID.'
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Órden encontrado con éxito!.'
+    }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], OrdersController.prototype, "findOrderById", null);
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),

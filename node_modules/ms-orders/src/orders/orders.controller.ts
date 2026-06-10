@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Get, Body, HttpCode, HttpStatus, Param, ParseIntPipe } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -19,6 +19,19 @@ export class OrdersController {
   })
   findAll() {
     return this.ordersService.findAll();
+  }
+
+  @Get(':id')
+  @ApiOperation({ 
+    summary: 'Obtener la órden por ID', 
+    description: 'Retorna el órden buscado por ID.' 
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Órden encontrado con éxito!.'
+  })
+  findOrderById(@Param('id', ParseIntPipe) id: number) {
+    return this.ordersService.findOrderById(id);
   }
 
   @Post()
