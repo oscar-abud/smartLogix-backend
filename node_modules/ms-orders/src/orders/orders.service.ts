@@ -31,7 +31,13 @@ export class OrdersService {
   async findOrderById(orderId: number) {
     try {
       const orden = await this.orderRepository.findOne({
-        where: { id: orderId }
+        where: { id: orderId },
+        relations: {
+        items: true,
+        },
+        order: { 
+        createdAt: 'DESC' 
+        },
       })
 
       if (!orden) {

@@ -42,7 +42,13 @@ let OrdersService = class OrdersService {
     async findOrderById(orderId) {
         try {
             const orden = await this.orderRepository.findOne({
-                where: { id: orderId }
+                where: { id: orderId },
+                relations: {
+                    items: true,
+                },
+                order: {
+                    createdAt: 'DESC'
+                },
             });
             if (!orden) {
                 throw new common_1.NotFoundException(`El orden con ID ${orderId} no existe en el inventario.`);
@@ -50,7 +56,7 @@ let OrdersService = class OrdersService {
             return orden;
         }
         catch (error) {
-            console.error(...oo_tx(`2429976761_43_6_43_72_11`, 'Error en buscar el orden en OrdersService:', error));
+            console.error(...oo_tx(`1522797496_49_6_49_72_11`, 'Error en buscar el orden en OrdersService:', error));
             throw new common_1.InternalServerErrorException('No se pudo buscar la orden debido a un problema interno.');
         }
     }
@@ -99,7 +105,7 @@ let OrdersService = class OrdersService {
         }
         catch (transactionError) {
             await queryRunner.rollbackTransaction();
-            console.error(...oo_tx(`2429976761_118_6_118_78_11`, 'Error transaccional en OrdersService:', transactionError));
+            console.error(...oo_tx(`1522797496_124_6_124_78_11`, 'Error transaccional en OrdersService:', transactionError));
             throw new common_1.InternalServerErrorException('No se pudo procesar la orden debido a un problema interno.');
         }
         finally {
