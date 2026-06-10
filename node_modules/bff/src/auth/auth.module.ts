@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { HttpModule } from '@nestjs/axios';
+import { CircuitBreakerService } from '../common/circuit-breaker.service';
 
 @Module({
   imports: [
@@ -18,6 +19,6 @@ import { HttpModule } from '@nestjs/axios';
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
-  exports: [AuthService, JwtModule, PassportModule], // 👈 Exportamos esto para que AppModule los pueda usar
+  exports: [AuthService, JwtModule, PassportModule],
 })
 export class AuthModule {}

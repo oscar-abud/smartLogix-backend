@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const inventory_service_1 = require("./inventory.service");
 const create_inventory_dto_1 = require("./dto/create-inventory.dto");
 const create_item_dto_1 = require("./dto/create-item.dto");
+const create_inventory_type_dto_1 = require("./dto/create-inventory-type.dto");
 let InventoryController = class InventoryController {
     inventoryService;
     constructor(inventoryService) {
@@ -25,11 +26,17 @@ let InventoryController = class InventoryController {
     async findAll() {
         return this.inventoryService.getAll();
     }
+    async getTypes() {
+        return this.inventoryService.getAllInventoryTypes();
+    }
     async findOne(id) {
         return this.inventoryService.getInventory(id);
     }
     async create(createInventoryDto, userId) {
         return this.inventoryService.registerInventory(createInventoryDto, userId);
+    }
+    async createType(createInventoryTypeDto) {
+        return this.inventoryService.createInventoryType(createInventoryTypeDto);
     }
     async assignUserToInventory(inventoryId, userId) {
         return this.inventoryService.assignUser(inventoryId, userId);
@@ -41,7 +48,7 @@ let InventoryController = class InventoryController {
         return this.inventoryService.updateUserRelation(inventoryId, userId);
     }
     async removeUserFromInventory(inventoryId, userId) {
-        console.log(...oo_oo(`1473247226_60_4_60_83_4`, '[Microservicio] ID de usuario recibido para desvincular:', userId));
+        console.log(...oo_oo(`2843848326_71_4_71_83_4`, '[Microservicio] ID de usuario recibido para desvincular:', userId));
         return this.inventoryService.removeUserRelation(inventoryId, userId);
     }
     async delete(id) {
@@ -55,6 +62,12 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('types'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "getTypes", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
@@ -70,6 +83,13 @@ __decorate([
     __metadata("design:paramtypes", [create_inventory_dto_1.CreateInventoryDto, String]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "create", null);
+__decorate([
+    (0, common_1.Post)('types'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_inventory_type_dto_1.CreateInventoryTypeDto]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "createType", null);
 __decorate([
     (0, common_1.Post)(':inventoryId/users'),
     __param(0, (0, common_1.Param)('inventoryId', common_1.ParseIntPipe)),

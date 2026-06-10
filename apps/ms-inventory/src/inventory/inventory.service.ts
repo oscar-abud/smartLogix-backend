@@ -6,6 +6,8 @@ import { Inventory } from './entities/inventory.entity';
 import { UserInventory } from './entities/user-inventory.entity';
 import { InventoryItem } from './entities/inventory-item.entity';
 import { CreateItemDto } from './dto/create-item.dto';
+import { CreateInventoryTypeDto } from './dto/create-inventory-type.dto';
+import { InventoryType } from './entities/inventory-type.entity';
 
 @Injectable()
 export class InventoryService {
@@ -15,6 +17,9 @@ export class InventoryService {
     
     @InjectRepository(InventoryItem)
     private readonly itemRepository: Repository<InventoryItem>,
+
+    @InjectRepository(InventoryType)
+    private readonly typeRepository: Repository<InventoryType>,
     
     private readonly dataSource: DataSource,
   ) {}
@@ -85,6 +90,23 @@ export class InventoryService {
         throw error;
       }
       throw new InternalServerErrorException(`Error al registrar el producto en el almacén: ${error.message}`);
+    }
+  }
+
+  // 🔥 NUEVO: Crear un nuevo tipo de inventario corporativo
+  async createInventoryType(createInventoryTypeDto: CreateInventoryTypeDto) {
+    const { name } = createInventoryTypeDto;
+    try {
+      const typeExists = await this.typeRepository.findOne({ where: { name } });
+      if (typeExists) {
+        throw new BadRequestException(`El tipo de inventario '${name}' ya está registrado.`);
+      }
+
+      const newType = this.typeRepository.create(createInventoryTypeDto);
+      return await this.typeRepository.save(newType);
+    } catch (error: any) {
+      if (error instanceof BadRequestException) throw error;
+      throw new InternalServerErrorException(`Error al registrar el tipo de inventario: ${error.message}`);
     }
   }
 
@@ -185,6 +207,16 @@ export class InventoryService {
     } catch (error: any) {
       if (error instanceof NotFoundException) throw error;
       throw new InternalServerErrorException(`Error al obtener el almacén en ms-inventory: ${error.message}`);
+    }
+  }
+
+  async getAllInventoryTypes() {
+    try {
+      return await this.typeRepository.find({
+        order: { id: 'ASC' }
+      });
+    } catch (error: any) {
+      throw new InternalServerErrorException(`Error al obtener los tipos de inventario: ${error.message}`);
     }
   }
 

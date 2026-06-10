@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { CircuitBreakerService } from '../common/circuit-breaker.service';
 import { CreateItemDto } from './dto/create-item.dto';
+import { CreateInventoryTypeDto } from './dto/create-inventory-type.dto';
 
 @Injectable()
 export class InventoryService {
@@ -117,6 +118,32 @@ export class InventoryService {
     }
   }
 
+  async getAllTypes() {
+    try {
+      return await this.breakerService.runWithCircuitBreaker(
+        'MS-INVENTORY-GET-TYPES',
+        async () => {
+          const { data } = await firstValueFrom(
+            this.httpService.get(`${this.inventoryMicroserviceUrl}/types`)
+          );
+          return data;
+        },
+        // Fallback: Si ms-inventory falla, devolvemos opciones genéricas temporalmente para no bloquear la UI
+        async () => {
+          console.error('[BFF Fallback - getTypes] ms-inventory inaccesible. Devolviendo catálogo de emergencia.');
+          return [
+            { id: 1, name: 'Inventario A (Supermercado) [MODO OFFLINE]', description: 'Catálogo de contingencia' },
+            { id: 2, name: 'Inventario B (Médico) [MODO OFFLINE]', description: 'Catálogo de contingencia' }
+          ];
+        }
+      );
+    } catch (error: any) {
+      throw new InternalServerErrorException(
+        error.response?.data?.message || 'Error al recuperar el catálogo de tipos de inventario'
+      );
+    }
+  }
+
   async createInventory(createInventoryDto: CreateInventoryDto, userId: string) {
     try {
       // En operaciones de escritura, el fallback NO inventa datos; arroja una excepción limpia de disponibilidad
@@ -163,6 +190,28 @@ export class InventoryService {
       if (error instanceof ServiceUnavailableException) throw error;
       throw new InternalServerErrorException(
         error.response?.data?.message || 'Error al procesar el alta del producto desde el orquestador BFF'
+      );
+    }
+  }
+
+  async createType(createInventoryTypeDto: CreateInventoryTypeDto) {
+    try {
+      return await this.breakerService.runWithCircuitBreaker(
+        'MS-INVENTORY-CREATE-TYPE',
+        async () => {
+          const { data } = await firstValueFrom(
+            this.httpService.post(`${this.inventoryMicroserviceUrl}/types`, createInventoryTypeDto)
+          );
+          return data;
+        },
+        async () => {
+          throw new ServiceUnavailableException('El servicio de configuración de tipos de almacén no está disponible.');
+        }
+      );
+    } catch (error: any) {
+      if (error instanceof ServiceUnavailableException) throw error;
+      throw new InternalServerErrorException(
+        error.response?.data?.message || 'Error al procesar el alta de la categoría desde el BFF'
       );
     }
   }

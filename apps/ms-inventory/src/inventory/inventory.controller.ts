@@ -3,6 +3,7 @@ import { InventoryService } from './inventory.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { ApiOperation } from '@nestjs/swagger';
 import { CreateItemDto } from './dto/create-item.dto';
+import { CreateInventoryTypeDto } from './dto/create-inventory-type.dto';
 
 @Controller('inventory') // Ruta interna: http://localhost:3002/api/inventory
 export class InventoryController {
@@ -11,6 +12,11 @@ export class InventoryController {
   @Get('')
   async findAll() {
     return this.inventoryService.getAll();
+  }
+
+  @Get('types')
+  async getTypes() {
+    return this.inventoryService.getAllInventoryTypes();
   }
 
   @Get(':id')
@@ -24,6 +30,11 @@ export class InventoryController {
     @Headers('x-user-id') userId: string,
   ) {
     return this.inventoryService.registerInventory(createInventoryDto, userId);
+  }
+
+  @Post('types')
+  async createType(@Body() createInventoryTypeDto: CreateInventoryTypeDto) {
+    return this.inventoryService.createInventoryType(createInventoryTypeDto);
   }
 
   @Post(':inventoryId/users') // Escucha: POST http://localhost:3002/api/inventory/:inventoryId/users

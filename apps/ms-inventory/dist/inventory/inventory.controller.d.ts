@@ -1,6 +1,7 @@
 import { InventoryService } from './inventory.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { CreateItemDto } from './dto/create-item.dto';
+import { CreateInventoryTypeDto } from './dto/create-inventory-type.dto';
 export declare class InventoryController {
     private readonly inventoryService;
     constructor(inventoryService: InventoryService);
@@ -15,6 +16,7 @@ export declare class InventoryController {
         createdAt: Date;
         userAssignments: import("./entities/user-inventory.entity").UserInventory[];
     }[]>;
+    getTypes(): Promise<import("./entities/inventory-type.entity").InventoryType[]>;
     findOne(id: number): Promise<{
         id: number;
         name: string;
@@ -26,6 +28,7 @@ export declare class InventoryController {
         userIds: string[];
     }>;
     create(createInventoryDto: CreateInventoryDto, userId: string): Promise<import("./entities/inventory.entity").Inventory>;
+    createType(createInventoryTypeDto: CreateInventoryTypeDto): Promise<import("./entities/inventory-type.entity").InventoryType>;
     assignUserToInventory(inventoryId: number, userId: string): Promise<{
         success: boolean;
         message: string;

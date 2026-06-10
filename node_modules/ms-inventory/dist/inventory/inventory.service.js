@@ -19,13 +19,16 @@ const typeorm_2 = require("typeorm");
 const inventory_entity_1 = require("./entities/inventory.entity");
 const user_inventory_entity_1 = require("./entities/user-inventory.entity");
 const inventory_item_entity_1 = require("./entities/inventory-item.entity");
+const inventory_type_entity_1 = require("./entities/inventory-type.entity");
 let InventoryService = class InventoryService {
     inventoryRepository;
     itemRepository;
+    typeRepository;
     dataSource;
-    constructor(inventoryRepository, itemRepository, dataSource) {
+    constructor(inventoryRepository, itemRepository, typeRepository, dataSource) {
         this.inventoryRepository = inventoryRepository;
         this.itemRepository = itemRepository;
+        this.typeRepository = typeRepository;
         this.dataSource = dataSource;
     }
     async registerInventory(createInventoryDto, creatorUserId) {
@@ -81,6 +84,22 @@ let InventoryService = class InventoryService {
                 throw error;
             }
             throw new common_1.InternalServerErrorException(`Error al registrar el producto en el almacén: ${error.message}`);
+        }
+    }
+    async createInventoryType(createInventoryTypeDto) {
+        const { name } = createInventoryTypeDto;
+        try {
+            const typeExists = await this.typeRepository.findOne({ where: { name } });
+            if (typeExists) {
+                throw new common_1.BadRequestException(`El tipo de inventario '${name}' ya está registrado.`);
+            }
+            const newType = this.typeRepository.create(createInventoryTypeDto);
+            return await this.typeRepository.save(newType);
+        }
+        catch (error) {
+            if (error instanceof common_1.BadRequestException)
+                throw error;
+            throw new common_1.InternalServerErrorException(`Error al registrar el tipo de inventario: ${error.message}`);
         }
     }
     async getAll() {
@@ -162,6 +181,16 @@ let InventoryService = class InventoryService {
             throw new common_1.InternalServerErrorException(`Error al obtener el almacén en ms-inventory: ${error.message}`);
         }
     }
+    async getAllInventoryTypes() {
+        try {
+            return await this.typeRepository.find({
+                order: { id: 'ASC' }
+            });
+        }
+        catch (error) {
+            throw new common_1.InternalServerErrorException(`Error al obtener los tipos de inventario: ${error.message}`);
+        }
+    }
     async assignUser(inventoryId, userId) {
         await this.inventoryRepository.manager.query(`DELETE FROM user_inventories WHERE user_id = $1 AND inventory_id = $2`, [userId, inventoryId]);
         await this.inventoryRepository.manager.query(`INSERT INTO user_inventories (inventory_id, user_id) VALUES ($1, $2)`, [inventoryId, userId]);
@@ -210,7 +239,9 @@ exports.InventoryService = InventoryService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(inventory_entity_1.Inventory)),
     __param(1, (0, typeorm_1.InjectRepository)(inventory_item_entity_1.InventoryItem)),
+    __param(2, (0, typeorm_1.InjectRepository)(inventory_type_entity_1.InventoryType)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.DataSource])
 ], InventoryService);
