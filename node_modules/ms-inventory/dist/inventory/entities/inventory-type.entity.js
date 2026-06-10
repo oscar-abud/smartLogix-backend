@@ -33,7 +33,7 @@ __decorate([
     __metadata("design:type", String)
 ], InventoryType.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.CreateDateColumn)({ name: 'createdat' }),
+    (0, typeorm_1.CreateDateColumn)({ name: 'createdAt' }),
     __metadata("design:type", Date)
 ], InventoryType.prototype, "createdAt", void 0);
 __decorate([

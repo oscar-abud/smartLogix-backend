@@ -12,7 +12,7 @@ export class InventoryType {
   @Column({ type: 'text', nullable: true })
   description!: string;
 
-  @CreateDateColumn({ name: 'createdat' })
+  @CreateDateColumn({ name: 'createdAt' })
   createdAt!: Date;
 
   // Relación: Un tipo de inventario agrupa a muchos productos
