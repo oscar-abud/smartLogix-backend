@@ -10,10 +10,11 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const axios_1 = require("@nestjs/axios");
 const auth_module_1 = require("./auth/auth.module");
-const inventory_controller_1 = require("./inventory/inventory.controller");
-const inventory_service_1 = require("./inventory/inventory.service");
 const common_module_1 = require("./common/common.module");
+const shipping_module_1 = require("./shipping/shipping.module");
+const inventory_controller_1 = require("./inventory/inventory.controller");
 const orders_module_1 = require("./orders/orders.module");
+const inventory_service_1 = require("./inventory/inventory.service");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -23,7 +24,8 @@ exports.AppModule = AppModule = __decorate([
             axios_1.HttpModule,
             auth_module_1.AuthModule,
             common_module_1.CommonModule,
-            orders_module_1.OrdersModule
+            orders_module_1.OrdersModule,
+            shipping_module_1.ShippingModule
         ],
         controllers: [
             inventory_controller_1.InventoryController

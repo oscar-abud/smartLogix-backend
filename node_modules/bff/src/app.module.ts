@@ -2,18 +2,20 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { AuthModule } from './auth/auth.module';
-
-import { InventoryController } from './inventory/inventory.controller';
-import { InventoryService } from './inventory/inventory.service';
 import { CommonModule } from './common/common.module';
+import { ShippingModule } from './shipping/shipping.module';
+import { InventoryController } from './inventory/inventory.controller';
 import { OrdersModule } from './orders/orders.module';
+import { InventoryService } from './inventory/inventory.service';
+import { InventoryModule } from './inventory/inventory.module';
 
 @Module({
   imports: [
     HttpModule,
     AuthModule,
     CommonModule,
-    OrdersModule
+    OrdersModule,
+    ShippingModule
   ],
   controllers: [
     InventoryController
