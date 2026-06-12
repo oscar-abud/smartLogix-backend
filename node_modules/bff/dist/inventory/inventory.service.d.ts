@@ -14,6 +14,7 @@ export declare class InventoryService {
     getInventory(id: number): Promise<any>;
     getAllTypes(): Promise<any>;
     getItemById(itemId: number): Promise<any>;
+    getItems(): Promise<any>;
     createInventory(createInventoryDto: CreateInventoryDto, userId: string): Promise<any>;
     addItemToInventory(inventoryId: number, createItemDto: CreateItemDto): Promise<any>;
     createType(createInventoryTypeDto: CreateInventoryTypeDto): Promise<any>;

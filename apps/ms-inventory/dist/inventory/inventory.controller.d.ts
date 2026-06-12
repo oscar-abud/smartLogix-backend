@@ -18,6 +18,7 @@ export declare class InventoryController {
         userAssignments: import("./entities/user-inventory.entity").UserInventory[];
     }[]>;
     getTypes(): Promise<import("./entities/inventory-type.entity").InventoryType[]>;
+    findItems(): Promise<import("./entities/inventory-item.entity").InventoryItem[]>;
     findItemById(itemId: number): Promise<import("./entities/inventory-item.entity").InventoryItem>;
     findOne(id: number): Promise<{
         id: number;

@@ -11,6 +11,7 @@ export declare class InventoryController {
     findAll(): Promise<any[]>;
     findAllTypes(): Promise<any>;
     findItemById(itemId: number): Promise<any>;
+    findItems(): Promise<any>;
     findOne(id: number): Promise<any>;
     createInventory(createInventoryDto: CreateInventoryDto, req: any): Promise<any>;
     createType(createInventoryTypeDto: CreateInventoryTypeDto): Promise<any>;

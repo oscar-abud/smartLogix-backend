@@ -39,6 +39,7 @@ export declare class InventoryService {
     }>;
     getAllInventoryTypes(): Promise<InventoryType[]>;
     getItemById(itemId: number): Promise<InventoryItem>;
+    getItems(): Promise<InventoryItem[]>;
     assignUser(inventoryId: number, userId: string): Promise<{
         success: boolean;
         message: string;

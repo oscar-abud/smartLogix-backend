@@ -233,6 +233,12 @@ export class InventoryService {
     return item;
   }
 
+  async getItems() {
+    const item = await this.itemRepository.find();
+
+    return item;
+  }
+
   async assignUser(inventoryId: number, userId: string) {
     // Ejemplo usando QueryBuilder o repositorio de tu entidad intermedia (user_inventories)
     // Evitamos duplicados limpiando cualquier rastro previo del usuario en este almacén antes de insertar

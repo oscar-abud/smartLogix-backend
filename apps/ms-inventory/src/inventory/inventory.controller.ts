@@ -20,6 +20,11 @@ export class InventoryController {
     return this.inventoryService.getAllInventoryTypes();
   }
 
+  @Get('items')
+  async findItems() {
+    return this.inventoryService.getItems();
+  }
+
   @Get('items/:itemId')
   async findItemById(@Param('itemId', ParseIntPipe) itemId: number) {
     return this.inventoryService.getItemById(itemId);

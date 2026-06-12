@@ -171,6 +171,32 @@ export class InventoryService {
     }
   }
 
+  async getItems() {
+    try {
+      return await this.breakerService.runWithCircuitBreaker(
+        'MS-INVENTORY-GET-ITEM',
+        async () => {
+          // 1. Apunta al nuevo endpoint del microservicio: http://localhost:3002/api/inventory/items/:itemId
+          const { data } = await firstValueFrom(
+            this.httpService.get(`${this.inventoryMicroserviceUrl}/items`)
+          );
+          return data;
+        },
+        // 2. Fallback: Si el microservicio de inventario no responde
+        async () => {
+          throw new ServiceUnavailableException(
+            `El catálogo de inventarios no se encuentra disponible.`
+          );
+        }
+      );
+    } catch (error: any) {
+      if (error instanceof ServiceUnavailableException) throw error;
+      throw new InternalServerErrorException(
+        error.response?.data?.message || `Error al recuperar listar detalles de los ítems desde el BFF`
+      );
+    }
+  }
+
   async createInventory(createInventoryDto: CreateInventoryDto, userId: string) {
     try {
       // En operaciones de escritura, el fallback NO inventa datos; arroja una excepción limpia de disponibilidad
