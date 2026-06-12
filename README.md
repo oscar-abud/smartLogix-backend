@@ -14,8 +14,8 @@ El repositorio está organizado utilizando una estructura limpia de aplicaciones
 │   ├── bff/             # API Gateway / Backend For Frontend (Puerto 3000)
 │   ├── ms-inventory/    # Microservicio de Inventario y Catálogo (Puerto 3002)
 │   ├── ms-orders/       # Microservicio de Procesamiento de Órdenes (Puerto 3003)
-│   ├── ms-shipping/     # Microservicio de Despachos y Logística
-│   └── ms-users/        # Microservicio de Autenticación y Usuarios
+│   ├── ms-shipping/     # Microservicio de Despachos y Logística (Puerto 3004)
+│   └── ms-users/        # Microservicio de Autenticación y Usuarios (Puerto 3001)
 ├── database/            # Scripts de respaldo de base de datos
 └── docker/
     └── docker-compose.yml # Orquestación de infraestructura local
