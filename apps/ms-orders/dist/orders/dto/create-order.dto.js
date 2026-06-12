@@ -9,32 +9,48 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateOrderDto = void 0;
+exports.CreateOrderDto = exports.OrderItemDto = void 0;
 const class_validator_1 = require("class-validator");
+const class_transformer_1 = require("class-transformer");
 const swagger_1 = require("@nestjs/swagger");
-class CreateOrderDto {
+class OrderItemDto {
     productId;
     quantity;
 }
-exports.CreateOrderDto = CreateOrderDto;
+exports.OrderItemDto = OrderItemDto;
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: 5,
-        description: 'ID único del ítem/producto existente en el catálogo de inventarios',
+        example: 1,
+        description: 'ID único del producto existente en el inventario',
     }),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsPositive)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'El ID del producto es obligatorio.' }),
     __metadata("design:type", Number)
-], CreateOrderDto.prototype, "productId", void 0);
+], OrderItemDto.prototype, "productId", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: 3,
-        description: 'Cantidad física de unidades que el cliente desea comprar',
+        description: 'Cantidad física de unidades que se desea comprar',
     }),
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsPositive)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'La cantidad solicitada es obligatoria.' }),
     __metadata("design:type", Number)
-], CreateOrderDto.prototype, "quantity", void 0);
+], OrderItemDto.prototype, "quantity", void 0);
+class CreateOrderDto {
+    items;
+}
+exports.CreateOrderDto = CreateOrderDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: [OrderItemDto],
+        description: 'Arreglo de productos con sus respectivas cantidades a comprar',
+    }),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.ValidateNested)({ each: true }),
+    (0, class_transformer_1.Type)(() => OrderItemDto),
+    (0, class_validator_1.IsNotEmpty)({ message: 'El listado de ítems no puede estar vacío.' }),
+    __metadata("design:type", Array)
+], CreateOrderDto.prototype, "items", void 0);
 //# sourceMappingURL=create-order.dto.js.map

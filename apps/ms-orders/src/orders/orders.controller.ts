@@ -10,27 +10,13 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Get()
-  @ApiOperation({ 
-    summary: 'Obtener el listado histórico de órdenes', 
-    description: 'Retorna todas las órdenes generadas en el sistema ordenadas de forma descendente por fecha de creación, incluyendo el desglose de sus ítems.' 
-  })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Listado histórico devuelto exitosamente.' 
-  })
+  @ApiOperation({ summary: 'Obtener el listado histórico de órdenes' })
   findAll() {
     return this.ordersService.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ 
-    summary: 'Obtener la órden por ID', 
-    description: 'Retorna el órden buscado por ID.' 
-  })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Órden encontrado con éxito!.'
-  })
+  @ApiOperation({ summary: 'Obtener la órden por ID' })
   findOrderById(@Param('id', ParseIntPipe) id: number) {
     return this.ordersService.findOrderById(id);
   }
@@ -38,27 +24,17 @@ export class OrdersController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ 
-    summary: 'Generar una nueva orden de compra', 
-    description: 'Valida las existencias en el inventario, registra la compra en PostgreSQL y descuenta de forma atómica el stock disponible.' 
+    summary: 'Generar una nueva orden de compra multi-producto', 
+    description: 'Valida las existencias de todos los productos en el inventario, registra la cabecera y el detalle en PostgreSQL de forma atómica.' 
   })
-  @ApiResponse({ 
-    status: 201, 
-    description: 'La orden fue procesada con éxito y el stock físico ha sido actualizado.' 
-  })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Solicitud rechazada. Posible stock insuficiente del artículo o datos de entrada inválidos.' 
-  })
-  @ApiResponse({ 
-    status: 404, 
-    description: 'El producto (productId) seleccionado no existe en el catálogo global de inventarios.' 
-  })
+  @ApiResponse({ status: 201, description: 'La orden multi-producto fue procesada con éxito.' })
+  @ApiResponse({ status: 400, description: 'Stock insuficiente en uno o más artículos.' })
   create(@Body() createOrderDto: CreateOrderDto) {
     return this.ordersService.create(createOrderDto);
   }
 
   @Patch(':id/status')
-  @ApiOperation({ summary: 'Actualizar el estado de una orden (PENDING, PROCESSED, CANCELLED)' })
+  @ApiOperation({ summary: 'Actualizar el estado de una orden' })
   updateStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateOrderStatusDto: UpdateOrderStatusDto

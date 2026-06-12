@@ -138,7 +138,6 @@ export class OrdersService {
 
   async createOrder(createOrderDto: CreateOrderDto) {
     try {
-      // Usamos el Circuit Breaker para proteger las transacciones de escritura
       return await this.breakerService.runWithCircuitBreaker(
         'MS-ORDERS-CREATE',
         async () => {

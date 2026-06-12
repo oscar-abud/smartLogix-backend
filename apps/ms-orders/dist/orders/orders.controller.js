@@ -42,28 +42,14 @@ let OrdersController = class OrdersController {
 exports.OrdersController = OrdersController;
 __decorate([
     (0, common_1.Get)(),
-    (0, swagger_1.ApiOperation)({
-        summary: 'Obtener el listado histórico de órdenes',
-        description: 'Retorna todas las órdenes generadas en el sistema ordenadas de forma descendente por fecha de creación, incluyendo el desglose de sus ítems.'
-    }),
-    (0, swagger_1.ApiResponse)({
-        status: 200,
-        description: 'Listado histórico devuelto exitosamente.'
-    }),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener el listado histórico de órdenes' }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], OrdersController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
-    (0, swagger_1.ApiOperation)({
-        summary: 'Obtener la órden por ID',
-        description: 'Retorna el órden buscado por ID.'
-    }),
-    (0, swagger_1.ApiResponse)({
-        status: 200,
-        description: 'Órden encontrado con éxito!.'
-    }),
+    (0, swagger_1.ApiOperation)({ summary: 'Obtener la órden por ID' }),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -73,21 +59,11 @@ __decorate([
     (0, common_1.Post)(),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     (0, swagger_1.ApiOperation)({
-        summary: 'Generar una nueva orden de compra',
-        description: 'Valida las existencias en el inventario, registra la compra en PostgreSQL y descuenta de forma atómica el stock disponible.'
+        summary: 'Generar una nueva orden de compra multi-producto',
+        description: 'Valida las existencias de todos los productos en el inventario, registra la cabecera y el detalle en PostgreSQL de forma atómica.'
     }),
-    (0, swagger_1.ApiResponse)({
-        status: 201,
-        description: 'La orden fue procesada con éxito y el stock físico ha sido actualizado.'
-    }),
-    (0, swagger_1.ApiResponse)({
-        status: 400,
-        description: 'Solicitud rechazada. Posible stock insuficiente del artículo o datos de entrada inválidos.'
-    }),
-    (0, swagger_1.ApiResponse)({
-        status: 404,
-        description: 'El producto (productId) seleccionado no existe en el catálogo global de inventarios.'
-    }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: 'La orden multi-producto fue procesada con éxito.' }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Stock insuficiente en uno o más artículos.' }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_order_dto_1.CreateOrderDto]),
@@ -95,7 +71,7 @@ __decorate([
 ], OrdersController.prototype, "create", null);
 __decorate([
     (0, common_1.Patch)(':id/status'),
-    (0, swagger_1.ApiOperation)({ summary: 'Actualizar el estado de una orden (PENDING, PROCESSED, CANCELLED)' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Actualizar el estado de una orden' }),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),

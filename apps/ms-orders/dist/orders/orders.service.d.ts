@@ -15,7 +15,7 @@ export declare class OrdersService {
         orderId: number;
         totalAmount: number;
         status: OrderStatus;
-        quantity: number;
+        totalItemsProcessed: any;
         createdAt: Date;
     }>;
     updateStatus(orderId: number, updateOrderStatusDto: UpdateOrderStatusDto): Promise<Order>;

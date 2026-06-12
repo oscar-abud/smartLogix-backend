@@ -52,79 +52,92 @@ export class OrdersService {
   }
 
   async create(createOrderDto: CreateOrderDto) {
-    const { productId, quantity } = createOrderDto;
-
-    // Endpoint destino para consultar y alterar las existencias físicas
+    const { items } = createOrderDto;
     const inventoryUrl = 'http://localhost:3002/api/inventory'; 
 
-    let productData;
-    try {
-      const response = await firstValueFrom(
-        this.httpService.get(`${inventoryUrl}/items/${productId}`)
-      );
-      productData = response.data;
-    } catch (error) {
-      throw new NotFoundException(`El producto con ID ${productId} no existe en el catálogo.`);
+    let totalAmount = 0;
+    const validatedItems: any = [];
+
+    // FASE DE VALIDACIÓN PREVIA (Antes de tocar la Base de Datos)
+    for (const item of items) {
+      const { productId, quantity } = item;
+      let productData;
+
+      try {
+        const response = await firstValueFrom(
+          this.httpService.get(`${inventoryUrl}/items/${productId}`)
+        );
+        productData = response.data;
+      } catch (error) {
+        throw new NotFoundException(`El producto con ID ${productId} no existe en el catálogo.`);
+      }
+
+      // Validar existencias físicas
+      if (productData.stockAvailable < quantity) {
+        throw new BadRequestException(
+          `Stock insuficiente para el artículo '${productData.name}'. Stock actual: ${productData.stockAvailable}, solicitado: ${quantity}`
+        );
+      }
+
+      const unitPrice = parseFloat(productData.price);
+      const subtotal = unitPrice * quantity;
+      totalAmount += subtotal;
+
+      // Guardamos la información resuelta temporalmente
+      validatedItems.push({
+        productId,
+        quantity,
+        unitPrice,
+      });
     }
 
-    if (productData.stockAvailable < quantity) {
-      throw new BadRequestException(
-        `Stock insuficiente para el artículo '${productData.name}'. Stock actual: ${productData.stockAvailable}, solicitado: ${quantity}`
-      );
-    }
-
-    // Cálculos económicos de la venta
-    const unitPrice = parseFloat(productData.price);
-    const totalAmount = unitPrice * quantity;
-
-    // Iniciar Transacción en PostgreSQL
+    // FASE TRANSACCIONAL ATÓMICA en PostgreSQL e Inventario
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      // Crear e insertar la cabecera limpia (sin user_id)
+      // Guardar cabecera de la Orden
       const order = new Order();
       order.status = OrderStatus.PENDING;
       order.totalAmount = totalAmount;
-
       const savedOrder = await queryRunner.manager.save(order);
 
-      // Crear e insertar el detalle del ítem
-      const orderItem = new OrderItem();
-      orderItem.orderId = savedOrder.id;
-      orderItem.productId = productId;
-      orderItem.quantity = quantity;
-      orderItem.price = unitPrice;
+      // Guardar cada ítem asociado y sincronizar stocks mediante bucle iterativo
+      for (const validItem of validatedItems) {
+        const orderItem = new OrderItem();
+        orderItem.orderId = savedOrder.id;
+        orderItem.productId = validItem.productId;
+        orderItem.quantity = validItem.quantity;
+        orderItem.price = validItem.unitPrice;
 
-      await queryRunner.manager.save(orderItem);
+        await queryRunner.manager.save(orderItem);
 
-      // Descontar el stock en ms-inventory de forma síncrona
-      await firstValueFrom(
-        this.httpService.patch(`${inventoryUrl}/items/${productId}/stock`, {
-          quantity: -quantity,
-        })
-      );
+        // Descontar el stock en ms-inventory síncronamente
+        await firstValueFrom(
+          this.httpService.patch(`${inventoryUrl}/items/${validItem.productId}/stock`, {
+            quantity: -validItem.quantity,
+          })
+        );
+      }
 
-      // Consolidar la transacción si todo anduvo bien
+      // Si todo anduvo bien, consolidamos la transacción en la base de datos
       await queryRunner.commitTransaction();
 
       return {
-        message: 'Orden creada con éxito y existencias descontadas del inventario.',
+        message: 'Orden multi-producto creada con éxito y stock descontado del inventario.',
         orderId: savedOrder.id,
         totalAmount: savedOrder.totalAmount,
         status: savedOrder.status,
-        quantity: quantity,
+        totalItemsProcessed: validatedItems.length,
         createdAt: savedOrder.createdAt,
       };
 
     } catch (transactionError) {
-      // Revertir todo en cascada ante cualquier imprevisto de red o base de datos
       await queryRunner.rollbackTransaction();
       console.error('Error transaccional en OrdersService:', transactionError);
-      throw new InternalServerErrorException('No se pudo procesar la orden debido a un problema interno.');
+      throw new InternalServerErrorException('No se pudo procesar la orden debido a un problema interno de consistencia.');
     } finally {
-      // Liberar el query runner
       await queryRunner.release();
     }
   }

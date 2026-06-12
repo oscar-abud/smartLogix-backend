@@ -1,4 +1,7 @@
-export declare class CreateOrderDto {
+export declare class OrderItemDto {
     productId: number;
     quantity: number;
+}
+export declare class CreateOrderDto {
+    items: OrderItemDto[];
 }

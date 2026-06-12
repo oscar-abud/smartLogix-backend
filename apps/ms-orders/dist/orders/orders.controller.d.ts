@@ -11,7 +11,7 @@ export declare class OrdersController {
         orderId: number;
         totalAmount: number;
         status: import("./entities/order.entity").OrderStatus;
-        quantity: number;
+        totalItemsProcessed: any;
         createdAt: Date;
     }>;
     updateStatus(id: number, updateOrderStatusDto: UpdateOrderStatusDto): Promise<import("./entities/order.entity").Order>;
