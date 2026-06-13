@@ -57,7 +57,7 @@ CREATE INDEX IF NOT EXISTS idx_inventory_items_sku ON inventory_items(sku);
 CREATE INDEX IF NOT EXISTS idx_user_inventories_user ON user_inventories(user_id);
 
 -- =============================================================================
--- DATOS SEMILLA REALES (Extraídos de tus capturas de pantalla)
+-- DATOS SEMILLA REALES (Extraídos de tus capturas de pantalla y registros)
 -- =============================================================================
 
 -- Insertar tus dos almacenes reales tal cual los tienes hoy
@@ -66,9 +66,11 @@ INSERT INTO inventories (id, name, description, created_at) VALUES
 (2, 'Almacén Central Norte', 'Bodega principal destinada a productos de alta tecnología y servidores.', '2026-06-08 16:01:21.889')
 ON CONFLICT (id) DO NOTHING;
 
--- Insertar Categoría base
-INSERT INTO inventory_types (id, name, description)
-VALUES (1, 'General / Tecnología', 'Categoría raíz para productos estándar sin clasificación específica.')
+-- Insertar Categorías base requeridas por tus productos (IDs 1, 2 y 3)
+INSERT INTO inventory_types (id, name, description) VALUES
+(1, 'Alimentos y Abarrotes', 'Categoría para productos alimenticios perecederos y no perecederos.'),
+(2, 'Insumos Médicos / Salud', 'Artículos de protección personal, desinfectantes y asistencia médica.'),
+(3, 'Hardware y Electrónica', 'Componentes de computadoras, servidores y tecnología de alta fidelidad.')
 ON CONFLICT (id) DO NOTHING;
 
 -- Insertar las asignaciones de tus usuarios reales de ms-users a las bodegas (Tu tabla intermedia)
@@ -78,7 +80,19 @@ INSERT INTO user_inventories (id, user_id, inventory_id, assigned_at) VALUES
 (3, '8e5d3016-1c03-48e4-8ca5-534bed945fbe', 1, '2026-06-08 17:09:28.526')  -- Alex en Almacén Inicial
 ON CONFLICT (id) DO NOTHING;
 
--- Sincronizar las secuencias de Postgres
+-- Insertar los ítems/productos reales de tu inventario
+INSERT INTO inventory_items (id, sku, name, price, stock_available, stock_reserved, inventory_type_id, createdat, inventory_id) VALUES
+(1, 'SUPER-ARROZ-01', 'Arroz Grado 1 Extra Largo 1kg', 1490.00, 130, 0, 1, '2026-06-07 14:28:49.879', 1),
+(2, 'SUPER-LECHE-02', 'Leche Entera Caja 1L', 1050.00, 128, 0, 1, '2026-06-07 14:28:49.879', 1),
+(3, 'MED-MASC-01', 'Mascarillas Quirúrgicas (Caja 50 und)', 4500.00, 197, 0, 2, '2026-06-07 14:28:49.879', 1),
+(4, 'MED-ALCO-02', 'Alcohol Gel 70% 500ml', 2990.00, 38, 0, 2, '2026-06-07 14:28:49.879', 1),
+(5, 'SUPER-ARROZ-01-02', 'Arroz Grado 1 Extra Largo 1kg', 1490.00, 144, 0, 1, '2026-06-10 19:49:19.607', 2),
+(6, 'SUPER-ARROZ-01-04', 'Arroz Grado 1 Extra Largo 1kg', 1490.00, 150, 0, 1, '2026-06-10 19:51:29.441', 2),
+(7, 'HW-99-DL', 'Memoria Ram 32GB', 260000.00, 100, 0, 3, '2026-06-10 21:05:12.283', 2)
+ON CONFLICT (id) DO NOTHING;
+
+-- Sincronizar las secuencias de Postgres (Modificado al número máximo real de cada tabla)
 SELECT setval('inventories_id_seq', COALESCE((SELECT MAX(id) FROM inventories), 2));
-SELECT setval('inventory_types_id_seq', COALESCE((SELECT MAX(id) FROM inventory_types), 1));
+SELECT setval('inventory_types_id_seq', COALESCE((SELECT MAX(id) FROM inventory_types), 3));
 SELECT setval('user_inventories_id_seq', COALESCE((SELECT MAX(id) FROM user_inventories), 3));
+SELECT setval('inventory_items_id_seq', COALESCE((SELECT MAX(id) FROM inventory_items), 7));
