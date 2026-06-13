@@ -1,11 +1,29 @@
--- 1. Crear la tabla de roles (Por si acaso NestJS no levanta antes)
+-- 1. Crear la tabla de roles si no existe
 CREATE TABLE IF NOT EXISTS roles (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) UNIQUE NOT NULL
 );
 
--- 2. Insertar los roles por defecto del sistema
--- El "ON CONFLICT" evita que el script falle si Docker se reinicia y los datos ya existen
+-- 2. Insertar los roles por defecto
 INSERT INTO roles (id, name) 
 VALUES (1, 'ADMIN'), (2, 'OPERATOR'), (3, 'CLIENT')
 ON CONFLICT (name) DO NOTHING;
+
+-- 3. Crear la tabla de usuarios con soporte para UUID
+-- (NestJS la creará de todas formas, pero si Docker corre primero, esto la deja lista)
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    role_id INT,
+    CONSTRAINT fk_users_roles FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL
+);
+
+-- 4. Insertar tus usuarios reales de prueba extraídos
+INSERT INTO users (id, email, password, "createdAt", role_id) VALUES 
+('fb7d4acf-0a5a-4dc1-8957-c4b921b34416', 'oscar@smartlogix.com', '$2b$10$Xw0XNYXDbs/DHCYGpw9fUO8LXN6e279.hyC05309hNdw.NNQ8s/SS', '2026-06-03 21:39:37', 1),
+('8e5d3016-1c03-48e4-8ca5-534bed945fbe', 'alexSmart@smartlogix.com', '$2b$10$edvXrysqvUlWd63NklQed.7xNumu3ryWfTby7A/CMBZmBNPJR4jtS', '2026-06-07 23:53:14', 2),
+('f1d27308-36b2-427d-ac89-f501b656a878', 'usuario@smartlogix.com', '$2b$10$1b8QGz8TGrM6Pr/xSdJEf.OCMDHMW2jBbpKNVEKJOgAllIw0Vk31u', '2026-06-05 02:04:44', 3),
+('23cd207b-209a-48b2-8a6b-1fe6d2700f58', 'prueba@smartlogix.com', '$2b$10$/qFQ2aJBTWD0B2N9gh5Mu.4/PnDTsr2dEnKJkJVVlA2o2SRHj0EM2', '2026-06-08 17:00:25', 3)
+ON CONFLICT (email) DO NOTHING;
