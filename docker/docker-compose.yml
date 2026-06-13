@@ -14,7 +14,8 @@ services:
       POSTGRES_DB: smartlogix_users
     volumes:
       - users_db_data:/var/lib/postgresql/data
-      - ./apps/ms-users/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # CAMBIADO: Agregamos .. al inicio para apuntar a la raíz real
+      - ../apps/ms-users/db/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   # Base de datos MS Inventario
   inventory-db:
@@ -29,7 +30,8 @@ services:
       POSTGRES_DB: smartlogix_inventory
     volumes:
       - inventory_db_data:/var/lib/postgresql/data
-      - ./apps/ms-inventory/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # CAMBIADO: Agregamos .. al inicio
+      - ../apps/ms-inventory/db/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   # Base de datos MS Ordenes
   orders-db:
@@ -44,7 +46,8 @@ services:
       POSTGRES_DB: smartlogix_orders
     volumes:
       - orders_db_data:/var/lib/postgresql/data
-      - ./apps/ms-orders/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      # CAMBIADO: Agregamos .. al inicio
+      - ../apps/ms-orders/db/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
   inventory_db_data:
