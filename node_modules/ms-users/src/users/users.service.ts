@@ -58,8 +58,11 @@ export class UsersService {
     return {
       id: user.id,
       email: user.email,
-      id_role: user.role.id,
-      rol: user.role.name,
+      role: {
+        id: user.role.id,
+        name: user.role.name,
+      },
+      createdAt: user.createdAt,
     };
   }
 

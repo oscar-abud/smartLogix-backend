@@ -7,7 +7,7 @@ export class LoginDto {
   @IsNotEmpty()
   email!: string;
   
-  @ApiProperty({ example: 'password123', description: 'Contraseña de acceso (mínimo 6 caracteres)' })
+  @ApiProperty({ example: '123456', description: 'Contraseña de acceso (mínimo 6 caracteres)' })
   @IsNotEmpty()
   password!: string;
 }

@@ -24,7 +24,7 @@ __decorate([
     __metadata("design:type", String)
 ], LoginDto.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'password123', description: 'Contraseña de acceso (mínimo 6 caracteres)' }),
+    (0, swagger_1.ApiProperty)({ example: '123456', description: 'Contraseña de acceso (mínimo 6 caracteres)' }),
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], LoginDto.prototype, "password", void 0);
