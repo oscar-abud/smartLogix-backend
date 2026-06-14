@@ -54,9 +54,7 @@ export class InventoryController {
     @Body() createInventoryDto: CreateInventoryDto,
     @Req() req: any
   ) {
-    const userId = req.user.userId; 
-    console.log('ID del usuario extraído con éxito:', userId);
-    
+    const userId = req.user.userId;
     return this.inventoryService.createInventory(createInventoryDto, userId);
   }
 
