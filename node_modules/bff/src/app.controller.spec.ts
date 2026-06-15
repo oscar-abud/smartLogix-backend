@@ -1,22 +1,27 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { CircuitBreakerService } from './common/circuit-breaker.service';
 
-describe('AppController', () => {
-  let appController: AppController;
+describe('CircuitBreakerService', () => {
+  let service: CircuitBreakerService;
 
-  beforeEach(async () => {
-    const app: TestingModule = await Test.createTestingModule({
-      controllers: [AppController],
-      providers: [AppService],
-    }).compile();
-
-    appController = app.get<AppController>(AppController);
+  beforeEach(() => {
+    service = new CircuitBreakerService();
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
-    });
+  it('ejecuta la acción y retorna el resultado cuando el servicio responde', async () => {
+    const result = await service.runWithCircuitBreaker(
+      'TEST-SERVICE',
+      async () => ({ data: 'ok' }),
+      async () => ({ data: 'fallback' }),
+    );
+    expect(result).toEqual({ data: 'ok' });
+  });
+
+  it('invoca el fallback si la acción falla', async () => {
+    const result = await service.runWithCircuitBreaker(
+      'TEST-FAIL',
+      async () => { throw new Error('servicio caído'); },
+      async () => ({ data: 'fallback' }),
+    );
+    expect(result).toEqual({ data: 'fallback' });
   });
 });

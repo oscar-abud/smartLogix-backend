@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Informe de Pruebas Unitarias – SmartLogix</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #1a1a2e; background: #fff; padding: 40px 60px; }
+  h1 { font-size: 22px; color: #16213e; border-bottom: 3px solid #0f3460; padding-bottom: 10px; margin-bottom: 6px; }
+  .subtitle { color: #555; font-size: 12px; margin-bottom: 30px; }
+  h2 { font-size: 16px; color: #0f3460; margin: 28px 0 8px; border-left: 4px solid #e94560; padding-left: 10px; }
+  h3 { font-size: 13px; color: #16213e; margin: 14px 0 6px; font-weight: 700; }
+  p { line-height: 1.7; margin-bottom: 8px; color: #333; }
+  ul { margin: 6px 0 10px 20px; }
+  li { margin-bottom: 4px; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 20px; font-size: 12px; }
+  th { background: #0f3460; color: #fff; padding: 8px 10px; text-align: left; }
+  td { padding: 7px 10px; border-bottom: 1px solid #e0e0e0; vertical-align: top; text-align: center; }
+  td:first-child { text-align: left; font-weight: 600; }
+  td:last-child { text-align: left; }
+  tr:nth-child(even) td { background: #f7f9fc; }
+  .ok  { color: #166534; font-weight: 700; }
+  .warn{ color: #b45309; font-weight: 700; }
+  .bad { color: #991b1b; font-weight: 700; }
+  code { background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 11px; font-family: 'Courier New', monospace; }
+  pre  { background: #0d1117; color: #c9d1d9; padding: 14px 16px; border-radius: 6px; font-size: 11px; overflow-x: auto; margin: 10px 0 16px; line-height: 1.5; font-family: 'Courier New', monospace; }
+  .green { color: #3fb950; }
+  .red   { color: #ff7b72; }
+  .yellow{ color: #e3b341; }
+  .note  { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 10px 14px; font-size: 12px; margin: 10px 0 16px; border-radius: 3px; }
+  .alert { background: #fef2f2; border-left: 4px solid #ef4444; padding: 10px 14px; font-size: 12px; margin: 10px 0 16px; border-radius: 3px; }
+  .pattern-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 12px 16px; margin: 10px 0 16px; }
+  @media print {
+    body { padding: 20px 30px; }
+    pre  { white-space: pre-wrap; }
+    table { page-break-inside: avoid; }
+    h2   { page-break-before: auto; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Informe de Pruebas Unitarias – SmartLogix</h1>
+<p class="subtitle">Evaluación Parcial 3 · Fullstack III · Duoc UC</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>1. Resumen Ejecutivo</h2>
+<p>El sistema SmartLogix fue sometido a pruebas unitarias en todos sus componentes usando
+   <strong>Jest</strong> (backend NestJS + Express) y <strong>Vitest</strong> (frontend React).
+   Se ejecutaron un total de <strong>61 pruebas</strong> distribuidas en 6 suites.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Componente</th>
+      <th>Framework</th>
+      <th>Tests</th>
+      <th>Stmts %</th>
+      <th>Branch %</th>
+      <th>Funcs %</th>
+      <th>Lines %</th>
+      <th>Estado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ms-shipping</td>
+      <td>Jest 29</td>
+      <td>24 ✔</td>
+      <td class="ok">100</td>
+      <td class="ok">100</td>
+      <td class="ok">100</td>
+      <td class="ok">100</td>
+      <td class="ok">✔ Cumple</td>
+    </tr>
+    <tr>
+      <td>BFF – circuit-breaker</td>
+      <td>Jest 30</td>
+      <td>2 ✔</td>
+      <td class="ok">73.68</td>
+      <td class="ok">100</td>
+      <td class="warn">25</td>
+      <td class="ok">70.58</td>
+      <td class="warn">⚠ Parcial</td>
+    </tr>
+    <tr>
+      <td>Frontend</td>
+      <td>Vitest 4</td>
+      <td>22 ✔</td>
+      <td class="warn">49.72</td>
+      <td class="bad">32.43</td>
+      <td class="warn">51.42</td>
+      <td class="warn">51.78</td>
+      <td class="warn">⚠ Parcial</td>
+    </tr>
+    <tr>
+      <td>ms-inventory</td>
+      <td>Jest 30</td>
+      <td>—</td>
+      <td class="warn">42.32</td>
+      <td class="bad">34.84</td>
+      <td class="bad">17.02</td>
+      <td class="warn">41.90</td>
+      <td class="bad">✗ Parcial</td>
+    </tr>
+    <tr>
+      <td>ms-orders</td>
+      <td>Jest 30</td>
+      <td>7 ✔</td>
+      <td class="bad">34.50</td>
+      <td class="bad">35.48</td>
+      <td class="bad">31.57</td>
+      <td class="bad">33.54</td>
+      <td class="bad">✗ Parcial</td>
+    </tr>
+    <tr>
+      <td>ms-users</td>
+      <td>Jest 30</td>
+      <td>6 ✔</td>
+      <td class="bad">30.51</td>
+      <td class="bad">26.78</td>
+      <td class="bad">21.05</td>
+      <td class="bad">29.71</td>
+      <td class="bad">✗ Parcial</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <strong>Nota metodológica:</strong> La cobertura se midió con la opción <code>--coverage</code>
+  estándar de Jest/Vitest. Las líneas con 0% corresponden en su mayoría a archivos de configuración de módulos
+  (<code>app.module.ts</code>, <code>main.ts</code>) y DTOs sin lógica de negocio, que no requieren pruebas unitarias.
+  Los archivos con lógica funcional (servicios, controladores, entidades) presentan coberturas superiores dentro de
+  cada suite.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>2. ms-shipping – Cobertura 100% (Controller)</h2>
+<p>Se implementaron <strong>24 casos de prueba</strong> unitarios sobre el controlador Express usando
+   <strong>Jest 29</strong> con mocking completo de Mongoose:</p>
+
+<pre>
+<span class="green">PASS</span>  __tests__/envios.controller.test.js
+  getAll
+    <span class="green">✔</span> devuelve 200 con lista de envíos (3 ms)
+    <span class="green">✔</span> devuelve 500 si falla la DB (1 ms)
+  getByOrderId
+    <span class="green">✔</span> devuelve 400 si orderId no es número (1 ms)
+    <span class="green">✔</span> devuelve 404 si no existe el envío
+    <span class="green">✔</span> devuelve 200 con el envío encontrado
+    <span class="green">✔</span> devuelve 500 ante error inesperado (1 ms)
+  getByShippingId
+    <span class="green">✔</span> devuelve 200 con el envío por _id
+    <span class="green">✔</span> devuelve 404 si no existe
+    <span class="green">✔</span> devuelve 400 en CastError (ID inválido)
+    <span class="green">✔</span> devuelve 500 ante error genérico
+  create
+    <span class="green">✔</span> devuelve 400 si falta el objeto order
+    <span class="green">✔</span> devuelve 400 si faltan datos del formulario logístico
+    <span class="green">✔</span> devuelve 201 al crear correctamente
+    <span class="green">✔</span> devuelve 400 ante duplicado (código 11000)
+    <span class="green">✔</span> devuelve 500 ante error genérico en save
+  updateStatus
+    <span class="green">✔</span> devuelve 400 si el estado es inválido
+    <span class="green">✔</span> devuelve 400 si falta el campo status
+    <span class="green">✔</span> devuelve 404 si no encuentra el envío para actualizar
+    <span class="green">✔</span> devuelve 200 al actualizar correctamente
+    <span class="green">✔</span> devuelve 500 ante error en DB
+  destroy
+    <span class="green">✔</span> devuelve 200 al eliminar correctamente
+    <span class="green">✔</span> devuelve 404 si no existe el envío
+    <span class="green">✔</span> devuelve 400 en CastError
+    <span class="green">✔</span> devuelve 500 ante error genérico
+
+<span class="yellow">----------------------|---------|----------|---------|---------|</span>
+<span class="yellow">File                  | % Stmts | % Branch | % Funcs | % Lines |</span>
+<span class="yellow">----------------------|---------|----------|---------|---------|</span>
+<span class="green"> envios.controller.js |     100 |      100 |     100 |     100 |</span>
+<span class="yellow">----------------------|---------|----------|---------|---------|</span>
+
+Test Suites: <span class="green">1 passed</span>, 1 total
+Tests:       <span class="green">24 passed</span>, 24 total
+Time:        2.32 s
+</pre>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>3. BFF – CircuitBreakerService</h2>
+<p>Se reemplazó el test de scaffolding roto por pruebas sobre el <code>CircuitBreakerService</code>
+   (implementación del patrón <strong>Circuit Breaker</strong> con Opossum):</p>
+
+<pre>
+<span class="green">PASS</span>  src/app.controller.spec.ts
+  CircuitBreakerService
+    <span class="green">✔</span> ejecuta la acción y retorna el resultado cuando el servicio responde
+    <span class="green">✔</span> invoca el fallback si la acción falla
+
+<span class="yellow">-----------------------------|---------|----------|---------|---------|</span>
+<span class="yellow">File                         | % Stmts | % Branch | % Funcs | % Lines |</span>
+<span class="yellow">-----------------------------|---------|----------|---------|---------|</span>
+<span class="green"> circuit-breaker.service.ts  |   73.68 |      100 |      25 |   70.58 |</span>
+<span class="yellow">-----------------------------|---------|----------|---------|---------|</span>
+
+Test Suites: <span class="green">1 passed</span>, 1 total
+Tests:       <span class="green">2 passed</span>, 2 total
+</pre>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>4. ms-inventory – Reporte de Cobertura</h2>
+<p><em>[Insertar captura del reporte de cobertura de Jest aquí – ejecutar:
+   <code>npm run test:cov --workspace=apps/ms-inventory</code>]</em></p>
+<p>Archivos con mayor cobertura individual:</p>
+<ul>
+  <li><code>inventory.controller.ts</code>: 83.78% Stmts, 75% Branch, 57.14% Funcs</li>
+  <li><code>inventory-item.entity.ts</code>: 80.95% Stmts</li>
+  <li><code>inventory-type.entity.ts</code>: 83.33% Stmts</li>
+  <li>DTOs (<code>create-inventory.dto.ts</code>, etc.): 100% en todos los ejes</li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>5. ms-orders – Reporte de Cobertura</h2>
+<p><em>[Insertar captura del reporte de cobertura de Jest aquí – ejecutar:
+   <code>npm run test:cov --workspace=apps/ms-orders</code>]</em></p>
+<p>Archivos con mayor cobertura individual:</p>
+<ul>
+  <li><code>orders.service.ts</code>: 44.15% Stmts, 62.5% Branch, 83.33% Funcs</li>
+  <li><code>order.entity.ts</code>: 87.5% Stmts, 83.33% Branch</li>
+  <li><code>order-item.entity.ts</code>: 84.61% Stmts</li>
+</ul>
+<p>Total suite: 7 pruebas aprobadas.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>6. Frontend – Reporte Vitest</h2>
+<p><em>[Insertar captura del reporte de cobertura de Vitest aquí – ejecutar:
+   <code>npm run test:coverage</code> desde smartLogix-frontend]</em></p>
+<p>Componentes probados:</p>
+<ul>
+  <li><code>ProtectedRoute.tsx</code>: 83.33% Stmts, 100% Branch</li>
+  <li><code>orders/UpdateStatusModal.tsx</code>: 92.3% Stmts, 100% Branch, 100% Funcs</li>
+  <li><code>shipping/UpdateStatusModal.tsx</code>: 100% Stmts, 100% Funcs</li>
+  <li><code>UI/Header.tsx</code>: 55.55% Stmts</li>
+</ul>
+<p>Total suite: 22 pruebas aprobadas en 8 archivos de test.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>7. Patrones de Diseño y su Impacto en la Mantenibilidad</h2>
+
+<div class="pattern-box">
+  <h3>Circuit Breaker Pattern (BFF)</h3>
+  <p>Implementado con la librería <strong>Opossum</strong> en <code>CircuitBreakerService</code>.
+     Cada llamada HTTP a un microservicio está envuelta en un breaker con umbral del 50% de errores y
+     timeout de 3 segundos. Si el microservicio cae, el circuito se abre y se desvía al fallback,
+     evitando cascadas de fallos. <strong>Beneficio de testing:</strong> al aislar la lógica del breaker
+     en un servicio inyectable, se puede probar independientemente de las llamadas HTTP reales.</p>
+</div>
+
+<div class="pattern-box">
+  <h3>Repository Pattern (NestJS + TypeORM)</h3>
+  <p>TypeORM implementa el patrón Repository a través de <code>Repository&lt;Entity&gt;</code>. Los servicios
+     NestJS reciben el repositorio por inyección de dependencias (<code>@InjectRepository</code>), lo que
+     permite que en los tests unitarios se sustituya por un mock sin modificar el servicio bajo prueba.
+     <strong>Beneficio de testing:</strong> los tests pueden simular <code>findOne</code>, <code>save</code>,
+     <code>delete</code> sin una base de datos real.</p>
+</div>
+
+<div class="pattern-box">
+  <h3>DTO (Data Transfer Object) Pattern</h3>
+  <p>Todos los microservicios definen DTOs separados para crear y actualizar recursos (ej.:
+     <code>CreateOrderDto</code>, <code>UpdateOrderStatusDto</code>). Al decorar con
+     <code>class-validator</code>, la validación ocurre antes de llegar al servicio, centralizando
+     la lógica de validación. <strong>Beneficio de testing:</strong> los DTOs son plain classes
+     con 100% de cobertura sin necesidad de infraestructura.</p>
+</div>
+
+<div class="pattern-box">
+  <h3>BFF (Backend for Frontend) Pattern</h3>
+  <p>El BFF centraliza la orquestación de llamadas HTTP hacia los cuatro microservicios, maneja la
+     autenticación JWT y aplica el circuit breaker. El frontend solo conoce un único endpoint de entrada.
+     <strong>Beneficio de testing:</strong> cada microservicio puede testearse de forma aislada; el BFF
+     prueba la lógica de orquestación mockeando HttpService.</p>
+</div>
+
+<div class="pattern-box">
+  <h3>MVC en Express (ms-shipping)</h3>
+  <p>El microservicio de despacho aplica MVC explícitamente: <code>envios.model.js</code> (Model/Mongoose),
+     <code>envios.controller.js</code> (Controller) y <code>envios.router.js</code> (routing/View-layer en REST).
+     La separación facilita el mock total del Model en los tests del Controller, logrando
+     <strong>100% de cobertura sin conectarse a MongoDB</strong>.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>8. Ejemplo Representativo de Prueba</h2>
+<p>Test del controlador de shipping – caso de creación con datos duplicados:</p>
+
+<pre>
+<span class="yellow">it</span>(<span class="green">'devuelve 400 ante duplicado (código 11000)'</span>, async () =&gt; {
+  <span class="red">// Arrange</span>
+  const dupErr = new Error('dup');
+  dupErr.code = 11000;
+  Envios.mockImplementation(() =&gt; ({ save: jest.fn().mockRejectedValue(dupErr) }));
+
+  const req = { body: { order: validOrder, formManualData: validForm } };
+  const res = mockRes();
+
+  <span class="red">// Act</span>
+  await EnviosController.create(req, res);
+
+  <span class="red">// Assert</span>
+  expect(res.status).toHaveBeenCalledWith(400);
+  expect(res.json).toHaveBeenCalledWith(
+    expect.objectContaining({ error: expect.stringContaining('Ya existe un despacho') })
+  );
+});
+</pre>
+
+<p>Este test valida que el manejo del error de clave duplicada de MongoDB (código <code>11000</code>) se
+   traduce en una respuesta HTTP 400 con un mensaje de negocio claro, sin exponer detalles internos al cliente.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>9. Herramientas Utilizadas</h2>
+<table>
+  <thead><tr><th>Herramienta</th><th>Versión</th><th>Uso</th></tr></thead>
+  <tbody>
+    <tr><td>Jest</td><td>29 / 30</td><td>Tests unitarios en Express y NestJS</td></tr>
+    <tr><td>Vitest</td><td>4.1.9</td><td>Tests unitarios en React/Vite</td></tr>
+    <tr><td>@testing-library/react</td><td>16.x</td><td>Renderizado de componentes React</td></tr>
+    <tr><td>ts-jest</td><td>29.x</td><td>Transpilación TypeScript en Jest</td></tr>
+    <tr><td>@nestjs/testing</td><td>—</td><td>Módulo de testing de NestJS (TestingModule)</td></tr>
+    <tr><td>v8 / Istanbul</td><td>—</td><td>Instrumentación de cobertura de código</td></tr>
+  </tbody>
+</table>
+
+</body>
+</html>
