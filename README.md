@@ -133,6 +133,12 @@ npm run start:dev ms-orders
 
 ```
 
+* **Microservicio de Envios (ms-shipping):**
+```bash
+npm run start:dev shipping
+
+```
+
 
 * **Backend For Frontend (bff):**
 ```bash
@@ -152,6 +158,7 @@ npm run start:dev bff
 | **MS Users** | Aplicación / DB | **5432** | `smartlogix_users` | `users_user` | `users_password` |
 | **MS Inventory** | Aplicación / DB | **5433** | `smartlogix_inventory` | `inventory_user` | `inventory_password` |
 | **MS Orders** | Aplicación / DB | **5434** | `smartlogix_orders` | `orders_user` | `orders_password` |
+| **MS Shipping** | Aplicación / DB | **null** | `MongoDbAtlas` | `null` | `null` |
 
 ---
 
@@ -163,7 +170,7 @@ npm run start:dev bff
 ***
 
 ### Qué mejoras incluye:
-1. **Instalación de Node (`npm install`):** Esencial para que otra máquina reconstruya la carpeta `node_modules`.
+1. **Instalación de Node (`npm install`):** Esencial para que otra máquina reconstruya la carpeta `node_modules` en cada carpeta (bff, ms-users, ms-inventory, ms-orders y ms-shipping).
 2. **Arranque de NestJS (`npm run start:dev ...`):** Añadí los comandos típicos de arquitectura NestJS monorepo para que sepan exactamente cómo levantar cada app tras encender Docker.
 
 ```
