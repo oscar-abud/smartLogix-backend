@@ -1,98 +1,114 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# MS-Users — Microservicio de Usuarios
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Microservicio construido con **NestJS + TypeScript + TypeORM**. Gestiona el registro, autenticación y administración de usuarios sobre **PostgreSQL**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+- **Puerto:** `3001`
+- **Swagger UI:** `http://localhost:3001/api`
+- **Prefijo global:** `/api`
+- **Base de datos:** PostgreSQL (puerto `5432`)
 
-## Description
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
+## Instalación
 
 ```bash
-$ npm install
+# Desde la raíz del monorepo
+npm install
+
+# O directamente en esta carpeta
+cd apps/ms-users
+npm install
 ```
 
-## Compile and run the project
+---
+
+## Configuración de base de datos
+
+Crea o edita el archivo `.env` en `apps/ms-users/`:
+
+```env
+PORT=3001
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=users_user
+DB_PASSWORD=users_password
+DB_NAME=smartlogix_users
+```
+
+| Variable      | Descripción                            |
+|---------------|----------------------------------------|
+| `PORT`        | Puerto en que escucha el microservicio |
+| `DB_HOST`     | Host del servidor PostgreSQL           |
+| `DB_PORT`     | Puerto de PostgreSQL                   |
+| `DB_USER`     | Usuario de la base de datos            |
+| `DB_PASSWORD` | Contraseña del usuario                 |
+| `DB_NAME`     | Nombre de la base de datos             |
+
+> El esquema inicial se crea automáticamente desde `apps/ms-users/db/init.sql` al levantar el contenedor Docker del proyecto. Si usas una instancia PostgreSQL externa, ejecuta ese script manualmente.
+
+Para levantar la base de datos con Docker:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+# Desde la raíz del monorepo
+docker-compose up -d
 ```
 
-## Run tests
+---
+
+## Ejecución
 
 ```bash
-# unit tests
-$ npm run test
+# Desde la raíz del monorepo (recomendado)
+npm run dev:users
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# Directamente en esta carpeta
+npm run start:dev   # modo watch
+npm run start       # modo producción
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Pruebas unitarias
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Este servicio usa **Jest** con **ts-jest**.
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Ejecutar todos los tests
+npm run test
+
+# Modo watch (re-ejecuta al guardar cambios)
+npm run test:watch
+
+# Reporte de cobertura de código
+npm run test:cov
+
+# Tests e2e
+npm run test:e2e
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Ver métricas de cobertura
 
-## Resources
+Luego de ejecutar `npm run test:cov`, se genera la carpeta `coverage/` con un reporte HTML:
 
-Check out a few resources that may come in handy when working with NestJS:
+```
+apps/ms-users/coverage/lcov-report/index.html
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Abre ese archivo en el navegador para ver el porcentaje de cobertura por archivo, línea y rama.
 
-## Support
+El archivo de test principal es `src/users/users.service.spec.ts`.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+---
 
-## Stay in touch
+## Endpoints principales
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+> Este servicio es de uso **interno** — el BFF actúa como proxy. No expone autenticación JWT propia.
 
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+| Método   | Ruta                      | Descripción                              |
+|----------|---------------------------|------------------------------------------|
+| `GET`    | `/api/users`              | Listar todos los usuarios                |
+| `GET`    | `/api/users/:id`          | Obtener usuario por ID (UUID)            |
+| `POST`   | `/api/users/login`        | Validar credenciales (uso interno BFF)   |
+| `POST`   | `/api/users/register`     | Registrar un nuevo usuario               |
+| `PATCH`  | `/api/users/:id`          | Actualizar datos de un usuario           |
+| `DELETE` | `/api/users/:id`          | Eliminar un usuario                      |

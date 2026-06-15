@@ -1,98 +1,136 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# BFF — SmartLogix Gateway
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Capa intermedia (Backend For Frontend) construida con **NestJS + TypeScript**. Actúa como punto de entrada único para el frontend React, centralizando autenticación JWT, orquestación de microservicios y documentación Swagger.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+- **Puerto:** `3000`
+- **Swagger UI:** `http://localhost:3000/docs`
+- **Prefijo global:** `/api`
 
-## Description
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
+## Instalación
 
 ```bash
-$ npm install
+# Desde la raíz del monorepo
+npm install
+
+# O directamente en esta carpeta
+cd apps/bff
+npm install
 ```
 
-## Compile and run the project
+---
+
+## Ejecución
 
 ```bash
-# development
-$ npm run start
+# Desde la raíz del monorepo (recomendado)
+npm run dev:bff
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+# Directamente en esta carpeta
+npm run start:dev   # modo watch
+npm run start       # modo producción
 ```
 
-## Run tests
+> Los microservicios deben estar corriendo antes de iniciar el BFF. El orden recomendado es: `ms-users` → `ms-inventory` → `ms-orders` → `ms-shipping` → `bff`.
+
+---
+
+## Configuración de variables de entorno
+
+Crea un archivo `.env` en `apps/bff/` con el siguiente contenido:
+
+```env
+JWT_SECRET=TU_FIRMA_SECRETA_SUPER_SEGURA
+```
+
+| Variable     | Descripción                                         | Default                            |
+|--------------|-----------------------------------------------------|------------------------------------|
+| `JWT_SECRET` | Clave secreta para firmar y verificar tokens JWT    | `TU_FIRMA_SECRETA_SUPER_SEGURA`    |
+
+> Las URLs de los microservicios (`http://localhost:3001`, `3002`, `3003`, `3004`) están definidas directamente en los servicios del BFF. Si cambian de puerto, actualiza los archivos `auth.service.ts`, `inventory.service.ts`, `orders.service.ts` y `shipping.service.ts`.
+
+---
+
+## Pruebas unitarias
+
+Este servicio usa **Jest** con **ts-jest**.
 
 ```bash
-# unit tests
-$ npm run test
+# Ejecutar todos los tests
+npm run test
 
-# e2e tests
-$ npm run test:e2e
+# Modo watch (re-ejecuta al guardar cambios)
+npm run test:watch
 
-# test coverage
-$ npm run test:cov
+# Reporte de cobertura de código
+npm run test:cov
+
+# Tests e2e
+npm run test:e2e
 ```
 
-## Deployment
+### Ver métricas de cobertura
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Luego de ejecutar `npm run test:cov`, se genera la carpeta `coverage/` con un reporte HTML interactivo:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+```
+apps/bff/coverage/lcov-report/index.html
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Abre ese archivo en el navegador para ver el porcentaje de cobertura por archivo, línea y rama.
 
-## Resources
+---
 
-Check out a few resources that may come in handy when working with NestJS:
+## Endpoints principales
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Todos los endpoints requieren el prefijo `/api`. Los marcados con 🔒 requieren `Authorization: Bearer <token>`.
 
-## Support
+### Auth (`/api/auth`)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+| Método   | Ruta                  | Descripción                              | Auth |
+|----------|-----------------------|------------------------------------------|------|
+| `POST`   | `/api/auth/login`     | Autenticar usuario y obtener JWT         | —    |
+| `POST`   | `/api/auth/register`  | Registrar nuevo usuario                  | 🔒   |
+| `GET`    | `/api/auth/user`      | Listar todos los usuarios                | 🔒   |
+| `GET`    | `/api/auth/user/:id`  | Obtener usuario por ID (UUID)            | 🔒   |
+| `PATCH`  | `/api/auth/user/:id`  | Actualizar datos de un usuario           | 🔒   |
+| `DELETE` | `/api/auth/user/:id`  | Eliminar un usuario                      | 🔒   |
 
-## Stay in touch
+### Inventory (`/api/inventory`)
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+| Método   | Ruta                                          | Descripción                              | Auth |
+|----------|-----------------------------------------------|------------------------------------------|------|
+| `GET`    | `/api/inventory`                              | Listar almacenes                         | 🔒   |
+| `GET`    | `/api/inventory/types`                        | Listar tipos de inventario               | 🔒   |
+| `GET`    | `/api/inventory/items`                        | Listar todos los ítems                   | 🔒   |
+| `GET`    | `/api/inventory/items/:itemId`                | Obtener ítem por ID                      | 🔒   |
+| `GET`    | `/api/inventory/:id`                          | Obtener almacén por ID                   | 🔒   |
+| `POST`   | `/api/inventory`                              | Crear almacén                            | 🔒   |
+| `POST`   | `/api/inventory/types`                        | Crear tipo de inventario                 | 🔒   |
+| `POST`   | `/api/inventory/:id/items`                    | Agregar ítem a un almacén                | 🔒   |
+| `PATCH`  | `/api/inventory/items/:itemId/stock`          | Actualizar stock de un ítem              | 🔒   |
+| `DELETE` | `/api/inventory/:inventoryId/users/:userId`   | Desvincular usuario de almacén           | 🔒   |
+| `DELETE` | `/api/inventory/:id`                          | Eliminar almacén                         | 🔒   |
 
-## License
+### Orders (`/api/orders`)
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+| Método   | Ruta                        | Descripción                              | Auth |
+|----------|-----------------------------|------------------------------------------|------|
+| `GET`    | `/api/orders`               | Listar historial de órdenes              | 🔒   |
+| `GET`    | `/api/orders/:id`           | Obtener orden por ID                     | 🔒   |
+| `POST`   | `/api/orders`               | Crear nueva orden                        | 🔒   |
+| `PATCH`  | `/api/orders/:id/status`    | Actualizar estado de una orden           | 🔒   |
+| `DELETE` | `/api/orders/:id`           | Eliminar orden                           | 🔒   |
+
+### Shipping (`/api/shipping`)
+
+| Método   | Ruta                              | Descripción                                    | Auth |
+|----------|-----------------------------------|------------------------------------------------|------|
+| `GET`    | `/api/shipping`                   | Listar todos los despachos                     | 🔒   |
+| `GET`    | `/api/shipping/:orderId`          | Obtener despacho por ID de orden               | 🔒   |
+| `POST`   | `/api/shipping`                   | Crear registro de despacho                     | 🔒   |
+| `PATCH`  | `/api/shipping/:orderId/status`   | Actualizar estado logístico de un despacho     | 🔒   |
+| `DELETE` | `/api/shipping/:id`               | Eliminar despacho por ID nativo de MongoDB     | 🔒   |
+
+> La documentación completa e interactiva está disponible en `http://localhost:3000/docs` (Swagger UI).
