@@ -1,176 +1,171 @@
-```markdown
-# 🚀 SmartLogix - Backend Ecosystem
+# SmartLogix — Backend Ecosystem
 
-Este repositorio contiene el ecosistema de backend basado en una arquitectura de **Microservicios** y un **BFF (Backend For Frontend)** utilizando **NestJS**. El sistema gestiona flujos operativos de usuarios, inventarios, órdenes de compra y despachos comerciales utilizando comunicación HTTP y resiliencia mediante patrones de estabilidad como *Circuit Breaker*.
+Plataforma integral de gestión logística para PYMEs, construida sobre una **arquitectura de microservicios** con un **BFF (Backend For Frontend)** como punto de entrada único. Reemplaza el sistema monolítico MicroSmart, eliminando los cuellos de botella de sincronización y habilitando escalado horizontal independiente por servicio.
 
 ---
 
-## 📂 Estructura del Proyecto
+## Diagrama de Arquitectura
 
-El repositorio está organizado utilizando una estructura limpia de aplicaciones:
+![Arquitectura SmartLogix](docs/arquitectura-EV3.png)
 
-```text
+> El frontend React (CSR) se comunica exclusivamente con el BFF en el puerto 3000. El BFF orquesta las llamadas hacia los cuatro microservicios internos, cada uno con su propia base de datos aislada.
+
+---
+
+## Descripción del Proyecto
+
+SmartLogix resuelve cuatro dominios de negocio críticos para la operación logística de una PYME:
+
+| Dominio               | Responsabilidad                                                        |
+|-----------------------|------------------------------------------------------------------------|
+| **Identidad**         | Control de acceso con roles, autenticación JWT y gestión de usuarios   |
+| **Inventario**        | Registro de almacenes, tipos de producto, ítems y control de stock     |
+| **Órdenes**           | Creación atómica de pedidos multi-producto con descuento de stock      |
+| **Despachos**         | Coordinación del flujo logístico desde preparación hasta entrega final |
+
+**Stack tecnológico:** NestJS · TypeScript · TypeORM · PostgreSQL · Express.js · Mongoose · MongoDB Atlas · JWT · Circuit Breaker (opossum) · Swagger · Docker
+
+---
+
+## Estructura del Monorepo
+
+```
+smartLogix-backend/
 ├── apps/
-│   ├── bff/             # API Gateway / Backend For Frontend (Puerto 3000)
-│   ├── ms-inventory/    # Microservicio de Inventario y Catálogo (Puerto 3002)
-│   ├── ms-orders/       # Microservicio de Procesamiento de Órdenes (Puerto 3003)
-│   ├── ms-shipping/     # Microservicio de Despachos y Logística (Puerto 3004)
-│   └── ms-users/        # Microservicio de Autenticación y Usuarios (Puerto 3001)
-├── database/            # Scripts de respaldo de base de datos
-└── docker/
-    └── docker-compose.yml # Orquestación de infraestructura local
-
+│   ├── bff/             # API Gateway / BFF — Puerto 3000
+│   ├── ms-users/        # Microservicio de Usuarios — Puerto 3001
+│   ├── ms-inventory/    # Microservicio de Inventario — Puerto 3002
+│   ├── ms-orders/       # Microservicio de Órdenes — Puerto 3003
+│   └── ms-shipping/     # Microservicio de Despachos — Puerto 3004
+├── database/            # Scripts de respaldo SQL
+├── docker/
+│   └── docker-compose.yml
+└── docs/
+    └── arquitectura-EV3.png
 ```
 
 ---
 
-## 🛠️ Prerrequisitos
+## Componentes y sus READMEs
 
-Antes de iniciar, asegúrate de tener instalado y activo en tu computadora:
-
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-* [Node.js (v18 o superior)](https://nodejs.org/)
-* [Git](https://git-scm.com/)
+| Servicio | Puerto | DB | README |
+|---|---|---|---|
+| **BFF (API Gateway)** | 3000 | — | [apps/bff/README.md](apps/bff/README.md) |
+| **MS-Users** | 3001 | PostgreSQL :5432 | [apps/ms-users/README.md](apps/ms-users/README.md) |
+| **MS-Inventory** | 3002 | PostgreSQL :5433 | [apps/ms-inventory/README.md](apps/ms-inventory/README.md) |
+| **MS-Orders** | 3003 | PostgreSQL :5434 | [apps/ms-orders/README.md](apps/ms-orders/README.md) |
+| **MS-Shipping** | 3004 | MongoDB Atlas | [apps/ms-shipping/README.md](apps/ms-shipping/README.md) |
 
 ---
 
-## 🐳 Paso 1: Infraestructura de Base de Datos (Docker)
+## Prerrequisitos
 
-El proyecto utiliza un entorno multi-base de datos contenerizado con **Docker**. Esto levanta tres instancias independientes de **PostgreSQL** con esquemas y datos semilla (`init.sql`) precargados de forma automática.
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) — activo y corriendo
+- [Node.js v18+](https://nodejs.org/)
+- [Git](https://git-scm.com/)
 
-### Comandos de Inicialización
+---
 
-1. **Posicionarse en la Raíz del Proyecto:**
-Abre una terminal y colócate en la carpeta raíz del repositorio clonado (donde se encuentra el archivo `package.json`).
+## Guía de Orquestación
+
+El sistema debe levantarse en este orden estricto: **bases de datos → microservicios → BFF**.
+
+### Paso 1 — Levantar las bases de datos (Docker)
+
+Los tres contenedores PostgreSQL se inicializan automáticamente con sus esquemas y datos semilla (`init.sql`).
+
+**Siempre ejecutar desde la raíz del proyecto** (donde está el `package.json`):
+
 ```bash
-cd /ruta/hacia/tu/proyecto-clonado
-
-```
-
-
-2. **Levantar los Contenedores:**
-Ejecuta el siguiente comando. Se utiliza el flag `-f` debido a que las rutas relativas de los scripts de inicialización `init.sql` requieren ejecutarse con respecto a la raíz:
-```bash
+# Levantar los tres contenedores en segundo plano
 docker compose -f docker/docker-compose.yml up -d
-
 ```
 
-
-> 💡 *Nota: El parámetro `-d` (detached mode) ejecuta los contenedores en segundo plano, liberando tu terminal inmediatamente.*
-
-
-3. **Verificar el Estado de las Bases de Datos:**
-Comprueba que los tres motores se crearon y están escuchando peticiones ejecutando:
 ```bash
+# Verificar que los tres contenedores están corriendo
 docker ps
-
 ```
 
+Deberías ver los tres contenedores activos:
+- `smartlogix-users-db` → PostgreSQL en puerto `5432`
+- `smartlogix-inventory-db` → PostgreSQL en puerto `5433`
+- `smartlogix-orders-db` → PostgreSQL en puerto `5434`
 
+> MongoDB Atlas (ms-shipping) es un servicio cloud — no requiere Docker local.
 
-### Comandos de Utilidad para Docker (Siempre desde la raíz)
+#### Comandos útiles de Docker
 
-* **Apagar el entorno temporalmente (Sin borrar datos):**
 ```bash
+# Pausar sin borrar datos
 docker compose -f docker/docker-compose.yml stop
 
-```
-
-
-* **Destruir los contenedores (Manteniendo los datos guardados en volúmenes):**
-```bash
+# Detener y eliminar contenedores (mantiene los volúmenes de datos)
 docker compose -f docker/docker-compose.yml down
 
-```
-
-
-* **Reset Total (Limpiar bases de datos y recargar datos semilla de fábrica):**
-Si modificaste registros y deseas restaurar el catálogo original limpio para pruebas, destruye los volúmenes físicos e inicializa de nuevo:
-```bash
+# Reset total — borra volúmenes y recarga datos semilla de fábrica
 docker compose -f docker/docker-compose.yml down -v
 docker compose -f docker/docker-compose.yml up -d
-
 ```
-
-
 
 ---
 
-## 🏃‍♂️ Paso 2: Despliegue de las Aplicaciones (NestJS)
-
-Una vez que los contenedores de Docker estén activos, puedes proceder a instalar las dependencias locales e iniciar los servicios de Node.js.
-
-### 1. Instalar Dependencias de Node
-
-Ejecuta el siguiente comando en la raíz del proyecto para instalar todos los módulos necesarios del monorepo:
+### Paso 2 — Instalar dependencias Node
 
 ```bash
 npm install
-
 ```
-
-### 2. Levantar los Servicios en Modo Desarrollo (Watch)
-
-Abre terminales separadas para cada servicio e inicialízalos en el siguiente orden recomendado:
-
-* **Microservicio de Usuarios (ms-users):**
-```bash
-npm run start:dev ms-users
-
-```
-
-
-* **Microservicio de Inventario (ms-inventory):**
-```bash
-npm run start:dev ms-inventory
-
-```
-
-
-* **Microservicio de Órdenes (ms-orders):**
-```bash
-npm run start:dev ms-orders
-
-```
-
-* **Microservicio de Envios (ms-shipping):**
-```bash
-npm run start:dev shipping
-
-```
-
-
-* **Backend For Frontend (bff):**
-```bash
-npm run start:dev bff
-
-```
-
-
 
 ---
 
-## 🔐 Credenciales y Puertos del Entorno Local
+### Paso 3 — Levantar los microservicios
 
-| Componente / Servicio | Tipo | Puerto Local | Base de Datos | Usuario | Contraseña |
-| --- | --- | --- | --- | --- | --- |
-| **BFF (Gateway)** | Aplicación | **3000** | N/A | N/A | N/A |
-| **MS Users** | Aplicación / DB | **5432** | `smartlogix_users` | `users_user` | `users_password` |
-| **MS Inventory** | Aplicación / DB | **5433** | `smartlogix_inventory` | `inventory_user` | `inventory_password` |
-| **MS Orders** | Aplicación / DB | **5434** | `smartlogix_orders` | `orders_user` | `orders_password` |
-| **MS Shipping** | Aplicación / DB | **null** | `MongoDbAtlas` | `null` | `null` |
+Abre una terminal separada por cada servicio y levántalos en este orden:
+
+```bash
+# Terminal 1 — Usuarios (depende de users-db)
+npm run dev:users
+```
+
+```bash
+# Terminal 2 — Inventario (depende de inventory-db)
+npm run dev:inventory
+```
+
+```bash
+# Terminal 3 — Órdenes (depende de orders-db y consulta ms-inventory)
+npm run dev:orders
+```
+
+```bash
+# Terminal 4 — Despachos (depende de MongoDB Atlas)
+npm run dev:shipping
+```
 
 ---
 
-## 📝 Notas de Desarrollo y Seguridad
+### Paso 4 — Levantar el BFF
 
-> ⚠️ **Aviso Académico:** Las credenciales y archivos de inicialización de base de datos se encuentran versionados de forma explícita en este repositorio con fines estrictamente educativos y de agilidad de despliegue en equipos de trabajo. **No reutilizar esta configuración en entornos de producción.**
+Una vez que los cuatro microservicios estén respondiendo:
 
+```bash
+# Terminal 5 — BFF (orquesta todos los microservicios)
+npm run dev:bff
 ```
-***
 
-### Qué mejoras incluye:
-1. **Instalación de Node (`npm install`):** Esencial para que otra máquina reconstruya la carpeta `node_modules` en cada carpeta (bff, ms-users, ms-inventory, ms-orders y ms-shipping).
-2. **Arranque de NestJS (`npm run start:dev ...`):** Añadí los comandos típicos de arquitectura NestJS monorepo para que sepan exactamente cómo levantar cada app tras encender Docker.
+El sistema queda operativo en:
+- **API Gateway (BFF):** `http://localhost:3000`
+- **Swagger UI:** `http://localhost:3000/docs`
 
-```
+---
+
+## Tabla de Credenciales del Entorno Local
+
+| Servicio | Puerto App | Puerto DB | Base de datos | Usuario DB | Contraseña DB |
+|---|---|---|---|---|---|
+| BFF | 3000 | — | — | — | — |
+| MS-Users | 3001 | 5432 | `smartlogix_users` | `users_user` | `users_password` |
+| MS-Inventory | 3002 | 5433 | `smartlogix_inventory` | `inventory_user` | `inventory_password` |
+| MS-Orders | 3003 | 5434 | `smartlogix_orders` | `orders_user` | `orders_password` |
+| MS-Shipping | 3004 | Atlas | MongoDB Atlas | Ver `api.js` | Ver `api.js` |
+
+> **Aviso académico:** Las credenciales están versionadas en este repositorio con fines educativos y de agilidad en entornos de desarrollo compartido. No reutilizar en producción.
