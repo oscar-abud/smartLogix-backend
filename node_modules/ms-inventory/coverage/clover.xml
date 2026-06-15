@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1781548784403" clover="3.2.0">
+  <project timestamp="1781548784404" name="All files">
+    <metrics statements="241" coveredstatements="101" conditionals="132" coveredconditionals="46" methods="47" coveredmethods="8" elements="420" coveredelements="155" complexity="0" loc="241" ncloc="241" packages="4" files="13" classes="13"/>
+    <package name="src">
+      <metrics statements="20" coveredstatements="0" conditionals="12" coveredconditionals="0" methods="1" coveredmethods="0"/>
+      <file name="app.module.ts" path="C:\Users\oscar\workspace\Duoc\fullstackIII\Unidad3\Parcial3\app\smartLogix-backend\apps\ms-inventory\src\app.module.ts">
+        <metrics statements="5" coveredstatements="0" conditionals="10" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="0" type="stmt"/>
+        <line num="2" count="0" type="stmt"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="26" count="0" type="stmt"/>
+      </file>
+      <file name="main.ts" path="C:\Users\oscar\workspace\Duoc\fullstackIII\Unidad3\Parcial3\app\smartLogix-backend\apps\ms-inventory\src\main.ts">
+        <metrics statements="15" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="1" count="0" type="stmt"/>
+        <line num="2" count="0" type="stmt"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="10" count="0" type="stmt"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="20" count="0" type="stmt"/>
+        <line num="23" count="0" type="stmt"/>
+        <line num="25" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="26" count="0" type="stmt"/>
+        <line num="27" count="0" type="stmt"/>
+        <line num="28" count="0" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.inventory">
+      <metrics statements="151" coveredstatements="37" conditionals="92" coveredconditionals="27" methods="34" coveredmethods="8"/>
+      <file name="inventory.controller.ts" path="C:\Users\oscar\workspace\Duoc\fullstackIII\Unidad3\Parcial3\app\smartLogix-backend\apps\ms-inventory\src\inventory\inventory.controller.ts">
+        <metrics statements="35" coveredstatements="29" conditionals="20" coveredconditionals="15" methods="14" coveredmethods="8"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="11" count="8" type="cond" truecount="3" falsecount="1"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="15" count="1" type="stmt"/>
+        <line num="19" count="1" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="24" count="1" type="stmt"/>
+        <line num="25" count="0" type="stmt"/>
+        <line num="29" count="1" type="stmt"/>
+        <line num="30" count="0" type="stmt"/>
+        <line num="34" count="1" type="stmt"/>
+        <line num="35" count="1" type="stmt"/>
+        <line num="39" count="1" type="stmt"/>
+        <line num="43" count="1" type="stmt"/>
+        <line num="47" count="1" type="cond" truecount="3" falsecount="1"/>
+        <line num="48" count="0" type="stmt"/>
+        <line num="52" count="1" type="stmt"/>
+        <line num="57" count="0" type="stmt"/>
+        <line num="61" count="1" type="stmt"/>
+        <line num="65" count="1" type="stmt"/>
+        <line num="69" count="1" type="stmt"/>
+        <line num="74" count="0" type="stmt"/>
+        <line num="78" count="1" type="stmt"/>
+        <line num="82" count="1" type="stmt"/>
+        <line num="86" count="1" type="stmt"/>
+        <line num="90" count="1" type="stmt"/>
+        <line num="91" count="1" type="stmt"/>
+        <line num="95" count="1" type="stmt"/>
+        <line num="96" count="0" type="stmt"/>
+      </file>
+      <file name="inventory.module.ts" path="C:\Users\oscar\workspace\Duoc\fullstackIII\Unidad3\Parcial3\app\smartLogix-backend\apps\ms-inventory\src\inventory\inventory.module.ts">
+        <metrics statements="9" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="0" type="stmt"/>
+        <line num="2" count="0" type="stmt"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="6" count="0" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="24" count="0" type="stmt"/>
+      </file>
+      <file name="inventory.service.ts" path="C:\Users\oscar\workspace\Duoc\fullstackIII\Unidad3\Parcial3\app\smartLogix-backend\apps\ms-inventory\src\inventory\inventory.service.ts">
+        <metrics statements="107" coveredstatements="8" conditionals="72" coveredconditionals="12" methods="20" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="17" count="0" type="cond" truecount="6" falsecount="2"/>
+        <line num="20" count="0" type="cond" truecount="3" falsecount="1"/>
+        <line num="23" count="0" type="cond" truecount="3" falsecount="1"/>
+        <line num="25" count="0" type="stmt"/>
+        <line num="29" count="0" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="32" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="33" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+        <line num="37" count="0" type="stmt"/>
+        <line num="38" count="0" type="stmt"/>
+        <line num="40" count="0" type="stmt"/>
+        <line num="41" count="0" type="stmt"/>
+        <line num="45" count="0" type="stmt"/>
+        <line num="47" count="0" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="53" count="0" type="stmt"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="58" count="0" type="stmt"/>
+        <line num="59" count="0" type="stmt"/>
+        <line num="61" count="0" type="stmt"/>
+        <line num="66" count="0" type="stmt"/>
+        <line num="68" count="0" type="stmt"/>
+        <line num="69" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="70" count="0" type="stmt"/>
+        <line num="74" count="0" type="stmt"/>
+        <line num="75" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="76" count="0" type="stmt"/>
+        <line num="80" count="0" type="stmt"/>
+        <line num="87" count="0" type="stmt"/>
+        <line num="90" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="91" count="0" type="stmt"/>
+        <line num="93" count="0" type="stmt"/>
+        <line num="99" count="0" type="stmt"/>
+        <line num="100" count="0" type="stmt"/>
+        <line num="101" count="0" type="stmt"/>
+        <line num="102" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="103" count="0" type="stmt"/>
+        <line num="106" count="0" type="stmt"/>
+        <line num="107" count="0" type="stmt"/>
+        <line num="109" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="110" count="0" type="stmt"/>
+        <line num="115" count="0" type="stmt"/>
+        <line num="116" count="0" type="stmt"/>
+        <line num="122" count="0" type="stmt"/>
+        <line num="128" count="0" type="stmt"/>
+        <line num="137" count="0" type="stmt"/>
+        <line num="139" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="141" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="145" count="0" type="stmt"/>
+        <line num="154" count="0" type="stmt"/>
+        <line num="159" count="0" type="stmt"/>
+        <line num="160" count="0" type="stmt"/>
+        <line num="169" count="0" type="stmt"/>
+        <line num="175" count="0" type="stmt"/>
+        <line num="183" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="184" count="0" type="stmt"/>
+        <line num="188" count="0" type="stmt"/>
+        <line num="189" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="192" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="197" count="0" type="stmt"/>
+        <line num="209" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="210" count="0" type="stmt"/>
+        <line num="215" count="0" type="stmt"/>
+        <line num="216" count="0" type="stmt"/>
+        <line num="220" count="0" type="stmt"/>
+        <line num="225" count="0" type="stmt"/>
+        <line num="229" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="230" count="0" type="stmt"/>
+        <line num="233" count="0" type="stmt"/>
+        <line num="237" count="0" type="stmt"/>
+        <line num="239" count="0" type="stmt"/>
+        <line num="245" count="0" type="stmt"/>
+        <line num="250" count="0" type="stmt"/>
+        <line num="255" count="0" type="stmt"/>
+        <line num="261" count="0" type="stmt"/>
+        <line num="267" count="0" type="stmt"/>
+        <line num="272" count="0" type="stmt"/>
+        <line num="276" count="0" type="stmt"/>
+        <line num="278" count="0" type="stmt"/>
+        <line num="279" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="280" count="0" type="stmt"/>
+        <line num="283" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="284" count="0" type="stmt"/>
+        <line num="289" count="0" type="stmt"/>
+        <line num="290" count="0" type="stmt"/>
+        <line num="292" count="0" type="stmt"/>
+        <line num="302" count="0" type="stmt"/>
+        <line num="304" count="0" type="stmt"/>
+        <line num="309" count="0" type="stmt"/>
+        <line num="314" count="0" type="stmt"/>
+        <line num="321" count="0" type="stmt"/>
+        <line num="322" count="0" type="stmt"/>
+        <line num="326" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="327" count="0" type="stmt"/>
+        <line num="330" count="0" type="stmt"/>
+        <line num="332" count="0" type="stmt"/>
+        <line num="338" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="339" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.inventory.dto">
+      <metrics statements="23" coveredstatements="23" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="create-inventory-type.dto.ts" path="C:\Users\oscar\workspace\Duoc\fullstackIII\Unidad3\Parcial3\app\smartLogix-backend\apps\ms-inventory\src\inventory\dto\create-inventory-type.dto.ts">
+        <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+      </file>
+      <file name="create-inventory.dto.ts" path="C:\Users\oscar\workspace\Duoc\fullstackIII\Unidad3\Parcial3\app\smartLogix-backend\apps\ms-inventory\src\inventory\dto\create-inventory.dto.ts">
+        <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+      </file>
+      <file name="create-item.dto.ts" path="C:\Users\oscar\workspace\Duoc\fullstackIII\Unidad3\Parcial3\app\smartLogix-backend\apps\ms-inventory\src\inventory\dto\create-item.dto.ts">
+        <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+        <line num="31" count="1" type="stmt"/>
+        <line num="40" count="1" type="stmt"/>
+        <line num="51" count="1" type="stmt"/>
+        <line num="60" count="1" type="stmt"/>
+      </file>
+      <file name="update-stock.dto.ts" path="C:\Users\oscar\workspace\Duoc\fullstackIII\Unidad3\Parcial3\app\smartLogix-backend\apps\ms-inventory\src\inventory\dto\update-stock.dto.ts">
+        <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.inventory.entities">
+      <metrics statements="47" coveredstatements="41" conditionals="28" coveredconditionals="19" methods="12" coveredmethods="0"/>
+      <file name="inventory-item.entity.ts" path="C:\Users\oscar\workspace\Duoc\fullstackIII\Unidad3\Parcial3\app\smartLogix-backend\apps\ms-inventory\src\inventory\entities\inventory-item.entity.ts">
+        <metrics statements="17" coveredstatements="15" conditionals="12" coveredconditionals="8" methods="4" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="17" count="1" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="23" count="1" type="stmt"/>
+        <line num="26" count="1" type="stmt"/>
+        <line num="29" count="1" type="stmt"/>
+        <line num="32" count="1" type="cond" truecount="3" falsecount="1"/>
+        <line num="39" count="0" type="stmt"/>
+        <line num="41" count="1" type="cond" truecount="3" falsecount="1"/>
+        <line num="44" count="0" type="stmt"/>
+        <line num="46" count="1" type="cond" truecount="2" falsecount="2"/>
+      </file>
+      <file name="inventory-type.entity.ts" path="C:\Users\oscar\workspace\Duoc\fullstackIII\Unidad3\Parcial3\app\smartLogix-backend\apps\ms-inventory\src\inventory\entities\inventory-type.entity.ts">
+        <metrics statements="9" coveredstatements="8" conditionals="4" coveredconditionals="3" methods="2" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="13" count="1" type="stmt"/>
+        <line num="16" count="1" type="cond" truecount="3" falsecount="1"/>
+        <line num="19" count="0" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+      </file>
+      <file name="inventory.entity.ts" path="C:\Users\oscar\workspace\Duoc\fullstackIII\Unidad3\Parcial3\app\smartLogix-backend\apps\ms-inventory\src\inventory\entities\inventory.entity.ts">
+        <metrics statements="12" coveredstatements="10" conditionals="4" coveredconditionals="3" methods="4" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="17" count="1" type="cond" truecount="3" falsecount="1"/>
+        <line num="20" count="0" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+        <line num="24" count="0" type="stmt"/>
+        <line num="25" count="1" type="stmt"/>
+      </file>
+      <file name="user-inventory.entity.ts" path="C:\Users\oscar\workspace\Duoc\fullstackIII\Unidad3\Parcial3\app\smartLogix-backend\apps\ms-inventory\src\inventory\entities\user-inventory.entity.ts">
+        <metrics statements="9" coveredstatements="8" conditionals="8" coveredconditionals="5" methods="2" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="17" count="1" type="cond" truecount="3" falsecount="1"/>
+        <line num="20" count="0" type="stmt"/>
+        <line num="22" count="1" type="cond" truecount="2" falsecount="2"/>
+      </file>
+    </package>
+  </project>
+</coverage>

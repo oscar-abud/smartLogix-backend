@@ -1,0 +1,61 @@
+============================================================
+  SMARTLOGIX – REPOSITORIOS DE GITHUB
+  Evaluación Parcial 3 – Fullstack III
+============================================================
+
+REPOSITORIO PRINCIPAL (Backend monorepo)
+  URL   : https://github.com/oscar-abud/smartLogix-backend
+  Desc  : Monorepo NestJS (npm workspaces) que contiene el BFF y los
+          cuatro microservicios. Incluye docker-compose, migraciones
+          SQL y configuración de entornos.
+
+------------------------------------------------------------
+
+REPOSITORIO FRONTEND
+  URL   : https://github.com/oscar-abud/smartLogix-frontend
+  Desc  : SPA en React 19 + Vite + TypeScript. Consume el BFF
+          (puerto 3000) para todas las operaciones. Maneja
+          autenticación JWT y rutas protegidas.
+
+------------------------------------------------------------
+
+MICROSERVICIOS (dentro del repositorio principal – apps/)
+
+1. ms-users  (apps/ms-users)
+   URL   : https://github.com/oscar-abud/smartLogix-backend/tree/main/apps/ms-users
+   Puerto: 3001
+   DB    : PostgreSQL – base de datos: smartlogix_users
+   Desc  : Gestión de usuarios y roles. Expone endpoints de registro,
+           login, listado y actualización de perfil.
+
+2. ms-inventory  (apps/ms-inventory)
+   URL   : https://github.com/oscar-abud/smartLogix-backend/tree/main/apps/ms-inventory
+   Puerto: 3002
+   DB    : PostgreSQL – base de datos: smartlogix_inventory
+   Desc  : Administración de almacenes, tipos de inventario y stock
+           de productos. Controla stock disponible y reservado.
+
+3. ms-orders  (apps/ms-orders)
+   URL   : https://github.com/oscar-abud/smartLogix-backend/tree/main/apps/ms-orders
+   Puerto: 3003
+   DB    : PostgreSQL – base de datos: smartlogix_orders
+   Desc  : Ciclo de vida de órdenes de compra (PENDING → PROCESSED →
+           CANCELLED). Persiste cabecera de orden y sus ítems.
+
+4. ms-shipping  (apps/ms-shipping)
+   URL   : https://github.com/oscar-abud/smartLogix-backend/tree/main/apps/ms-shipping
+   Puerto: 3004
+   DB    : MongoDB Atlas – colección: Envios
+   Desc  : Microservicio Express/Node.js para despacho logístico.
+           Registra y actualiza el estado de envíos (PREPARING →
+           IN_TRANSIT → DELIVERED / FAILED).
+
+5. bff  (apps/bff)
+   URL   : https://github.com/oscar-abud/smartLogix-backend/tree/main/apps/bff
+   Puerto: 3000
+   DB    : Sin persistencia propia (API Gateway / orquestador)
+   Desc  : Backend for Frontend NestJS. Centraliza autenticación JWT,
+           aplica Circuit Breaker (Opossum) y enruta requests hacia
+           los cuatro microservicios.
+
+============================================================

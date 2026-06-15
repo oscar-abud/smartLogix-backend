@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Descripción de Persistencia – SmartLogix</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #1a1a2e; background: #fff; padding: 40px 60px; }
+  h1 { font-size: 22px; color: #16213e; border-bottom: 3px solid #0f3460; padding-bottom: 10px; margin-bottom: 6px; }
+  .subtitle { color: #555; font-size: 12px; margin-bottom: 30px; }
+  h2 { font-size: 16px; color: #0f3460; margin: 28px 0 8px; border-left: 4px solid #e94560; padding-left: 10px; }
+  h3 { font-size: 13px; color: #16213e; margin: 16px 0 6px; font-weight: 700; }
+  p { line-height: 1.7; margin-bottom: 8px; color: #333; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 12px; }
+  th { background: #0f3460; color: #fff; padding: 8px 10px; text-align: left; }
+  td { padding: 7px 10px; border-bottom: 1px solid #e0e0e0; vertical-align: top; }
+  tr:nth-child(even) td { background: #f7f9fc; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .pg  { background: #dbeafe; color: #1e40af; }
+  .mg  { background: #dcfce7; color: #166534; }
+  .tag { background: #fef3c7; color: #92400e; }
+  code { background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 11px; font-family: 'Courier New', monospace; }
+  .section { margin-bottom: 30px; }
+  .note { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 10px 14px; font-size: 12px; margin: 10px 0; border-radius: 3px; }
+  @media print {
+    body { padding: 20px 30px; }
+    h2 { page-break-before: auto; }
+    table { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Descripción de la Persistencia – SmartLogix</h1>
+<p class="subtitle">Evaluación Parcial 3 · Fullstack III · Duoc UC</p>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>1. Visión General de la Arquitectura de Datos</h2>
+<div class="section">
+  <p>SmartLogix implementa una estrategia de <strong>persistencia políglota</strong>: tres microservicios usan
+     <strong>PostgreSQL</strong> mediante TypeORM (datos estructurados y relacionales), mientras que el microservicio
+     de despacho usa <strong>MongoDB Atlas</strong> mediante Mongoose (documentos semiestructurados y flexibles).</p>
+
+  <table>
+    <thead>
+      <tr><th>Microservicio</th><th>Motor</th><th>Base de datos</th><th>Puerto DB</th><th>ORM / ODM</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>ms-users</td>
+        <td><span class="badge pg">PostgreSQL</span></td>
+        <td><code>smartlogix_users</code></td>
+        <td>5432</td>
+        <td>TypeORM</td>
+      </tr>
+      <tr>
+        <td>ms-inventory</td>
+        <td><span class="badge pg">PostgreSQL</span></td>
+        <td><code>smartlogix_inventory</code></td>
+        <td>5433</td>
+        <td>TypeORM</td>
+      </tr>
+      <tr>
+        <td>ms-orders</td>
+        <td><span class="badge pg">PostgreSQL</span></td>
+        <td><code>smartlogix_orders</code></td>
+        <td>5434</td>
+        <td>TypeORM</td>
+      </tr>
+      <tr>
+        <td>ms-shipping</td>
+        <td><span class="badge mg">MongoDB Atlas</span></td>
+        <td><code>ms-shipping</code> (cloud)</td>
+        <td>27017 (SRV)</td>
+        <td>Mongoose</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>2. ms-users – TypeORM + PostgreSQL</h2>
+<div class="section">
+  <h3>Entidades y relaciones</h3>
+  <table>
+    <thead><tr><th>Tabla</th><th>Columnas clave</th><th>Relación</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>users</code></td>
+        <td><code>id (UUID PK)</code>, <code>email (unique)</code>, <code>password</code>, <code>role_id (FK)</code>, <code>createdAt</code></td>
+        <td>ManyToOne → Role</td>
+      </tr>
+      <tr>
+        <td><code>roles</code></td>
+        <td><code>id (PK)</code>, <code>name</code></td>
+        <td>OneToMany → User</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Implementación técnica</h3>
+  <p>TypeORM es inicializado en <code>AppModule</code> mediante <code>TypeOrmModule.forRoot()</code> con la opción
+     <code>synchronize: false</code> en producción. Las entidades se registran con el decorador <code>@Entity</code> y
+     TypeORM genera automáticamente las consultas SQL. La relación <code>@ManyToOne</code> con <code>eager: true</code>
+     garantiza que el rol sea cargado junto al usuario en cada consulta sin necesidad de un JOIN manual.</p>
+  <p>La clave primaria de <code>users</code> usa <code>uuid</code> generado automáticamente, lo que evita colisiones entre
+     instancias y facilita la portabilidad del identificador hacia otros microservicios.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>3. ms-inventory – TypeORM + PostgreSQL</h2>
+<div class="section">
+  <h3>Entidades y relaciones</h3>
+  <table>
+    <thead><tr><th>Tabla</th><th>Columnas clave</th><th>Relaciones</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>inventories</code></td>
+        <td><code>id (PK)</code>, <code>name</code>, <code>description</code>, <code>created_at</code></td>
+        <td>OneToMany → InventoryItem, OneToMany → UserInventory</td>
+      </tr>
+      <tr>
+        <td><code>inventory_items</code></td>
+        <td><code>id (PK)</code>, <code>sku</code>, <code>name</code>, <code>price</code>, <code>stock_available</code>, <code>stock_reserved</code>, <code>inventory_type_id (FK)</code>, <code>inventory_id (FK)</code></td>
+        <td>ManyToOne → Inventory, ManyToOne → InventoryType</td>
+      </tr>
+      <tr>
+        <td><code>inventory_types</code></td>
+        <td><code>id (PK)</code>, <code>name</code></td>
+        <td>OneToMany → InventoryItem</td>
+      </tr>
+      <tr>
+        <td><code>user_inventory</code></td>
+        <td><code>inventory_id (FK)</code>, <code>user_id</code></td>
+        <td>ManyToOne → Inventory (tabla de unión)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Implementación técnica</h3>
+  <p>Este microservicio expone la lógica de stock mediante el método <code>updateStock</code> del servicio, que realiza
+     operaciones atómicas sobre <code>stock_available</code> y <code>stock_reserved</code> usando el repositorio TypeORM
+     (<code>Repository&lt;InventoryItem&gt;</code>). La separación entre stock disponible y reservado permite reflejar
+     las órdenes en tránsito sin comprometer la disponibilidad real.</p>
+  <p>La tabla <code>user_inventory</code> actúa como tabla de unión para la asignación de operadores a almacenes,
+     sin necesidad de duplicar datos de usuario en este microservicio (el <code>user_id</code> viene del JWT del BFF).</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>4. ms-orders – TypeORM + PostgreSQL</h2>
+<div class="section">
+  <h3>Entidades y relaciones</h3>
+  <table>
+    <thead><tr><th>Tabla</th><th>Columnas clave</th><th>Relaciones</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>orders</code></td>
+        <td><code>id (PK autoincrement)</code>, <code>status (enum)</code>, <code>total_amount (decimal 12,2)</code>, <code>createdAt</code></td>
+        <td>OneToMany → OrderItem (cascade)</td>
+      </tr>
+      <tr>
+        <td><code>order_items</code></td>
+        <td><code>id (PK)</code>, <code>order_id (FK)</code>, <code>product_id</code>, <code>quantity</code>, <code>price (decimal 10,2)</code></td>
+        <td>ManyToOne → Order (onDelete CASCADE)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Implementación técnica</h3>
+  <p>La relación <code>OneToMany</code> con <code>cascade: true</code> en <code>Order.items</code> permite guardar la
+     cabecera y todos los ítems en una sola operación <code>repository.save(order)</code>. El campo
+     <code>status</code> está tipado como un <code>enum</code> de TypeScript (<code>PENDING | PROCESSED | CANCELLED</code>),
+     lo que impone restricciones a nivel de modelo antes de llegar a la base de datos.</p>
+  <p>El <code>product_id</code> en <code>order_items</code> es una referencia lógica hacia ms-inventory, sin clave
+     foránea física entre bases de datos, respetando la independencia de cada microservicio.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>5. ms-shipping – Mongoose + MongoDB Atlas</h2>
+<div class="section">
+  <h3>Esquema del documento</h3>
+  <table>
+    <thead><tr><th>Campo</th><th>Tipo</th><th>Restricciones</th><th>Origen</th></tr></thead>
+    <tbody>
+      <tr><td><code>orderId</code></td><td>Number</td><td>required, unique</td><td>ms-orders (API REST)</td></tr>
+      <tr><td><code>totalProductsQuantity</code></td><td>Number</td><td>required</td><td>Calculado del array items</td></tr>
+      <tr><td><code>orderCreatedAt</code></td><td>Date</td><td>required</td><td>ms-orders (API REST)</td></tr>
+      <tr><td><code>recipientName</code></td><td>String (trim)</td><td>required</td><td>Formulario manual del operador</td></tr>
+      <tr><td><code>shippingAddress</code></td><td>String (trim)</td><td>required</td><td>Formulario manual del operador</td></tr>
+      <tr><td><code>shippingDistrict</code></td><td>String (trim)</td><td>required</td><td>Formulario manual del operador</td></tr>
+      <tr><td><code>shippingCity</code></td><td>String (trim)</td><td>required</td><td>Formulario manual del operador</td></tr>
+      <tr><td><code>shippingStatus</code></td><td>String (enum)</td><td>PREPARING | IN_TRANSIT | DELIVERED | FAILED</td><td>Control interno</td></tr>
+      <tr><td><code>createdAt / updatedAt</code></td><td>Date</td><td>auto (timestamps: true)</td><td>Mongoose</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Implementación técnica</h3>
+  <p>El esquema se define mediante <code>mongoose.Schema</code> con la opción <code>timestamps: true</code>, que
+     genera automáticamente <code>createdAt</code> y <code>updatedAt</code> en cada documento. La restricción
+     <code>unique: true</code> sobre <code>orderId</code> garantiza que no se pueda registrar dos veces el
+     despacho de la misma orden (error MongoDB code <code>11000</code>).</p>
+  <p>El campo <code>shippingStatus</code> usa validación de enum nativa de Mongoose, evitando estados inválidos
+     sin necesidad de validación adicional en el controlador. La conexión a MongoDB Atlas se realiza mediante
+     el URI <code>mongodb+srv</code> con <code>retryWrites: true</code> para tolerancia a fallos de red.</p>
+  <p>A diferencia de las tablas relacionales, el documento Envío combina datos provenientes de dos fuentes
+     (la orden en PostgreSQL y el formulario del operador) en un único documento JSON desnormalizado,
+     optimizando la lectura del historial logístico.</p>
+
+  <div class="note">
+    <strong>Razón de MongoDB en ms-shipping:</strong> Los registros de despacho tienen estructura variable
+    (distintos campos opcionales por destino) y se acceden principalmente por lectura histórica, lo que
+    favorece el modelo documental sobre el relacional.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<h2>6. Comunicación entre Motores</h2>
+<div class="section">
+  <p>No existe ninguna conexión directa entre los motores de base de datos. La integración de datos entre
+     microservicios ocurre <strong>exclusivamente a través de HTTP REST</strong>: el BFF orquesta las llamadas
+     entre ms-orders (PostgreSQL) y ms-shipping (MongoDB), pasando el objeto JSON de la orden en el body
+     del POST. Esto mantiene la independencia de despliegue y la tolerancia a fallos entre bases de datos.</p>
+</div>
+
+</body>
+</html>

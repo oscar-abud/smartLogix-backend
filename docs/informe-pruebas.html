@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Informe de Pruebas Unitarias – SmartLogix</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #1a1a2e; background: #fff; padding: 40px 60px; }
+  h1 { font-size: 22px; color: #16213e; border-bottom: 3px solid #0f3460; padding-bottom: 10px; margin-bottom: 6px; }
+  .subtitle { color: #555; font-size: 12px; margin-bottom: 30px; }
+  h2 { font-size: 16px; color: #0f3460; margin: 28px 0 8px; border-left: 4px solid #e94560; padding-left: 10px; }
+  h3 { font-size: 13px; color: #16213e; margin: 14px 0 6px; font-weight: 700; }
+  p { line-height: 1.7; margin-bottom: 8px; color: #333; }
+  ul { margin: 6px 0 10px 20px; }
+  li { margin-bottom: 4px; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 20px; font-size: 12px; }
+  th { background: #0f3460; color: #fff; padding: 8px 10px; text-align: left; }
+  td { padding: 7px 10px; border-bottom: 1px solid #e0e0e0; vertical-align: top; text-align: center; }
+  td:first-child { text-align: left; font-weight: 600; }
+  td:last-child { text-align: left; }
+  tr:nth-child(even) td { background: #f7f9fc; }
+  .ok  { color: #166534; font-weight: 700; }
+  .warn{ color: #b45309; font-weight: 700; }
+  .bad { color: #991b1b; font-weight: 700; }
+  code { background: #f1f5f9; padding: 1px 5px; border-radius: 3px; font-size: 11px; font-family: 'Courier New', monospace; }
+  pre  { background: #0d1117; color: #c9d1d9; padding: 14px 16px; border-radius: 6px; font-size: 11px; overflow-x: auto; margin: 10px 0 16px; line-height: 1.5; font-family: 'Courier New', monospace; }
+  .green { color: #3fb950; }
+  .red   { color: #ff7b72; }
+  .yellow{ color: #e3b341; }
+  .note  { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 10px 14px; font-size: 12px; margin: 10px 0 16px; border-radius: 3px; }
+  .alert { background: #fef2f2; border-left: 4px solid #ef4444; padding: 10px 14px; font-size: 12px; margin: 10px 0 16px; border-radius: 3px; }
+  .pattern-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 12px 16px; margin: 10px 0 16px; }
+  @media print {
+    body { padding: 20px 30px; }
+    pre  { white-space: pre-wrap; }
+    table { page-break-inside: avoid; }
+    h2   { page-break-before: auto; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Informe de Pruebas Unitarias – SmartLogix</h1>
+<p class="subtitle">Evaluación Parcial 3 · Fullstack III · Duoc UC</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>1. Resumen Ejecutivo</h2>
+<p>El sistema SmartLogix fue sometido a pruebas unitarias en todos sus componentes usando
+   <strong>Jest</strong> (backend NestJS + Express) y <strong>Vitest</strong> (frontend React).
+   Se ejecutaron un total de <strong>127 pruebas</strong> distribuidas en 6 suites.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Componente</th>
+      <th>Framework</th>
+      <th>Tests</th>
+      <th>Stmts %</th>
+      <th>Branch %</th>
+      <th>Funcs %</th>
+      <th>Lines %</th>
+      <th>Estado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ms-shipping</td>
+      <td>Jest 29</td>
+      <td>24 ✔</td>
+      <td class="ok">100</td>
+      <td class="ok">100</td>
+      <td class="ok">100</td>
+      <td class="ok">100</td>
+      <td class="ok">✔ Cumple</td>
+    </tr>
+    <tr>
+      <td>BFF – circuit-breaker</td>
+      <td>Jest 30</td>
+      <td>2 ✔</td>
+      <td class="ok">73.68</td>
+      <td class="ok">100</td>
+      <td class="warn">25</td>
+      <td class="ok">70.58</td>
+      <td class="ok">✔ Cumple</td>
+    </tr>
+    <tr>
+      <td>Frontend (componentes)</td>
+      <td>Vitest 4</td>
+      <td>34 ✔</td>
+      <td class="ok">87.56</td>
+      <td class="ok">75.67</td>
+      <td class="ok">85.71</td>
+      <td class="ok">87.5</td>
+      <td class="ok">✔ Cumple</td>
+    </tr>
+    <tr>
+      <td>ms-inventory</td>
+      <td>Jest 30</td>
+      <td>30 ✔</td>
+      <td class="ok">70.41</td>
+      <td class="ok">63.63</td>
+      <td class="warn">48.93</td>
+      <td class="ok">71.36</td>
+      <td class="ok">✔ Cumple</td>
+    </tr>
+    <tr>
+      <td>ms-orders</td>
+      <td>Jest 30</td>
+      <td>17 ✔</td>
+      <td class="ok">75.43</td>
+      <td class="ok">61.29</td>
+      <td class="ok">68.42</td>
+      <td class="ok">76.77</td>
+      <td class="ok">✔ Cumple</td>
+    </tr>
+    <tr>
+      <td>ms-users</td>
+      <td>Jest 30</td>
+      <td>20 ✔</td>
+      <td class="ok">72.72</td>
+      <td class="ok">66.07</td>
+      <td class="ok">73.68</td>
+      <td class="ok">75.36</td>
+      <td class="ok">✔ Cumple</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <strong>Nota metodológica:</strong> La cobertura se midió con la opción <code>--coverage</code>
+  estándar de Jest/Vitest. Las líneas con 0% corresponden en su mayoría a archivos de configuración de módulos
+  (<code>app.module.ts</code>, <code>main.ts</code>) y DTOs sin lógica de negocio, que no requieren pruebas unitarias.
+  Los archivos con lógica funcional (servicios, controladores, entidades) presentan coberturas superiores dentro de
+  cada suite.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>2. ms-shipping – Cobertura 100% (Controller)</h2>
+<p>Se implementaron <strong>24 casos de prueba</strong> unitarios sobre el controlador Express usando
+   <strong>Jest 29</strong> con mocking completo de Mongoose:</p>
+
+<pre>
+<span class="green">PASS</span>  __tests__/envios.controller.test.js
+  getAll
+    <span class="green">✔</span> devuelve 200 con lista de envíos (3 ms)
+    <span class="green">✔</span> devuelve 500 si falla la DB (1 ms)
+  getByOrderId
+    <span class="green">✔</span> devuelve 400 si orderId no es número (1 ms)
+    <span class="green">✔</span> devuelve 404 si no existe el envío
+    <span class="green">✔</span> devuelve 200 con el envío encontrado
+    <span class="green">✔</span> devuelve 500 ante error inesperado (1 ms)
+  getByShippingId
+    <span class="green">✔</span> devuelve 200 con el envío por _id
+    <span class="green">✔</span> devuelve 404 si no existe
+    <span class="green">✔</span> devuelve 400 en CastError (ID inválido)
+    <span class="green">✔</span> devuelve 500 ante error genérico
+  create
+    <span class="green">✔</span> devuelve 400 si falta el objeto order
+    <span class="green">✔</span> devuelve 400 si faltan datos del formulario logístico
+    <span class="green">✔</span> devuelve 201 al crear correctamente
+    <span class="green">✔</span> devuelve 400 ante duplicado (código 11000)
+    <span class="green">✔</span> devuelve 500 ante error genérico en save
+  updateStatus
+    <span class="green">✔</span> devuelve 400 si el estado es inválido
+    <span class="green">✔</span> devuelve 400 si falta el campo status
+    <span class="green">✔</span> devuelve 404 si no encuentra el envío para actualizar
+    <span class="green">✔</span> devuelve 200 al actualizar correctamente
+    <span class="green">✔</span> devuelve 500 ante error en DB
+  destroy
+    <span class="green">✔</span> devuelve 200 al eliminar correctamente
+    <span class="green">✔</span> devuelve 404 si no existe el envío
+    <span class="green">✔</span> devuelve 400 en CastError
+    <span class="green">✔</span> devuelve 500 ante error genérico
+
+<span class="yellow">----------------------|---------|----------|---------|---------|</span>
+<span class="yellow">File                  | % Stmts | % Branch | % Funcs | % Lines |</span>
+<span class="yellow">----------------------|---------|----------|---------|---------|</span>
+<span class="green"> envios.controller.js |     100 |      100 |     100 |     100 |</span>
+<span class="yellow">----------------------|---------|----------|---------|---------|</span>
+
+Test Suites: <span class="green">1 passed</span>, 1 total
+Tests:       <span class="green">24 passed</span>, 24 total
+Time:        2.32 s
+</pre>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>3. BFF – CircuitBreakerService</h2>
+<p>Se reemplazó el test de scaffolding roto por pruebas sobre el <code>CircuitBreakerService</code>
+   (implementación del patrón <strong>Circuit Breaker</strong> con Opossum):</p>
+
+<pre>
+<span class="green">PASS</span>  src/app.controller.spec.ts
+  CircuitBreakerService
+    <span class="green">✔</span> ejecuta la acción y retorna el resultado cuando el servicio responde
+    <span class="green">✔</span> invoca el fallback si la acción falla
+
+<span class="yellow">-----------------------------|---------|----------|---------|---------|</span>
+<span class="yellow">File                         | % Stmts | % Branch | % Funcs | % Lines |</span>
+<span class="yellow">-----------------------------|---------|----------|---------|---------|</span>
+<span class="green"> circuit-breaker.service.ts  |   73.68 |      100 |      25 |   70.58 |</span>
+<span class="yellow">-----------------------------|---------|----------|---------|---------|</span>
+
+Test Suites: <span class="green">1 passed</span>, 1 total
+Tests:       <span class="green">2 passed</span>, 2 total
+</pre>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>4. ms-inventory – Reporte de Cobertura</h2>
+<p>Comando ejecutado: <code>npm run test:cov --workspace=apps/ms-inventory</code></p>
+<p>Se implementaron <strong>30 pruebas</strong> en 2 suites (service + controller). 22 pruebas del service cubren los métodos principales: <code>createInventoryType</code>, <code>getAllInventoryTypes</code>, <code>getItemById</code>, <code>getItems</code>, <code>addItemToInventory</code>, <code>updateItemStock</code>, <code>deleteInventory</code>, <code>assignUser</code>, <code>updateUserRelation</code>, <code>removeUserRelation</code>, <code>getAll</code> y <code>getInventory</code>.</p>
+
+<pre>
+<span class="green">PASS</span>  src/inventory/inventory.service.spec.ts
+<span class="green">PASS</span>  src/inventory/inventory.controller.spec.ts
+
+<span class="yellow">-------------------------------|---------|----------|---------|---------|--------------------------------------------------</span>
+<span class="yellow">File                           | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                </span>
+<span class="yellow">-------------------------------|---------|----------|---------|---------|--------------------------------------------------</span>
+<span class="green"> All files                     |   70.41 |    63.63 |   48.93 |   71.36 |                                                  </span>
+<span class="yellow"> src                           |       0 |        0 |       0 |       0 |                                                  </span>
+<span class="red">  app.module.ts                |       0 |        0 |     100 |       0 | 1-26                                             </span>
+<span class="red">  main.ts                      |       0 |        0 |       0 |       0 | 1-31                                             </span>
+<span class="green"> src/inventory                 |   72.04 |    70.65 |   67.64 |   71.52 |                                                  </span>
+<span class="green">  inventory.controller.ts      |   83.78 |       75 |   57.14 |   82.85 | 25,30,48,57,74,96                                </span>
+<span class="red">  inventory.module.ts          |       0 |      100 |     100 |       0 | 1-24                                             </span>
+<span class="green">  inventory.service.ts         |   75.22 |    69.44 |      75 |      73 | 29-61,93,110,122-128,154,169-175,210,220,314,339 </span>
+<span class="green"> src/inventory/dto             |     100 |      100 |     100 |     100 |                                                  </span>
+<span class="green">  create-inventory-type.dto.ts |     100 |      100 |     100 |     100 |                                                  </span>
+<span class="green">  create-inventory.dto.ts      |     100 |      100 |     100 |     100 |                                                  </span>
+<span class="green">  create-item.dto.ts           |     100 |      100 |     100 |     100 |                                                  </span>
+<span class="green">  update-stock.dto.ts          |     100 |      100 |     100 |     100 |                                                  </span>
+<span class="yellow"> src/inventory/entities        |   80.32 |    67.85 |       0 |   87.23 |                                                  </span>
+<span class="green">  inventory-item.entity.ts     |   80.95 |    66.66 |       0 |   88.23 | 39,44                                            </span>
+<span class="green">  inventory-type.entity.ts     |   83.33 |       75 |       0 |   88.88 | 19                                               </span>
+<span class="green">  inventory.entity.ts          |      75 |       75 |       0 |   83.33 | 20,24                                            </span>
+<span class="green">  user-inventory.entity.ts     |   83.33 |     62.5 |       0 |   88.88 | 20                                               </span>
+<span class="yellow">-------------------------------|---------|----------|---------|---------|--------------------------------------------------</span>
+
+Test Suites: <span class="green">2 passed</span>, 2 total
+Tests:       <span class="green">30 passed</span>, 30 total
+</pre>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>5. ms-orders – Reporte de Cobertura</h2>
+<p>Comando ejecutado: <code>npm run test:cov --workspace=apps/ms-orders</code></p>
+<p>Se implementaron <strong>17 pruebas</strong> en 2 suites (service + controller). El service cubre: <code>findAll</code>, <code>findOrderById</code>, <code>updateStatus</code>, <code>remove</code> y <code>create</code> (incluyendo flujo transaccional con QueryRunner y llamadas HTTP a ms-inventory). El controller cubre todos sus endpoints delegando al service mockeado.</p>
+
+<pre>
+<span class="green">PASS</span>  src/orders/orders.service.spec.ts
+<span class="green">PASS</span>  src/orders/orders.controller.spec.ts
+
+<span class="yellow">-----------------------------|---------|----------|---------|---------|-------------------</span>
+<span class="yellow">File                         | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s </span>
+<span class="yellow">-----------------------------|---------|----------|---------|---------|-------------------</span>
+<span class="green"> All files                   |   75.43 |    61.29 |   68.42 |   76.77 |                   </span>
+<span class="yellow"> src                         |       0 |        0 |       0 |       0 |                   </span>
+<span class="red">  app.module.ts              |       0 |        0 |     100 |       0 | 1-26              </span>
+<span class="red">  main.ts                    |       0 |        0 |       0 |       0 | 1-30              </span>
+<span class="green"> src/orders                  |   85.84 |    77.77 |     100 |   86.73 |                   </span>
+<span class="green">  orders.controller.ts       |     100 |       75 |     100 |     100 | 10-40             </span>
+<span class="red">  orders.module.ts           |       0 |      100 |     100 |       0 | 1-18              </span>
+<span class="green">  orders.service.ts          |    93.5 |    79.16 |     100 |   93.15 | 137-139,157,173   </span>
+<span class="green"> src/orders/dto              |   92.85 |       75 |       0 |   92.85 |                   </span>
+<span class="green">  create-order.dto.ts        |   88.88 |      100 |       0 |   88.88 | 34                </span>
+<span class="green">  update-order-status.dto.ts |     100 |       75 |     100 |     100 | 13                </span>
+<span class="green"> src/orders/entities         |    86.2 |       70 |      20 |    91.3 |                   </span>
+<span class="green">  order-item.entity.ts       |   84.61 |       50 |       0 |      90 | 13                </span>
+<span class="green">  order.entity.ts            |    87.5 |    83.33 |   33.33 |    92.3 | 29                </span>
+<span class="yellow">-----------------------------|---------|----------|---------|---------|-------------------</span>
+
+Test Suites: <span class="green">2 passed</span>, 2 total
+Tests:       <span class="green">17 passed</span>, 17 total
+</pre>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>5b. ms-users – Reporte de Cobertura</h2>
+<p>Comando ejecutado: <code>npm run test:cov --workspace=apps/ms-users</code></p>
+<p>Se implementaron <strong>20 pruebas</strong> en 2 suites (service + controller). El service cubre: <code>registerUser</code>, <code>validateUserCredentials</code>, <code>findAll</code>, <code>getUser</code>, <code>updateUser</code> y <code>deleteUser</code>. El controller cubre todos sus endpoints.</p>
+
+<pre>
+<span class="green">PASS</span>  src/users/users.service.spec.ts
+<span class="green">PASS</span>  src/users/users.controller.spec.ts
+
+<span class="yellow">-----------------------|---------|----------|---------|---------|-------------------</span>
+<span class="yellow">File                   | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s </span>
+<span class="yellow">-----------------------|---------|----------|---------|---------|-------------------</span>
+<span class="green"> All files              |   72.72 |    66.07 |   73.68 |   75.36 |                   </span>
+<span class="yellow"> src                   |       0 |        0 |       0 |       0 |                   </span>
+<span class="red">  app.module.ts        |       0 |      100 |     100 |       0 | 1-22              </span>
+<span class="red">  main.ts              |       0 |        0 |       0 |       0 | 1-31              </span>
+<span class="green"> src/users             |   83.69 |    67.39 |     100 |    86.9 |                   </span>
+<span class="green">  users.controller.ts  |     100 |       75 |     100 |     100 | 10-36             </span>
+<span class="red">  users.module.ts      |       0 |      100 |     100 |       0 | 1-16              </span>
+<span class="green">  users.service.ts     |   90.16 |    63.33 |     100 |   92.98 | 75,87,121,149     </span>
+<span class="green"> src/users/dto         |     100 |      100 |     100 |     100 |                   </span>
+<span class="green">  create-user.dto.ts   |     100 |      100 |     100 |     100 |                   </span>
+<span class="green">  update-user.dto.ts   |     100 |      100 |     100 |     100 |                   </span>
+<span class="green">  validate-user.dto.ts |     100 |      100 |     100 |     100 |                   </span>
+<span class="yellow"> src/users/entities    |   81.81 |       75 |       0 |    87.5 |                   </span>
+<span class="green">  role.entity.ts       |      80 |      100 |       0 |   85.71 | 12                </span>
+<span class="green">  user.entity.ts       |   83.33 |       75 |       0 |   88.88 | 15                </span>
+<span class="yellow">-----------------------|---------|----------|---------|---------|-------------------</span>
+
+Test Suites: <span class="green">2 passed</span>, 2 total
+Tests:       <span class="green">20 passed</span>, 20 total
+</pre>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>6. Frontend – Reporte Vitest</h2>
+<p>Comando ejecutado: <code>npm run test:cov</code> desde <code>smartLogix-frontend</code></p>
+
+<pre>
+<span class="green"> Test Files  8 passed (8)</span>
+<span class="green">      Tests  34 passed (34)</span>
+   Start at  15:26:49
+   Duration  5.82s
+
+ % Coverage report from v8
+<span class="yellow">-------------------|---------|----------|---------|---------|-------------------</span>
+<span class="yellow">File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s </span>
+<span class="yellow">-------------------|---------|----------|---------|---------|-------------------</span>
+<span class="green"> All files         |   87.56 |    75.67 |   85.71 |    87.5 |                   </span>
+<span class="yellow"> components        |   83.33 |      100 |      50 |     100 |                   </span>
+<span class="green">  ProtectedRoute   |   83.33 |      100 |      50 |     100 |                   </span>
+<span class="green"> components/UI     |     100 |       50 |     100 |     100 |                   </span>
+<span class="green">  Header.tsx       |     100 |       50 |     100 |     100 |                   </span>
+<span class="yellow"> components/inv.   |   84.61 |       76 |      85 |   83.49 |                   </span>
+<span class="yellow">  AddInventory.tsx |   47.82 |    66.66 |      50 |   42.85 | 23-34,55-66       </span>
+<span class="green">  InventoryItem    |   95.52 |    78.57 |     100 |   96.61 | 40-41             </span>
+<span class="green">  InventoryType    |   88.88 |       75 |      75 |   86.95 | 42-43,84          </span>
+<span class="yellow"> components/orders |    92.3 |      100 |     100 |    92.3 |                   </span>
+<span class="green">  UpdateStatusModal|    92.3 |      100 |     100 |    92.3 | 36                </span>
+<span class="green"> components/ship.  |    92.5 |       75 |    87.5 |    92.1 |                   </span>
+<span class="green">  ShippingModal    |    87.5 |       75 |      80 |   86.36 | 52-53,70          </span>
+<span class="green">  UpdateStatusModal|     100 |       75 |     100 |     100 | 29                </span>
+<span class="yellow">-------------------|---------|----------|---------|---------|-------------------</span>
+
+=============================== Coverage summary ===============================
+Statements   : 87.56% ( 162/185 )
+Branches     : 75.67% (  56/74  )
+Functions    : 85.71% (  30/35  )
+Lines        : 87.5%  ( 147/168 )
+================================================================================
+</pre>
+<p>Componentes probados:</p>
+<ul>
+  <li><code>ProtectedRoute.tsx</code>: 83.33% Stmts, 100% Branch</li>
+  <li><code>orders/UpdateStatusModal.tsx</code>: 92.3% Stmts, 100% Branch, 100% Funcs</li>
+  <li><code>shipping/UpdateStatusModal.tsx</code>: 100% Stmts, 100% Funcs</li>
+  <li><code>UI/Header.tsx</code>: 55.55% Stmts</li>
+</ul>
+<p>Total suite: 34 pruebas aprobadas en 8 archivos de test.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>7. Patrones de Diseño y su Impacto en la Mantenibilidad</h2>
+
+<div class="pattern-box">
+  <h3>Circuit Breaker Pattern (BFF)</h3>
+  <p>Implementado con la librería <strong>Opossum</strong> en <code>CircuitBreakerService</code>.
+     Cada llamada HTTP a un microservicio está envuelta en un breaker con umbral del 50% de errores y
+     timeout de 3 segundos. Si el microservicio cae, el circuito se abre y se desvía al fallback,
+     evitando cascadas de fallos. <strong>Beneficio de testing:</strong> al aislar la lógica del breaker
+     en un servicio inyectable, se puede probar independientemente de las llamadas HTTP reales.</p>
+</div>
+
+<div class="pattern-box">
+  <h3>Repository Pattern (NestJS + TypeORM)</h3>
+  <p>TypeORM implementa el patrón Repository a través de <code>Repository&lt;Entity&gt;</code>. Los servicios
+     NestJS reciben el repositorio por inyección de dependencias (<code>@InjectRepository</code>), lo que
+     permite que en los tests unitarios se sustituya por un mock sin modificar el servicio bajo prueba.
+     <strong>Beneficio de testing:</strong> los tests pueden simular <code>findOne</code>, <code>save</code>,
+     <code>delete</code> sin una base de datos real.</p>
+</div>
+
+<div class="pattern-box">
+  <h3>DTO (Data Transfer Object) Pattern</h3>
+  <p>Todos los microservicios definen DTOs separados para crear y actualizar recursos (ej.:
+     <code>CreateOrderDto</code>, <code>UpdateOrderStatusDto</code>). Al decorar con
+     <code>class-validator</code>, la validación ocurre antes de llegar al servicio, centralizando
+     la lógica de validación. <strong>Beneficio de testing:</strong> los DTOs son plain classes
+     con 100% de cobertura sin necesidad de infraestructura.</p>
+</div>
+
+<div class="pattern-box">
+  <h3>BFF (Backend for Frontend) Pattern</h3>
+  <p>El BFF centraliza la orquestación de llamadas HTTP hacia los cuatro microservicios, maneja la
+     autenticación JWT y aplica el circuit breaker. El frontend solo conoce un único endpoint de entrada.
+     <strong>Beneficio de testing:</strong> cada microservicio puede testearse de forma aislada; el BFF
+     prueba la lógica de orquestación mockeando HttpService.</p>
+</div>
+
+<div class="pattern-box">
+  <h3>MVC en Express (ms-shipping)</h3>
+  <p>El microservicio de despacho aplica MVC explícitamente: <code>envios.model.js</code> (Model/Mongoose),
+     <code>envios.controller.js</code> (Controller) y <code>envios.router.js</code> (routing/View-layer en REST).
+     La separación facilita el mock total del Model en los tests del Controller, logrando
+     <strong>100% de cobertura sin conectarse a MongoDB</strong>.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>8. Ejemplo Representativo de Prueba</h2>
+<p>Test del controlador de shipping – caso de creación con datos duplicados:</p>
+
+<pre>
+<span class="yellow">it</span>(<span class="green">'devuelve 400 ante duplicado (código 11000)'</span>, async () =&gt; {
+  <span class="red">// Arrange</span>
+  const dupErr = new Error('dup');
+  dupErr.code = 11000;
+  Envios.mockImplementation(() =&gt; ({ save: jest.fn().mockRejectedValue(dupErr) }));
+
+  const req = { body: { order: validOrder, formManualData: validForm } };
+  const res = mockRes();
+
+  <span class="red">// Act</span>
+  await EnviosController.create(req, res);
+
+  <span class="red">// Assert</span>
+  expect(res.status).toHaveBeenCalledWith(400);
+  expect(res.json).toHaveBeenCalledWith(
+    expect.objectContaining({ error: expect.stringContaining('Ya existe un despacho') })
+  );
+});
+</pre>
+
+<p>Este test valida que el manejo del error de clave duplicada de MongoDB (código <code>11000</code>) se
+   traduce en una respuesta HTTP 400 con un mensaje de negocio claro, sin exponer detalles internos al cliente.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<h2>9. Herramientas Utilizadas</h2>
+<table>
+  <thead><tr><th>Herramienta</th><th>Versión</th><th>Uso</th></tr></thead>
+  <tbody>
+    <tr><td>Jest</td><td>29 / 30</td><td>Tests unitarios en Express y NestJS</td></tr>
+    <tr><td>Vitest</td><td>4.1.9</td><td>Tests unitarios en React/Vite</td></tr>
+    <tr><td>@testing-library/react</td><td>16.x</td><td>Renderizado de componentes React</td></tr>
+    <tr><td>ts-jest</td><td>29.x</td><td>Transpilación TypeScript en Jest</td></tr>
+    <tr><td>@nestjs/testing</td><td>—</td><td>Módulo de testing de NestJS (TestingModule)</td></tr>
+    <tr><td>v8 / Istanbul</td><td>—</td><td>Instrumentación de cobertura de código</td></tr>
+  </tbody>
+</table>
+
+</body>
+</html>

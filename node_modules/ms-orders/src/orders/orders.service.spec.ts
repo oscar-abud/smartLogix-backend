@@ -5,6 +5,7 @@ import { Order } from './entities/order.entity';
 import { DataSource, Repository } from 'typeorm';
 import { HttpService } from '@nestjs/axios';
 import { NotFoundException } from '@nestjs/common';
+import { of, throwError } from 'rxjs';
 
 describe('OrdersService', () => {
   let service: OrdersService;
@@ -40,6 +41,7 @@ describe('OrdersService', () => {
   const mockHttpService = {
     post: jest.fn(),
     get: jest.fn(),
+    patch: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -165,6 +167,50 @@ describe('OrdersService', () => {
         message: 'Orden #30 eliminada correctamente de forma lógica/física.',
       });
       expect(mockOrderRepository.remove).toHaveBeenCalledWith(mockOrder);
+    });
+
+    it('debe lanzar NotFoundException al intentar eliminar una orden inexistente', async () => {
+      mockOrderRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.remove(999)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  // Test para el método create
+  describe('create', () => {
+    const productData = { id: 1, name: 'Laptop Dell', price: '1000', stockAvailable: 5 };
+
+    it('debe crear una orden exitosamente con ítems válidos', async () => {
+      const createDto = { items: [{ productId: 1, quantity: 2 }] };
+      const savedOrder = { id: 10, status: 'PENDING', totalAmount: 2000, createdAt: new Date() };
+
+      mockHttpService.get.mockReturnValue(of({ data: productData }));
+      mockHttpService.patch.mockReturnValue(of({ data: {} }));
+      mockQueryRunner.manager.save
+        .mockResolvedValueOnce(savedOrder)
+        .mockResolvedValueOnce({ id: 1 });
+
+      const result = await service.create(createDto);
+
+      expect(result.orderId).toBe(10);
+      expect(result.totalAmount).toBe(2000);
+      expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
+      expect(mockQueryRunner.release).toHaveBeenCalled();
+    });
+
+    it('debe lanzar NotFoundException si el producto no existe en el catálogo', async () => {
+      const createDto = { items: [{ productId: 999, quantity: 1 }] };
+      mockHttpService.get.mockReturnValue(throwError(() => new Error('Not found')));
+
+      await expect(service.create(createDto)).rejects.toThrow(NotFoundException);
+    });
+
+    it('debe lanzar BadRequestException si el stock disponible es insuficiente', async () => {
+      const createDto = { items: [{ productId: 1, quantity: 100 }] };
+      const lowStockProduct = { ...productData, stockAvailable: 2 };
+      mockHttpService.get.mockReturnValue(of({ data: lowStockProduct }));
+
+      await expect(service.create(createDto)).rejects.toThrow();
     });
   });
 });
