@@ -130,4 +130,87 @@ describe('UsersService', () => {
       }
     });
   });
+
+  // 4. Test para validateUserCredentials
+  describe('validateUserCredentials', () => {
+    const validateDto = { email: 'test@smartlogix.com', password: 'password123' };
+
+    it('debe retornar datos del usuario si las credenciales son válidas', async () => {
+      const mockUser = {
+        id: 'uuid-1',
+        email: 'test@smartlogix.com',
+        password: 'hashedPass',
+        role: { id: 2, name: 'OPERATOR' },
+        createdAt: new Date(),
+      };
+      mockUserRepository.findOne.mockResolvedValue(mockUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+      const result = await service.validateUserCredentials(validateDto);
+
+      expect(result.email).toBe(validateDto.email);
+      expect(result.role.name).toBe('OPERATOR');
+    });
+
+    it('debe lanzar UnauthorizedException si el usuario no existe', async () => {
+      mockUserRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.validateUserCredentials(validateDto)).rejects.toThrow();
+    });
+
+    it('debe lanzar UnauthorizedException si la contraseña es incorrecta', async () => {
+      const mockUser = {
+        id: 'u1',
+        email: 'test@smartlogix.com',
+        password: 'hashed',
+        role: { id: 1, name: 'ADMIN' },
+        createdAt: new Date(),
+      };
+      mockUserRepository.findOne.mockResolvedValue(mockUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+      await expect(service.validateUserCredentials(validateDto)).rejects.toThrow();
+    });
+  });
+
+  // 5. Test para getUser
+  describe('getUser', () => {
+    it('debe retornar el usuario por ID cuando existe', async () => {
+      const mockUser = { id: 'uuid-10', email: 'user@test.com' };
+      mockUserRepository.findOne.mockResolvedValue(mockUser);
+
+      const result = await service.getUser('uuid-10');
+      expect(result).toEqual(mockUser);
+    });
+
+    it('debe retornar null si el usuario no existe', async () => {
+      mockUserRepository.findOne.mockResolvedValue(null);
+
+      const result = await service.getUser('uuid-not-found');
+      expect(result).toBeNull();
+    });
+  });
+
+  // 6. Test para updateUser
+  describe('updateUser', () => {
+    it('debe actualizar el usuario exitosamente incluyendo contraseña', async () => {
+      const existingUser = { id: 'uuid-1', email: 'old@test.com', password: 'oldHash' };
+      const updateDto = { email: 'new@test.com', password: 'newPass' };
+
+      mockUserRepository.findOne.mockResolvedValue(existingUser);
+      (bcrypt.genSalt as jest.Mock).mockResolvedValue('salt');
+      (bcrypt.hash as jest.Mock).mockResolvedValue('newHashedPass');
+      mockUserRepository.save.mockResolvedValue({ ...existingUser, email: 'new@test.com' });
+
+      const result = await service.updateUser('uuid-1', updateDto);
+      expect(result).toBeDefined();
+      expect(mockUserRepository.save).toHaveBeenCalled();
+    });
+
+    it('debe lanzar NotFoundException si el usuario no existe al actualizar', async () => {
+      mockUserRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.updateUser('uuid-000', { email: 'x@test.com' })).rejects.toThrow();
+    });
+  });
 });
